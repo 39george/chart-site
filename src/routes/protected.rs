@@ -44,6 +44,8 @@ async fn submit_song(
     admin_access::insert_new_song()
         .bind(
             &db_client,
+            &req.name,
+            &req.price,
             &req.primary_genre,
             &req.secondary_genre,
             &req.sex.to_string(),
