@@ -166,19 +166,14 @@ VALUES
 
 CREATE TABLE songs (
     id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
     primary_genre INTEGER NOT NULL REFERENCES genres(id) ON DELETE RESTRICT,
     secondary_genre INTEGER REFERENCES genres(id) ON DELETE RESTRICT,
     sex VARCHAR(6) NOT NULL CHECK (sex IN ('male', 'female')),
     tempo SMALLINT NOT NULL,
     key MusicKey NOT NULL,
     duration SMALLINT NOT NULL,
-    lyric VARCHAR(1000) NOT NULL
+    lyric VARCHAR(1000) NOT NULL,
+    cover_object_key VARCHAR(500) NOT NULL UNIQUE,
+    audio_object_key VARCHAR(500) NOT NULL UNIQUE
 );
-
-CREATE TABLE songs_genres (
-    id SERIAL PRIMARY KEY,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    genres_id INTEGER NOT NULL REFERENCES genres(id) ON DELETE RESTRICT,
-    song_id INTEGER DEFAULT NULL REFERENCES songs(id) ON DELETE CASCADE
-);
-
