@@ -1,0 +1,14 @@
+app_port: 8000
+app_addr: "127.0.0.1"
+app_base_url: "http://127.0.0.1:8000"
+database:
+  host: "mypg.orb.local"
+  port: 5432
+redis:
+  host: "myredis.orb.local"
+  port: 6379
+  db_number: 2
+object_storage:
+  endpoint_url: "http://garage.orb.local:3900"
+  region: "garage"
+  bucket_name: "chart-site-data"
