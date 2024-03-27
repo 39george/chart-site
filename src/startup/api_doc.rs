@@ -10,11 +10,11 @@ use utoipa::{
     Modify, OpenApi, ToResponse, ToSchema,
 };
 
-use crate::routes::open;
 use crate::{auth::users::Permission, domain::music_parameters::MusicKey};
 use crate::{
     domain::requests::SubmitSong, object_storage::presigned_post_form,
 };
+use crate::{domain::requests::UploadFileRequest, routes::open};
 use crate::{
     domain::{music_parameters::Sex, requests::Lyric},
     routes::development,
@@ -142,6 +142,8 @@ impl Modify for ServerAddon {
 #[openapi(
     paths(
         crate::routes::protected::submit_song,
+        crate::routes::protected::remove_song,
+        crate::routes::protected::upload_form,
         crate::auth::login::post::login,
         crate::auth::login::get::logout,
     ),
@@ -157,6 +159,7 @@ impl Modify for ServerAddon {
             Lyric,
             Sex,
             SubmitSong,
+            UploadFileRequest,
         ),
         responses(
             // Error responses

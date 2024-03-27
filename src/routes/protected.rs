@@ -1,5 +1,5 @@
 use anyhow::Context;
-use axum::extract::Path;
+use axum::extract::{Path, Query};
 use axum::Json;
 use axum::{extract::State, routing, Router};
 use axum_login::permission_required;
@@ -12,6 +12,7 @@ use crate::domain::object_key::ObjectKey;
 use crate::domain::requests::{SubmitSong, UploadFileRequest};
 use crate::object_storage::presigned_post_form::PresignedPostData;
 use crate::startup::AppState;
+use crate::trace_err;
 
 use super::{ResponseError, MAX_SIZES};
 
@@ -19,7 +20,7 @@ pub fn protected_router() -> Router<AppState> {
     Router::new()
         .route("/song", routing::post(submit_song))
         .route("/song/:id", routing::delete(remove_song))
-        .route("/upload", routing::post(upload_file))
+        .route("/upload_form", routing::get(upload_form))
         .layer(permission_required!(
             crate::auth::users::Backend,
             "administrator"
@@ -58,6 +59,7 @@ pub fn protected_router() -> Router<AppState> {
     tag = "protected.admins"
     
 )]
+#[tracing::instrument(name = "Submit new song", skip_all)]
 async fn submit_song(
     auth_session: AuthSession,
     State(state): State<AppState>,
@@ -93,6 +95,22 @@ async fn submit_song(
     Ok(StatusCode::CREATED)
 }
 
+#[utoipa::path(
+    delete,
+    path = "/api/protected/song/{id}",
+    responses(
+        (status = 200, description = "Song deleted successfully"),
+        (status = 403, description = "Forbidden"),
+        (status = 404, description = "Song not found"),
+        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+    
+)]
+#[tracing::instrument(name = "Delete song by id", skip_all)]
 async fn remove_song(
     auth_session: AuthSession,
     State(state): State<AppState>,
@@ -125,10 +143,27 @@ async fn remove_song(
     }
 }
 
-async fn upload_file(
+#[utoipa::path(
+    get,
+    path = "/api/protected/upload_form",
+    params(UploadFileRequest),
+    responses(
+        (status = 200, description = "Song deleted successfully"),
+        (status = 403, description = "Forbidden"),
+        (status = 404, description = "Song not found"),
+        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+    
+)]
+#[tracing::instrument(name = "Delete song by id", skip_all)]
+async fn upload_form(
     auth_session: AuthSession,
     State(state): State<AppState>,
-    Json(req): Json<UploadFileRequest>,
+    Query(req): Query<UploadFileRequest>,
 ) -> Result<Json<PresignedPostData>, ResponseError> {
     let admin = auth_session.user.ok_or(ResponseError::UnauthorizedError(
         anyhow::anyhow!("No such user in AuthSession!"),
