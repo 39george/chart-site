@@ -7,7 +7,7 @@ use garde::Validate;
 use http::StatusCode;
 
 use crate::auth::users::AuthSession;
-use crate::cornucopia::queries::{admin_access, open_access};
+use crate::cornucopia::queries::admin_access;
 use crate::domain::object_key::ObjectKey;
 use crate::domain::requests::{SubmitSong, UploadFileRequest};
 use crate::object_storage::presigned_post_form::PresignedPostData;
@@ -26,6 +26,38 @@ pub fn protected_router() -> Router<AppState> {
         ))
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/protected/song",
+    request_body(
+        content = SubmitSong,
+        content_type = "application/Json",
+        example = json!({
+            "name": "song_name",
+            "price": "3000.0",
+            "primary_genre": "абстрактный",
+            "secondary_genre":"свинг",
+            "sex": "Male",
+            "tempo": 100,
+            "key": "a_minor",
+            "duration": 300,
+            "lyric": "Some lyric...",
+            "cover_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8b:image.png",
+            "audio_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8e:song.mp3",
+        }),
+        
+    ),
+    responses(
+        (status = 201, description = "Song submitted successfully"),
+        (status = 403, description = "Forbidden"),
+        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+    
+)]
 async fn submit_song(
     auth_session: AuthSession,
     State(state): State<AppState>,

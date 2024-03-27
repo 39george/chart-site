@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use garde::Validate;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -77,6 +79,7 @@ pub struct SubmitSong {
     #[schema(minimum = 40, maximum = 320)]
     pub tempo: i16,
     pub key: MusicKey,
+    /// You should pass duration in seconds
     #[garde(range(min = MIN_AUDIO_DURATION_SEC, max = MAX_AUDIO_DURATION_SEC))]
     #[schema(minimum = 15, maximum = 600)]
     pub duration: i16,

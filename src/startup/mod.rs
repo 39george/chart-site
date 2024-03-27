@@ -134,6 +134,17 @@ impl Application {
             settings,
         };
 
+        // Set 'secure' attribute for cookies
+        let with_secure = if let Ok(e) = std::env::var("ENVIRONMENT") {
+            if e.eq("development") {
+                false
+            } else {
+                true
+            }
+        } else {
+            true
+        };
+
         // This uses `tower-sessions` to establish a layer that will provide the session
         // as a request extension.
         let session_store = tower_sessions_redis_store::RedisStore::new(
@@ -141,6 +152,7 @@ impl Application {
         );
         let session_layer =
             axum_login::tower_sessions::SessionManagerLayer::new(session_store)
+                .with_secure(with_secure)
                 .with_expiry(axum_login::tower_sessions::Expiry::OnInactivity(
                     time::Duration::days(1),
                 ));
