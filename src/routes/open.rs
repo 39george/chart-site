@@ -1,6 +1,7 @@
 use anyhow::Context;
 use axum::Json;
 use axum::{extract::State, routing, Router};
+use http::StatusCode;
 
 use crate::auth::users::AuthSession;
 use crate::cornucopia::queries::open_access::{self, FetchSongs};
@@ -12,6 +13,7 @@ pub fn open_router() -> Router<AppState> {
     Router::new()
         .route("/songs", routing::get(fetch_songs))
         .route("/genres", routing::get(genres))
+        .route("/healthcheck", routing::get(|| async { StatusCode::OK }))
 }
 
 async fn fetch_songs(
