@@ -16,4 +16,4 @@ VALUES (
 
 --! remove_song_by_id
 DELETE FROM songs
-WHERE id = :id;
+WHERE id = :id RETURNING songs.cover_object_key, songs.audio_object_key;

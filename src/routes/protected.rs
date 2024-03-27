@@ -107,11 +107,22 @@ async fn remove_song(
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
-    admin_access::remove_song_by_id()
+    let song = admin_access::remove_song_by_id()
         .bind(&db_client, &id)
+        .opt()
         .await
         .context("Failed to remove song by id")?;
-    Ok(StatusCode::OK)
+    if let Some(song) = song {
+        if let Ok(key) = trace_err!(song.cover_object_key.parse()) {
+            trace_err!(state.object_storage.delete_object_by_key(&key).await, ());
+        }
+        if let Ok(key) = trace_err!(song.cover_object_key.parse()) {
+            trace_err!(state.object_storage.delete_object_by_key(&key).await, ());
+        }
+        Ok(StatusCode::OK)
+    } else {
+        Err(ResponseError::NotFoundError(anyhow::anyhow!("No song with id: {id}"), "Song not found"))
+    }
 }
 
 async fn upload_file(
