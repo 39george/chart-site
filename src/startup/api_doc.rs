@@ -10,7 +10,11 @@ use utoipa::{
     Modify, OpenApi, ToResponse, ToSchema,
 };
 
-use crate::{auth::users::Permission, domain::music_parameters::MusicKey};
+use crate::{
+    auth::users::Permission, domain::music_parameters::MusicKey,
+    object_storage::presigned_post_form::PresignedPostData,
+    routes::development::InputWithFiles,
+};
 use crate::{
     domain::requests::SubmitSong, object_storage::presigned_post_form,
 };
@@ -78,7 +82,7 @@ pub struct ConflictErrorResponse;
 
 // ───── Responses ────────────────────────────────────────────────────────── //
 
-#[derive(ToResponse)]
+#[derive(ToResponse, ToSchema)]
 #[response(description = "Song data")]
 pub struct FetchSongs {
     pub song_id: i32,
@@ -159,6 +163,7 @@ impl Modify for ServerAddon {
         crate::routes::protected::remove_data,
         crate::auth::login::post::login,
         crate::auth::login::get::logout,
+        crate::routes::development::upload_file,
     ),
     components(
         schemas(
@@ -172,6 +177,9 @@ impl Modify for ServerAddon {
             Sex,
             SubmitSong,
             UploadFileRequest,
+            InputWithFiles,
+            FetchSongs,
+            PresignedPostData,
         ),
         responses(
             // Error responses
@@ -186,6 +194,7 @@ impl Modify for ServerAddon {
             crate::object_storage::presigned_post_form::PresignedPostData,
             FetchSongs,
             Permission,
+            PresignedPostData,
         )
     ),
     modifiers(&ServerAddon),
