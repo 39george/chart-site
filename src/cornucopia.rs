@@ -53,7 +53,54 @@
 } }}#[allow(clippy :: all, clippy :: pedantic)] #[allow(unused_variables)]
 #[allow(unused_imports)] #[allow(dead_code)] pub mod queries
 { pub mod admin_access
-{ use futures::{{StreamExt, TryStreamExt}};use futures; use cornucopia_async::GenericClient;#[derive( Debug)] pub struct InsertNewSongParams < T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,T6 : cornucopia_async::StringSql,T7 : cornucopia_async::StringSql,> { pub name : T1,pub price : rust_decimal::Decimal,pub primary_genre : T2,pub secondary_genre : Option<T3>,pub sex : T4,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : T5,pub cover_obj_key : T6,pub audio_obj_key : T7,}#[derive(serde::Serialize, Debug, Clone, PartialEq, )] pub struct RemoveSongById
+{ use futures::{{StreamExt, TryStreamExt}};use futures; use cornucopia_async::GenericClient;#[derive( Debug)] pub struct InsertNewSongParams < T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,T6 : cornucopia_async::StringSql,T7 : cornucopia_async::StringSql,> { pub name : T1,pub price : rust_decimal::Decimal,pub primary_genre : T2,pub secondary_genre : Option<T3>,pub sex : T4,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : T5,pub cover_obj_key : T6,pub audio_obj_key : T7,}#[derive( Debug)] pub struct UpdateSongParams < T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,T6 : cornucopia_async::StringSql,T7 : cornucopia_async::StringSql,> { pub name : T1,pub price : rust_decimal::Decimal,pub primary_genre : T2,pub secondary_genre : Option<T3>,pub sex : T4,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : T5,pub cover_object_key : T6,pub audio_object_key : T7,pub id : i32,}#[derive(serde::Serialize, Debug, Clone, PartialEq, )] pub struct GetSongObjectKeysById
+{ pub cover_object_key : String,pub audio_object_key : String,}pub struct GetSongObjectKeysByIdBorrowed < 'a >
+{ pub cover_object_key : &'a str,pub audio_object_key : &'a str,} impl < 'a > From < GetSongObjectKeysByIdBorrowed <
+'a >> for GetSongObjectKeysById
+{
+    fn
+    from(GetSongObjectKeysByIdBorrowed { cover_object_key,audio_object_key,} : GetSongObjectKeysByIdBorrowed < 'a >)
+    -> Self { Self { cover_object_key: cover_object_key.into(),audio_object_key: audio_object_key.into(),} }
+}pub struct GetSongObjectKeysByIdQuery < 'a, C : GenericClient, T, const N : usize >
+{
+    client : & 'a  C, params :
+    [& 'a (dyn postgres_types :: ToSql + Sync) ; N], stmt : & 'a mut cornucopia_async
+    :: private :: Stmt, extractor : fn(& tokio_postgres :: Row) -> GetSongObjectKeysByIdBorrowed,
+    mapper : fn(GetSongObjectKeysByIdBorrowed) -> T,
+} impl < 'a, C, T : 'a, const N : usize > GetSongObjectKeysByIdQuery < 'a, C, T, N >
+where C : GenericClient
+{
+    pub fn map < R > (self, mapper : fn(GetSongObjectKeysByIdBorrowed) -> R) -> GetSongObjectKeysByIdQuery
+    < 'a, C, R, N >
+    {
+        GetSongObjectKeysByIdQuery
+        {
+            client : self.client, params : self.params, stmt : self.stmt,
+            extractor : self.extractor, mapper,
+        }
+    } pub async fn one(self) -> Result < T, tokio_postgres :: Error >
+    {
+        let stmt = self.stmt.prepare(self.client) .await ? ; let row =
+        self.client.query_one(stmt, & self.params) .await ? ;
+        Ok((self.mapper) ((self.extractor) (& row)))
+    } pub async fn all(self) -> Result < Vec < T >, tokio_postgres :: Error >
+    { self.iter() .await ?.try_collect().await } pub async fn opt(self) -> Result
+    < Option < T >, tokio_postgres :: Error >
+    {
+        let stmt = self.stmt.prepare(self.client) .await ? ;
+        Ok(self.client.query_opt(stmt, & self.params) .await
+        ?.map(| row | (self.mapper) ((self.extractor) (& row))))
+    } pub async fn iter(self,) -> Result < impl futures::Stream < Item = Result
+    < T, tokio_postgres :: Error >> + 'a, tokio_postgres :: Error >
+    {
+        let stmt = self.stmt.prepare(self.client) .await ? ; let it =
+        self.client.query_raw(stmt, cornucopia_async :: private ::
+        slice_iter(& self.params)) .await ?
+        .map(move | res |
+        res.map(| row | (self.mapper) ((self.extractor) (& row)))) .into_stream() ;
+        Ok(it)
+    }
+}#[derive(serde::Serialize, Debug, Clone, PartialEq, )] pub struct RemoveSongById
 { pub cover_object_key : String,pub audio_object_key : String,}pub struct RemoveSongByIdBorrowed < 'a >
 { pub cover_object_key : &'a str,pub audio_object_key : &'a str,} impl < 'a > From < RemoveSongByIdBorrowed <
 'a >> for RemoveSongById
@@ -130,6 +177,49 @@ u64, tokio_postgres :: Error > > + Send + 'a>>, C > for InsertNewSongStmt
     params(& 'a mut self, client : & 'a  C, params : & 'a
     InsertNewSongParams < T1,T2,T3,T4,T5,T6,T7,>) -> std::pin::Pin<Box<dyn futures::Future<Output = Result < u64, tokio_postgres ::
     Error > > + Send + 'a>> { Box::pin(self.bind(client, & params.name,& params.price,& params.primary_genre,& params.secondary_genre,& params.sex,& params.tempo,& params.key,& params.duration,& params.lyric,& params.cover_obj_key,& params.audio_obj_key,) ) }
+}pub fn get_song_object_keys_by_id() -> GetSongObjectKeysByIdStmt
+{ GetSongObjectKeysByIdStmt(cornucopia_async :: private :: Stmt :: new("SELECT cover_object_key, audio_object_key FROM songs
+WHERE songs.id = $1")) } pub
+struct GetSongObjectKeysByIdStmt(cornucopia_async :: private :: Stmt) ; impl
+GetSongObjectKeysByIdStmt { pub fn bind < 'a, C : GenericClient, >
+(& 'a mut self, client : & 'a  C,
+id : & 'a i32,) -> GetSongObjectKeysByIdQuery < 'a, C,
+GetSongObjectKeysById, 1 >
+{
+    GetSongObjectKeysByIdQuery
+    {
+        client, params : [id,], stmt : & mut self.0, extractor :
+        | row | { GetSongObjectKeysByIdBorrowed { cover_object_key : row.get(0),audio_object_key : row.get(1),} }, mapper : | it | { <GetSongObjectKeysById>::from(it) },
+    }
+} }pub fn update_song() -> UpdateSongStmt
+{ UpdateSongStmt(cornucopia_async :: private :: Stmt :: new("UPDATE songs
+    SET name = $1,
+        price = $2,
+        primary_genre = (SELECT id FROM genres WHERE name = $3),
+        secondary_genre = (SELECT id FROM genres WHERE name = $4),
+        sex = $5,
+        tempo = $6,
+        key = $7,
+        duration = $8,
+        lyric = $9,
+        cover_object_key = $10,
+        audio_object_key = $11
+WHERE songs.id = $12")) } pub
+struct UpdateSongStmt(cornucopia_async :: private :: Stmt) ; impl
+UpdateSongStmt { pub async fn bind < 'a, C : GenericClient, T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,T6 : cornucopia_async::StringSql,T7 : cornucopia_async::StringSql,>
+(& 'a mut self, client : & 'a  C,
+name : & 'a T1,price : & 'a rust_decimal::Decimal,primary_genre : & 'a T2,secondary_genre : & 'a Option<T3>,sex : & 'a T4,tempo : & 'a i16,key : & 'a super::super::types::public::Musickey,duration : & 'a i16,lyric : & 'a T5,cover_object_key : & 'a T6,audio_object_key : & 'a T7,id : & 'a i32,) -> Result < u64, tokio_postgres :: Error >
+{
+    let stmt = self.0.prepare(client) .await ? ;
+    client.execute(stmt, & [name,price,primary_genre,secondary_genre,sex,tempo,key,duration,lyric,cover_object_key,audio_object_key,id,]) .await
+} }impl < 'a, C : GenericClient + Send + Sync, T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,T6 : cornucopia_async::StringSql,T7 : cornucopia_async::StringSql,>
+cornucopia_async :: Params < 'a, UpdateSongParams < T1,T2,T3,T4,T5,T6,T7,>, std::pin::Pin<Box<dyn futures::Future<Output = Result <
+u64, tokio_postgres :: Error > > + Send + 'a>>, C > for UpdateSongStmt
+{
+    fn
+    params(& 'a mut self, client : & 'a  C, params : & 'a
+    UpdateSongParams < T1,T2,T3,T4,T5,T6,T7,>) -> std::pin::Pin<Box<dyn futures::Future<Output = Result < u64, tokio_postgres ::
+    Error > > + Send + 'a>> { Box::pin(self.bind(client, & params.name,& params.price,& params.primary_genre,& params.secondary_genre,& params.sex,& params.tempo,& params.key,& params.duration,& params.lyric,& params.cover_object_key,& params.audio_object_key,& params.id,) ) }
 }pub fn remove_song_by_id() -> RemoveSongByIdStmt
 { RemoveSongByIdStmt(cornucopia_async :: private :: Stmt :: new("DELETE FROM songs
 WHERE id = $1 RETURNING songs.cover_object_key, songs.audio_object_key")) } pub
@@ -144,15 +234,53 @@ RemoveSongById, 1 >
         client, params : [id,], stmt : & mut self.0, extractor :
         | row | { RemoveSongByIdBorrowed { cover_object_key : row.get(0),audio_object_key : row.get(1),} }, mapper : | it | { <RemoveSongById>::from(it) },
     }
+} }pub fn insert_genre() -> InsertGenreStmt
+{ InsertGenreStmt(cornucopia_async :: private :: Stmt :: new("INSERT INTO genres(name)
+VALUES ($1)")) } pub
+struct InsertGenreStmt(cornucopia_async :: private :: Stmt) ; impl
+InsertGenreStmt { pub async fn bind < 'a, C : GenericClient, T1 : cornucopia_async::StringSql,>
+(& 'a mut self, client : & 'a  C,
+name : & 'a T1,) -> Result < u64, tokio_postgres :: Error >
+{
+    let stmt = self.0.prepare(client) .await ? ;
+    client.execute(stmt, & [name,]) .await
+} }pub fn remove_genre() -> RemoveGenreStmt
+{ RemoveGenreStmt(cornucopia_async :: private :: Stmt :: new("DELETE FROM genres WHERE name = $1")) } pub
+struct RemoveGenreStmt(cornucopia_async :: private :: Stmt) ; impl
+RemoveGenreStmt { pub async fn bind < 'a, C : GenericClient, T1 : cornucopia_async::StringSql,>
+(& 'a mut self, client : & 'a  C,
+name : & 'a T1,) -> Result < u64, tokio_postgres :: Error >
+{
+    let stmt = self.0.prepare(client) .await ? ;
+    client.execute(stmt, & [name,]) .await
+} }pub fn insert_mood() -> InsertMoodStmt
+{ InsertMoodStmt(cornucopia_async :: private :: Stmt :: new("INSERT INTO moods(name)
+VALUES ($1)")) } pub
+struct InsertMoodStmt(cornucopia_async :: private :: Stmt) ; impl
+InsertMoodStmt { pub async fn bind < 'a, C : GenericClient, T1 : cornucopia_async::StringSql,>
+(& 'a mut self, client : & 'a  C,
+name : & 'a T1,) -> Result < u64, tokio_postgres :: Error >
+{
+    let stmt = self.0.prepare(client) .await ? ;
+    client.execute(stmt, & [name,]) .await
+} }pub fn remove_mood() -> RemoveMoodStmt
+{ RemoveMoodStmt(cornucopia_async :: private :: Stmt :: new("DELETE FROM moods WHERE name = $1")) } pub
+struct RemoveMoodStmt(cornucopia_async :: private :: Stmt) ; impl
+RemoveMoodStmt { pub async fn bind < 'a, C : GenericClient, T1 : cornucopia_async::StringSql,>
+(& 'a mut self, client : & 'a  C,
+name : & 'a T1,) -> Result < u64, tokio_postgres :: Error >
+{
+    let stmt = self.0.prepare(client) .await ? ;
+    client.execute(stmt, & [name,]) .await
 } }}pub mod open_access
 { use futures::{{StreamExt, TryStreamExt}};use futures; use cornucopia_async::GenericClient;#[derive(serde::Serialize, Debug, Clone, PartialEq, )] pub struct FetchSongs
-{ pub song_name : String,pub primary_genre : String,pub secondary_genre : String,pub sex : String,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : String,}pub struct FetchSongsBorrowed < 'a >
-{ pub song_name : &'a str,pub primary_genre : &'a str,pub secondary_genre : &'a str,pub sex : &'a str,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : &'a str,} impl < 'a > From < FetchSongsBorrowed <
+{ pub song_id : i32,pub song_rating : Option<i32>,pub song_name : String,pub primary_genre : String,pub secondary_genre : String,pub cover_url : String,pub sex : String,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : String,}pub struct FetchSongsBorrowed < 'a >
+{ pub song_id : i32,pub song_rating : Option<i32>,pub song_name : &'a str,pub primary_genre : &'a str,pub secondary_genre : &'a str,pub cover_url : &'a str,pub sex : &'a str,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : &'a str,} impl < 'a > From < FetchSongsBorrowed <
 'a >> for FetchSongs
 {
     fn
-    from(FetchSongsBorrowed { song_name,primary_genre,secondary_genre,sex,tempo,key,duration,lyric,} : FetchSongsBorrowed < 'a >)
-    -> Self { Self { song_name: song_name.into(),primary_genre: primary_genre.into(),secondary_genre: secondary_genre.into(),sex: sex.into(),tempo,key,duration,lyric: lyric.into(),} }
+    from(FetchSongsBorrowed { song_id,song_rating,song_name,primary_genre,secondary_genre,cover_url,sex,tempo,key,duration,lyric,} : FetchSongsBorrowed < 'a >)
+    -> Self { Self { song_id,song_rating,song_name: song_name.into(),primary_genre: primary_genre.into(),secondary_genre: secondary_genre.into(),cover_url: cover_url.into(),sex: sex.into(),tempo,key,duration,lyric: lyric.into(),} }
 }pub struct FetchSongsQuery < 'a, C : GenericClient, T, const N : usize >
 {
     client : & 'a  C, params :
@@ -232,10 +360,13 @@ where C : GenericClient
         Ok(it)
     }
 }pub fn fetch_songs() -> FetchSongsStmt
-{ FetchSongsStmt(cornucopia_async :: private :: Stmt :: new("SELECT 
+{ FetchSongsStmt(cornucopia_async :: private :: Stmt :: new("SELECT
+    songs.id AS song_id,
+    songs.rating AS song_rating,
     songs.name AS song_name,
     p.name AS primary_genre,
     s.name AS secondary_genre,
+    songs.cover_object_key AS cover_url,
     sex,
     tempo,
     key,
@@ -253,10 +384,10 @@ FetchSongs, 0 >
     FetchSongsQuery
     {
         client, params : [], stmt : & mut self.0, extractor :
-        | row | { FetchSongsBorrowed { song_name : row.get(0),primary_genre : row.get(1),secondary_genre : row.get(2),sex : row.get(3),tempo : row.get(4),key : row.get(5),duration : row.get(6),lyric : row.get(7),} }, mapper : | it | { <FetchSongs>::from(it) },
+        | row | { FetchSongsBorrowed { song_id : row.get(0),song_rating : row.get(1),song_name : row.get(2),primary_genre : row.get(3),secondary_genre : row.get(4),cover_url : row.get(5),sex : row.get(6),tempo : row.get(7),key : row.get(8),duration : row.get(9),lyric : row.get(10),} }, mapper : | it | { <FetchSongs>::from(it) },
     }
 } }pub fn list_genres() -> ListGenresStmt
-{ ListGenresStmt(cornucopia_async :: private :: Stmt :: new("SELECT name from genres ORDER BY name")) } pub
+{ ListGenresStmt(cornucopia_async :: private :: Stmt :: new("SELECT name FROM genres ORDER BY name")) } pub
 struct ListGenresStmt(cornucopia_async :: private :: Stmt) ; impl
 ListGenresStmt { pub fn bind < 'a, C : GenericClient, >
 (& 'a mut self, client : & 'a  C,
@@ -266,6 +397,33 @@ String, 0 >
     StringQuery
     {
         client, params : [], stmt : & mut self.0, extractor :
+        | row | { row.get(0) }, mapper : | it | { it.into() },
+    }
+} }pub fn list_moods() -> ListMoodsStmt
+{ ListMoodsStmt(cornucopia_async :: private :: Stmt :: new("SELECT name FROM moods ORDER BY name")) } pub
+struct ListMoodsStmt(cornucopia_async :: private :: Stmt) ; impl
+ListMoodsStmt { pub fn bind < 'a, C : GenericClient, >
+(& 'a mut self, client : & 'a  C,
+) -> StringQuery < 'a, C,
+String, 0 >
+{
+    StringQuery
+    {
+        client, params : [], stmt : & mut self.0, extractor :
+        | row | { row.get(0) }, mapper : | it | { it.into() },
+    }
+} }pub fn get_song_audio_obj_key_by_id() -> GetSongAudioObjKeyByIdStmt
+{ GetSongAudioObjKeyByIdStmt(cornucopia_async :: private :: Stmt :: new("SELECT audio_object_key FROM songs
+WHERE songs.id = $1")) } pub
+struct GetSongAudioObjKeyByIdStmt(cornucopia_async :: private :: Stmt) ; impl
+GetSongAudioObjKeyByIdStmt { pub fn bind < 'a, C : GenericClient, >
+(& 'a mut self, client : & 'a  C,
+id : & 'a i32,) -> StringQuery < 'a, C,
+String, 1 >
+{
+    StringQuery
+    {
+        client, params : [id,], stmt : & mut self.0, extractor :
         | row | { row.get(0) }, mapper : | it | { it.into() },
     }
 } }}pub mod user_auth_queries
