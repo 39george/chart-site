@@ -274,13 +274,13 @@ name : & 'a T1,) -> Result < u64, tokio_postgres :: Error >
     client.execute(stmt, & [name,]) .await
 } }}pub mod open_access
 { use futures::{{StreamExt, TryStreamExt}};use futures; use cornucopia_async::GenericClient;#[derive(serde::Serialize, Debug, Clone, PartialEq, )] pub struct FetchSongs
-{ pub song_id : i32,pub song_rating : Option<i32>,pub song_name : String,pub primary_genre : String,pub secondary_genre : String,pub cover_url : String,pub sex : String,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : String,}pub struct FetchSongsBorrowed < 'a >
-{ pub song_id : i32,pub song_rating : Option<i32>,pub song_name : &'a str,pub primary_genre : &'a str,pub secondary_genre : &'a str,pub cover_url : &'a str,pub sex : &'a str,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : &'a str,} impl < 'a > From < FetchSongsBorrowed <
+{ pub song_id : i32,pub song_rating : Option<i32>,pub song_name : String,pub primary_genre : String,pub secondary_genre : Option<String>,pub cover_url : String,pub sex : String,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : String,}pub struct FetchSongsBorrowed < 'a >
+{ pub song_id : i32,pub song_rating : Option<i32>,pub song_name : &'a str,pub primary_genre : &'a str,pub secondary_genre : Option<&'a str>,pub cover_url : &'a str,pub sex : &'a str,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : &'a str,} impl < 'a > From < FetchSongsBorrowed <
 'a >> for FetchSongs
 {
     fn
     from(FetchSongsBorrowed { song_id,song_rating,song_name,primary_genre,secondary_genre,cover_url,sex,tempo,key,duration,lyric,} : FetchSongsBorrowed < 'a >)
-    -> Self { Self { song_id,song_rating,song_name: song_name.into(),primary_genre: primary_genre.into(),secondary_genre: secondary_genre.into(),cover_url: cover_url.into(),sex: sex.into(),tempo,key,duration,lyric: lyric.into(),} }
+    -> Self { Self { song_id,song_rating,song_name: song_name.into(),primary_genre: primary_genre.into(),secondary_genre: secondary_genre.map(|v| v.into()),cover_url: cover_url.into(),sex: sex.into(),tempo,key,duration,lyric: lyric.into(),} }
 }pub struct FetchSongsQuery < 'a, C : GenericClient, T, const N : usize >
 {
     client : & 'a  C, params :

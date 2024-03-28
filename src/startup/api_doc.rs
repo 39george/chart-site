@@ -85,7 +85,7 @@ pub struct FetchSongs {
     pub song_rating: Option<i32>,
     pub song_name: String,
     pub primary_genre: String,
-    pub secondary_genre: String,
+    pub secondary_genre: Option<String>,
     pub cover_url: String,
     pub sex: String,
     pub tempo: i16,

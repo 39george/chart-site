@@ -1,4 +1,4 @@
---! fetch_songs : (song_rating?)
+--! fetch_songs : (secondary_genre?, song_rating?)
 SELECT
     songs.id AS song_id,
     songs.rating AS song_rating,
