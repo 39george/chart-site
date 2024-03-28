@@ -3,7 +3,6 @@ use axum::extract::{Path, Query};
 use axum::Json;
 use axum::{extract::State, routing, Router};
 use axum_login::permission_required;
-use cornucopia_async::GenericClient;
 use garde::Validate;
 use http::StatusCode;
 use anyhow::anyhow;
@@ -13,7 +12,7 @@ use crate::cornucopia::queries::admin_access;
 use crate::domain::object_key::ObjectKey;
 use crate::domain::requests::{SubmitSong, UploadFileRequest};
 use crate::object_storage::presigned_post_form::PresignedPostData;
-use crate::startup::api_doc::{ForbiddenResponse, InternalErrorResponse, NotFoundResponse};
+use crate::startup::api_doc::{BadRequestResponse, ForbiddenResponse, InternalErrorResponse, NotFoundResponse};
 use crate::startup::AppState;
 use crate::trace_err;
 
@@ -25,10 +24,8 @@ pub fn protected_router() -> Router<AppState> {
         .route("/song", routing::post(submit_song))
         .route("/song/:id", routing::delete(remove_song))
         .route("/song/:id", routing::put(update_song))
-        .route("/genres", routing::post(add_genres))
-        .route("/genres", routing::delete(remove_genres))
-        .route("/moods", routing::post(add_moods))
-        .route("/moods", routing::delete(remove_moods))
+        .route("/:what", routing::post(add_data))
+        .route("/:what", routing::delete(remove_data))
         .layer(permission_required!(
             crate::auth::users::Backend,
             "administrator"
@@ -292,15 +289,16 @@ async fn upload_form(
     Ok(Json(presigned_post_data))
 }
 
-/// Add new genres
+/// Add new genres or moods
 #[utoipa::path(
     post,
-    path = "/api/protected/genres",
+    path = "/api/protected/{what}",
     request_body(
-        content = Vec<String>, description = "Json array with genres to add", content_type = "application/json"
+        content = Vec<String>, description = "Json array with data to add", content_type = "application/json"
     ),
     responses(
-        (status = 200, description = "Inserted genres successfully"),
+        (status = 200, description = "Inserted data successfully"),
+        (status = 400, response = BadRequestResponse),
         (status = 403, response = ForbiddenResponse),
         (status = 500, response = InternalErrorResponse)
     ),
@@ -310,10 +308,11 @@ async fn upload_form(
     tag = "protected.admins"
     
 )]
-#[tracing::instrument(name = "Add genres", skip_all)]
-async fn add_genres(
+#[tracing::instrument(name = "Add data (genres or moods)", skip_all)]
+async fn add_data(
     State(state): State<AppState>,
-    Json(genres): Json<Vec<String>>,
+    Path(what): Path<String>,
+    Json(data): Json<Vec<String>>,
 ) -> Result<StatusCode, ResponseError> {
     let db_client = state
         .pg_pool
@@ -322,21 +321,33 @@ async fn add_genres(
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
 
-    for genre in genres {
-        admin_access::insert_genre().bind(&db_client, &genre).await.context("Failed to insert genre")?;
-    } 
+    match what.as_str() {
+        "genres" => {
+            for genre in data {
+                admin_access::insert_genre().bind(&db_client, &genre).await.context("Failed to insert genre")?;
+            } 
+        }
+        "moods" => {
+            for mood in data{
+                admin_access::insert_mood().bind(&db_client, &mood).await.context("Failed to insert genre")?;
+            } 
+        }
+        _ => return Err(ResponseError::BadRequest(anyhow!("Only genres and moods available, given: {what}")))
+    }
+
     Ok(StatusCode::OK)
 }
 
-/// Remove existing genres
+/// Remove existing genres or moods
 #[utoipa::path(
     delete,
-    path = "/api/protected/genres",
+    path = "/api/protected/{what}",
     request_body(
-        content = Vec<String>, description = "Json array with genres to remove", content_type = "application/json"
+        content = Vec<String>, description = "Json array with data to remove", content_type = "application/json"
     ),
     responses(
-        (status = 200, description = "Removed genres successfully"),
+        (status = 200, description = "Removed data successfully"),
+        (status = 400, response = BadRequestResponse),
         (status = 403, response = ForbiddenResponse),
         (status = 500, response = InternalErrorResponse)
     ),
@@ -347,9 +358,10 @@ async fn add_genres(
     
 )]
 #[tracing::instrument(name = "Delete genres", skip_all)]
-async fn remove_genres(
+async fn remove_data(
     State(state): State<AppState>,
-    Json(genres): Json<Vec<String>>,
+    Path(what): Path<String>,
+    Json(data): Json<Vec<String>>,
 ) -> Result<StatusCode, ResponseError> {
     let db_client = state
         .pg_pool
@@ -358,80 +370,18 @@ async fn remove_genres(
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
 
-    for genre in genres {
-        admin_access::remove_genre().bind(&db_client, &genre).await.context("Failed to remove genre")?;
-    } 
-    Ok(StatusCode::OK)
-}
-
-/// Add new moods
-#[utoipa::path(
-    post,
-    path = "/api/protected/moods",
-    request_body(
-        content = Vec<String>, description = "Json array with moods to add", content_type = "application/json"
-    ),
-    responses(
-        (status = 200, description = "Inserted moods successfully"),
-        (status = 403, response = ForbiddenResponse),
-        (status = 500, response = InternalErrorResponse)
-    ),
-    security(
-        ("api_key" = [])
-    ),
-    tag = "protected.admins"
-    
-)]
-#[tracing::instrument(name = "Add moods", skip_all)]
-async fn add_moods(
-    State(state): State<AppState>,
-    Json(moods): Json<Vec<String>>,
-) -> Result<StatusCode, ResponseError> {
-    let db_client = state
-        .pg_pool
-        .get()
-        .await
-        .context("Failed to get connection from postgres pool")
-        .map_err(ResponseError::UnexpectedError)?;
-
-    for mood in moods{
-        admin_access::insert_mood().bind(&db_client, &mood).await.context("Failed to insert genre")?;
-    } 
-    Ok(StatusCode::OK)
-}
-
-/// Remove existing moods
-#[utoipa::path(
-    delete,
-    path = "/api/protected/moods",
-    request_body(
-        content = Vec<String>, description = "Json array with moods to remove", content_type = "application/json"
-    ),
-    responses(
-        (status = 200, description = "Removed moods successfully"),
-        (status = 403, response = ForbiddenResponse),
-        (status = 500, response = InternalErrorResponse)
-    ),
-    security(
-        ("api_key" = [])
-    ),
-    tag = "protected.admins"
-    
-)]
-#[tracing::instrument(name = "Remove moods", skip_all)]
-async fn remove_moods(
-    State(state): State<AppState>,
-    Json(moods): Json<Vec<String>>,
-) -> Result<StatusCode, ResponseError> {
-    let db_client = state
-        .pg_pool
-        .get()
-        .await
-        .context("Failed to get connection from postgres pool")
-        .map_err(ResponseError::UnexpectedError)?;
-
-    for mood in moods{
-        admin_access::remove_mood().bind(&db_client, &mood).await.context("Failed to remove mood")?;
-    } 
+    match what.as_str() {
+        "genres" => {
+            for genre in data {
+                admin_access::remove_genre().bind(&db_client, &genre).await.context("Failed to remove genre")?;
+            } 
+        }
+        "moods" => {
+            for mood in data {
+                admin_access::remove_mood().bind(&db_client, &mood).await.context("Failed to remove mood")?;
+            } 
+        }
+        _ => return Err(ResponseError::BadRequest(anyhow!("Only genres and moods available, given: {what}")))
+    }
     Ok(StatusCode::OK)
 }
