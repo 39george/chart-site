@@ -141,9 +141,14 @@ impl Modify for ServerAddon {
 #[derive(OpenApi)]
 #[openapi(
     paths(
+        crate::routes::protected::upload_form,
         crate::routes::protected::submit_song,
         crate::routes::protected::remove_song,
-        crate::routes::protected::upload_form,
+        crate::routes::protected::update_song,
+        crate::routes::protected::add_genres,
+        crate::routes::protected::remove_genres,
+        crate::routes::protected::add_moods,
+        crate::routes::protected::remove_moods,
         crate::auth::login::post::login,
         crate::auth::login::get::logout,
     ),
