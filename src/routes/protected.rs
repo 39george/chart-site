@@ -13,7 +13,7 @@ use crate::cornucopia::queries::admin_access;
 use crate::domain::object_key::ObjectKey;
 use crate::domain::requests::{SubmitSong, UploadFileRequest};
 use crate::object_storage::presigned_post_form::PresignedPostData;
-use crate::startup::api_doc::NotFoundResponse;
+use crate::startup::api_doc::{ForbiddenResponse, InternalErrorResponse, NotFoundResponse};
 use crate::startup::AppState;
 use crate::trace_err;
 
@@ -59,8 +59,8 @@ pub fn protected_router() -> Router<AppState> {
     ),
     responses(
         (status = 201, description = "Song submitted successfully"),
-        (status = 403, description = "Forbidden"),
-        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+        (status = 403, response = ForbiddenResponse),
+        (status = 500, response = InternalErrorResponse)
     ),
     security(
         ("api_key" = [])
@@ -127,9 +127,9 @@ async fn submit_song(
     ),
     responses(
         (status = 200, description = "Song updated successfully"),
-        (status = 403, description = "Forbidden"),
+        (status = 403, response = ForbiddenResponse),
         (status = 404, response = NotFoundResponse),
-        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+        (status = 500, response = InternalErrorResponse)
     ),
     security(
         ("api_key" = [])
@@ -199,9 +199,9 @@ async fn update_song(
     path = "/api/protected/song/{id}",
     responses(
         (status = 200, description = "Song deleted successfully"),
-        (status = 403, description = "Forbidden"),
-        (status = 404, description = "Song not found"),
-        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+        (status = 403, response = ForbiddenResponse),
+        (status = 404, response = NotFoundResponse),
+        (status = 500, response = InternalErrorResponse)
     ),
     security(
         ("api_key" = [])
@@ -248,9 +248,9 @@ async fn remove_song(
     params(UploadFileRequest),
     responses(
         (status = 200, description = "Song deleted successfully"),
-        (status = 403, description = "Forbidden"),
-        (status = 404, description = "Song not found"),
-        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+        (status = 403, response = ForbiddenResponse),
+        (status = 404, response = NotFoundResponse),
+        (status = 500, response = InternalErrorResponse)
     ),
     security(
         ("api_key" = [])
@@ -301,8 +301,8 @@ async fn upload_form(
     ),
     responses(
         (status = 200, description = "Inserted genres successfully"),
-        (status = 403, description = "Forbidden"),
-        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+        (status = 403, response = ForbiddenResponse),
+        (status = 500, response = InternalErrorResponse)
     ),
     security(
         ("api_key" = [])
@@ -337,8 +337,8 @@ async fn add_genres(
     ),
     responses(
         (status = 200, description = "Removed genres successfully"),
-        (status = 403, description = "Forbidden"),
-        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+        (status = 403, response = ForbiddenResponse),
+        (status = 500, response = InternalErrorResponse)
     ),
     security(
         ("api_key" = [])
@@ -373,8 +373,8 @@ async fn remove_genres(
     ),
     responses(
         (status = 200, description = "Inserted moods successfully"),
-        (status = 403, description = "Forbidden"),
-        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+        (status = 403, response = ForbiddenResponse),
+        (status = 500, response = InternalErrorResponse)
     ),
     security(
         ("api_key" = [])
@@ -409,8 +409,8 @@ async fn add_moods(
     ),
     responses(
         (status = 200, description = "Removed moods successfully"),
-        (status = 403, description = "Forbidden"),
-        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+        (status = 403, response = ForbiddenResponse),
+        (status = 500, response = InternalErrorResponse)
     ),
     security(
         ("api_key" = [])

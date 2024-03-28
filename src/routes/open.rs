@@ -8,6 +8,8 @@ use axum::{extract::State, routing, Router};
 use http::StatusCode;
 
 use crate::cornucopia::queries::open_access::{self, FetchSongs};
+use crate::startup::api_doc::BadRequestResponse;
+use crate::startup::api_doc::InternalErrorResponse;
 use crate::startup::AppState;
 
 use super::ResponseError;
@@ -20,6 +22,17 @@ pub fn open_router() -> Router<AppState> {
         .route("/healthcheck", routing::get(|| async { StatusCode::OK }))
 }
 
+/// Fetch songs
+#[utoipa::path(
+    get,
+    path = "/api/open/songs",
+    responses(
+        (status = 200, response = crate::startup::api_doc::FetchSongs),
+        (status = 500, response = InternalErrorResponse)
+    ),
+    tag = "open"
+    
+)]
 async fn fetch_songs(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<FetchSongs>>, ResponseError> {
@@ -37,6 +50,17 @@ async fn fetch_songs(
     Ok(Json(songs))
 }
 
+/// Retrieve audio url for song by id, returns plain string url
+#[utoipa::path(
+    get,
+    path = "/api/open/audio_url/{id}",
+    responses(
+        (status = 200, body = String, content_type = "text/plain"),
+        (status = 500, response = InternalErrorResponse)
+    ),
+    tag = "open"
+    
+)]
 async fn get_audio_url(
     State(state): State<AppState>,
     Path(song_id): Path<i32>,
@@ -72,6 +96,19 @@ async fn get_audio_url(
     Ok(url)
 }
 
+
+/// Fetch genres or moods list
+#[utoipa::path(
+    get,
+    path = "/api/open/{what}",
+    responses(
+        (status = 200, body = Vec<String>, content_type = "application/json"),
+        (status = 400, response = BadRequestResponse),
+        (status = 500, response = InternalErrorResponse)
+    ),
+    tag = "open"
+    
+)]
 async fn data(
     State(state): State<AppState>,
     Path(what): Path<String>,

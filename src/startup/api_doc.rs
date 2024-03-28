@@ -26,6 +26,10 @@ use crate::{
 #[response(description = "Something happened on the server")]
 pub struct InternalErrorResponse;
 
+#[derive(ToResponse)]
+#[response(description = "You not allowed to access this method")]
+pub struct ForbiddenResponse;
+
 #[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(
@@ -74,12 +78,15 @@ pub struct ConflictErrorResponse;
 
 // ───── Responses ────────────────────────────────────────────────────────── //
 
-#[derive(ToSchema)]
-#[schema(as = FetchSongs)]
+#[derive(ToResponse)]
+#[response(description = "Song data")]
 pub struct FetchSongs {
+    pub song_id: i32,
+    pub song_rating: Option<i32>,
     pub song_name: String,
     pub primary_genre: String,
     pub secondary_genre: String,
+    pub cover_url: String,
     pub sex: String,
     pub tempo: i16,
     pub key: MusicKey,
@@ -141,6 +148,9 @@ impl Modify for ServerAddon {
 #[derive(OpenApi)]
 #[openapi(
     paths(
+        crate::routes::open::fetch_songs,
+        crate::routes::open::get_audio_url,
+        crate::routes::open::data,
         crate::routes::protected::upload_form,
         crate::routes::protected::submit_song,
         crate::routes::protected::remove_song,
@@ -156,7 +166,6 @@ impl Modify for ServerAddon {
         schemas(
             crate::auth::login::Credentials,
             crate::auth::login::Username,
-            FetchSongs,
             Password,
             MediaType,
             ObjectKey,
@@ -169,6 +178,7 @@ impl Modify for ServerAddon {
         responses(
             // Error responses
             InternalErrorResponse,
+            ForbiddenResponse,
             BadRequestResponse,
             NotAcceptableErrorResponse,
             UnauthorizedErrorResponse,
@@ -176,6 +186,7 @@ impl Modify for ServerAddon {
             ConflictErrorResponse,
             // Other responses
             crate::object_storage::presigned_post_form::PresignedPostData,
+            FetchSongs,
             Permission,
         )
     ),
