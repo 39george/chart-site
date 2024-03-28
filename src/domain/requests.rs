@@ -1,4 +1,7 @@
+use std::any::Any;
+
 use garde::Validate;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use utoipa::IntoParams;
 use utoipa::ToSchema;
@@ -7,6 +10,8 @@ use super::contains_no_control_characters;
 use super::forbidden_characters;
 use super::music_parameters::{MusicKey, Sex};
 use super::object_key::ObjectKey;
+use super::PRDCT_NAME_MAX_LEN;
+use super::PRDCT_NAME_MIN_LEN;
 use super::{GENRE_MAX_LEN, GENRE_MIN_LEN, MAX_TEMPO, MIN_TEMPO};
 use super::{MAX_AUDIO_DURATION_SEC, MIN_AUDIO_DURATION_SEC};
 use super::{MAX_FILENAME_LEN, MIN_FILENAME_LEN};
@@ -35,6 +40,24 @@ impl AsRef<str> for Lyric {
 #[garde(allow_unvalidated)]
 pub struct SubmitSong {
     #[garde(
+        length(min = PRDCT_NAME_MIN_LEN, max = PRDCT_NAME_MAX_LEN),
+        custom(forbidden_characters),
+        custom(contains_no_control_characters)
+    )]
+    #[schema(
+        min_length = 2,
+        max_length = 30,
+        pattern = r#"[^/()"<>\\{};:]*"#,
+        example = "Mixing"
+    )]
+    pub name: String,
+    #[garde(skip)]
+    #[schema(
+        value_type = f32,
+        example = 18.50
+    )]
+    pub price: Decimal,
+    #[garde(
         length(min=GENRE_MIN_LEN, max=GENRE_MAX_LEN),
         custom(forbidden_characters),
         custom(contains_no_control_characters)
@@ -56,6 +79,7 @@ pub struct SubmitSong {
     #[schema(minimum = 40, maximum = 320)]
     pub tempo: i16,
     pub key: MusicKey,
+    /// You should pass duration in seconds
     #[garde(range(min = MIN_AUDIO_DURATION_SEC, max = MAX_AUDIO_DURATION_SEC))]
     #[schema(minimum = 15, maximum = 600)]
     pub duration: i16,

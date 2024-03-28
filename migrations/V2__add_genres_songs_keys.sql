@@ -167,6 +167,7 @@ VALUES
 CREATE TABLE songs (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
+    price DECIMAL NOT NULL,
     primary_genre INTEGER NOT NULL REFERENCES genres(id) ON DELETE RESTRICT,
     secondary_genre INTEGER REFERENCES genres(id) ON DELETE RESTRICT,
     sex VARCHAR(6) NOT NULL CHECK (sex IN ('male', 'female')),

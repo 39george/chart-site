@@ -1,5 +1,5 @@
 use anyhow::Context;
-use axum::extract::Path;
+use axum::extract::{Path, Query};
 use axum::Json;
 use axum::{extract::State, routing, Router};
 use axum_login::permission_required;
@@ -7,11 +7,12 @@ use garde::Validate;
 use http::StatusCode;
 
 use crate::auth::users::AuthSession;
-use crate::cornucopia::queries::{admin_access, open_access};
+use crate::cornucopia::queries::admin_access;
 use crate::domain::object_key::ObjectKey;
 use crate::domain::requests::{SubmitSong, UploadFileRequest};
 use crate::object_storage::presigned_post_form::PresignedPostData;
 use crate::startup::AppState;
+use crate::trace_err;
 
 use super::{ResponseError, MAX_SIZES};
 
@@ -19,13 +20,46 @@ pub fn protected_router() -> Router<AppState> {
     Router::new()
         .route("/song", routing::post(submit_song))
         .route("/song/:id", routing::delete(remove_song))
-        .route("/upload", routing::post(upload_file))
+        .route("/upload_form", routing::get(upload_form))
         .layer(permission_required!(
             crate::auth::users::Backend,
             "administrator"
         ))
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/protected/song",
+    request_body(
+        content = SubmitSong,
+        content_type = "application/Json",
+        example = json!({
+            "name": "song_name",
+            "price": "3000.0",
+            "primary_genre": "абстрактный",
+            "secondary_genre":"свинг",
+            "sex": "Male",
+            "tempo": 100,
+            "key": "a_minor",
+            "duration": 300,
+            "lyric": "Some lyric...",
+            "cover_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8b:image.png",
+            "audio_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8e:song.mp3",
+        }),
+        
+    ),
+    responses(
+        (status = 201, description = "Song submitted successfully"),
+        (status = 403, description = "Forbidden"),
+        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+    
+)]
+#[tracing::instrument(name = "Submit new song", skip_all)]
 async fn submit_song(
     auth_session: AuthSession,
     State(state): State<AppState>,
@@ -44,6 +78,8 @@ async fn submit_song(
     admin_access::insert_new_song()
         .bind(
             &db_client,
+            &req.name,
+            &req.price,
             &req.primary_genre,
             &req.secondary_genre,
             &req.sex.to_string(),
@@ -59,6 +95,22 @@ async fn submit_song(
     Ok(StatusCode::CREATED)
 }
 
+#[utoipa::path(
+    delete,
+    path = "/api/protected/song/{id}",
+    responses(
+        (status = 200, description = "Song deleted successfully"),
+        (status = 403, description = "Forbidden"),
+        (status = 404, description = "Song not found"),
+        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+    
+)]
+#[tracing::instrument(name = "Delete song by id", skip_all)]
 async fn remove_song(
     auth_session: AuthSession,
     State(state): State<AppState>,
@@ -73,17 +125,45 @@ async fn remove_song(
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
-    admin_access::remove_song_by_id()
+    let song = admin_access::remove_song_by_id()
         .bind(&db_client, &id)
+        .opt()
         .await
         .context("Failed to remove song by id")?;
-    Ok(StatusCode::OK)
+    if let Some(song) = song {
+        if let Ok(key) = trace_err!(song.cover_object_key.parse()) {
+            trace_err!(state.object_storage.delete_object_by_key(&key).await, ());
+        }
+        if let Ok(key) = trace_err!(song.cover_object_key.parse()) {
+            trace_err!(state.object_storage.delete_object_by_key(&key).await, ());
+        }
+        Ok(StatusCode::OK)
+    } else {
+        Err(ResponseError::NotFoundError(anyhow::anyhow!("No song with id: {id}"), "Song not found"))
+    }
 }
 
-async fn upload_file(
+#[utoipa::path(
+    get,
+    path = "/api/protected/upload_form",
+    params(UploadFileRequest),
+    responses(
+        (status = 200, description = "Song deleted successfully"),
+        (status = 403, description = "Forbidden"),
+        (status = 404, description = "Song not found"),
+        (status = 500, description = "Something happened on the server, or provided id's were incorrect")
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+    
+)]
+#[tracing::instrument(name = "Delete song by id", skip_all)]
+async fn upload_form(
     auth_session: AuthSession,
     State(state): State<AppState>,
-    Json(req): Json<UploadFileRequest>,
+    Query(req): Query<UploadFileRequest>,
 ) -> Result<Json<PresignedPostData>, ResponseError> {
     let admin = auth_session.user.ok_or(ResponseError::UnauthorizedError(
         anyhow::anyhow!("No such user in AuthSession!"),

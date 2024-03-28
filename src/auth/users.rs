@@ -97,7 +97,7 @@ impl AuthnBackend for Backend {
     type Credentials = Credentials;
     type Error = AuthError;
 
-    #[tracing::instrument(name = "Authenticate user", skip(self, creds))]
+    #[tracing::instrument(name = "Authenticate user", skip_all)]
     async fn authenticate(
         &self,
         creds: Self::Credentials,

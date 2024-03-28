@@ -1,0 +1,132 @@
+# In recent versions of Dockerfile, EXPOSE doesn't have any operational
+# impact anymore, it is just informative.
+#
+# In older versions of Docker, the EXPOSE keyword could be used for service
+# discovery by linked containers, but (a) it still didn't have any operational
+# impact -- the ports were available whether or not there was a matching EXPOSE
+# -- and container "linking" has been deprecated for a quite some time.
+
+services:
+  chart-site:
+    image: ghashy/chart-site:0.1
+    expose:
+      - "8000"
+    secrets:
+      - object-storage-key-id
+      - object-storage-access-key
+      - redis-password
+      - postgres-password
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: chartsite
+      APP_CONFIG_FILE: /app/config/local-compose.yaml
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+      REDIS_PASSWORD_FILE: /run/secrets/redis-password
+      OBJECT_STORAGE_KEY_ID_FILE: /run/secrets/object-storage-key-id
+      OBJECT_STORAGE_ACCESS_KEY_FILE: /run/secrets/object-storage-access-key
+      ENVIRONMENT: development
+    networks:
+      - default
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/open/healthcheck"]
+      # The health check will first run interval seconds after the container is 
+      # started, and then again interval seconds after each previous check 
+      # completes.
+      interval: 2s
+      # If a single run of the check takes longer than timeout seconds then the 
+      # check is considered to have failed.
+      timeout: 3s
+      # It takes retries consecutive failures of the health check for the 
+      # container to be considered unhealthy.
+      retries: 2
+      # Start period provides initialization time for containers that need time 
+      # to bootstrap. Probe failure during that period will not be counted 
+      # towards the maximum number of retries. However, if a health check 
+      # succeeds during the start period, the container is considered started 
+      # and all consecutive failures will be counted towards the maximum number 
+      # of retries.
+      start_period: 3s
+
+  postgres:
+    image: postgres:16.1-alpine3.18
+    restart: always
+    user: postgres
+    secrets:
+      - postgres-password
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=chartsite
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password
+    expose:
+      - "5432"
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 2
+
+  redis:
+    image: redis:alpine
+    secrets:
+      - redis-password
+    environment:
+      REDIS_PASSWORD_FILE: /run/secrets/redis-password
+    command: sh -c "redis-server --requirepass $(cat $$REDIS_PASSWORD_FILE)"
+    volumes:
+      - redis_volume:/data
+    expose:
+      - "6379"
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "$(cat $$REDIS_PASSWORD_FILE)", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 2
+      start_period: 2s
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    volumes:
+      - ./config/nginx-compose.conf:/etc/nginx/nginx.conf
+    ports:
+      - "10000:10000"
+    networks:
+      - default
+    depends_on:
+      chart-site:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  redis_volume:
+  postgres_volume:
+
+secrets:
+  postgres-password:
+    file: secrets/postgres_password.txt
+  redis-password:
+    file: secrets/redis_password.txt
+  object-storage-key-id:
+    file: secrets/object_storage_key_id.txt
+  object-storage-access-key:
+    file: secrets/object_storage_access_key.txt
+
+networks:
+  default: {}
+

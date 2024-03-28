@@ -10,10 +10,15 @@ use utoipa::{
     Modify, OpenApi, ToResponse, ToSchema,
 };
 
-use crate::auth::users::Permission;
-use crate::object_storage::presigned_post_form;
-use crate::routes::development;
-use crate::routes::open;
+use crate::{auth::users::Permission, domain::music_parameters::MusicKey};
+use crate::{
+    domain::requests::SubmitSong, object_storage::presigned_post_form,
+};
+use crate::{domain::requests::UploadFileRequest, routes::open};
+use crate::{
+    domain::{music_parameters::Sex, requests::Lyric},
+    routes::development,
+};
 
 // ───── ErrorResponses ───────────────────────────────────────────────────── //
 
@@ -51,6 +56,7 @@ pub struct UnauthorizedErrorResponse(String);
 
 // We use ToSchema here, because we write manually in every case,
 // inlined, description, examples etc.
+#[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(
     description = "Not found some data (param name passed)",
@@ -59,7 +65,7 @@ pub struct UnauthorizedErrorResponse(String);
         "param": "param_name" }),
 )]
 pub struct NotFoundResponse {
-    _param: String,
+    param: String,
 }
 
 #[derive(ToResponse)]
@@ -69,18 +75,16 @@ pub struct ConflictErrorResponse;
 // ───── Responses ────────────────────────────────────────────────────────── //
 
 #[derive(ToSchema)]
-#[schema(as = GetSongsList)]
-pub struct GetSongsListResponse {
-    pub song_id: i32,
-    pub created_at: time::OffsetDateTime,
-    pub cover_url: String,
-    pub name: String,
-    pub author: String,
-    pub likes: i64,
-    pub listenings: i64,
-    pub relevance_score: rust_decimal::Decimal,
-    pub price: rust_decimal::Decimal,
-    pub is_user_liked: Option<bool>,
+#[schema(as = FetchSongs)]
+pub struct FetchSongs {
+    pub song_name: String,
+    pub primary_genre: String,
+    pub secondary_genre: String,
+    pub sex: String,
+    pub tempo: i16,
+    pub key: MusicKey,
+    pub duration: i16,
+    pub lyric: String,
 }
 
 // ───── TypeWrappers ─────────────────────────────────────────────────────── //
@@ -136,36 +140,51 @@ impl Modify for ServerAddon {
 
 #[derive(OpenApi)]
 #[openapi(
-        components(
-            schemas(
-                crate::auth::login::Credentials,
-                crate::auth::login::Username,
-                GetSongsListResponse,
-                Password,
-                MediaType,
-                ObjectKey,
-            ),
-            responses(
-                InternalErrorResponse,
-                BadRequestResponse,
-                NotAcceptableErrorResponse,
-                UnauthorizedErrorResponse,
-                crate::object_storage::presigned_post_form::PresignedPostData,
-                Permission,
-                NotFoundResponse,
-                ConflictErrorResponse,
-            )
+    paths(
+        crate::routes::protected::submit_song,
+        crate::routes::protected::remove_song,
+        crate::routes::protected::upload_form,
+        crate::auth::login::post::login,
+        crate::auth::login::get::logout,
+    ),
+    components(
+        schemas(
+            crate::auth::login::Credentials,
+            crate::auth::login::Username,
+            FetchSongs,
+            Password,
+            MediaType,
+            ObjectKey,
+            MusicKey,
+            Lyric,
+            Sex,
+            SubmitSong,
+            UploadFileRequest,
         ),
-        modifiers(&ServerAddon),
-        tags(
-            (name = "open", description = "Open routes (no authorization)"),
-            (name = "protected.admins", description = "Protected routes for admins"),
-            (name = "development", description = "Routes available only in development mode")
-        ),
-        info(
-            title = "Chart site - OpenAPI 3.0",
-            version = "0.1.0",
-            description = "This is a swagger documentation for chart site backend application.",
+        responses(
+            // Error responses
+            InternalErrorResponse,
+            BadRequestResponse,
+            NotAcceptableErrorResponse,
+            UnauthorizedErrorResponse,
+            NotFoundResponse,
+            ConflictErrorResponse,
+            // Other responses
+            crate::object_storage::presigned_post_form::PresignedPostData,
+            Permission,
         )
-    )]
+    ),
+    modifiers(&ServerAddon),
+    modifiers(&SecurityAddon),
+    tags(
+        (name = "open", description = "Open routes (no authorization)"),
+        (name = "protected.admins", description = "Protected routes for admins"),
+        (name = "development", description = "Routes available only in development mode")
+    ),
+    info(
+        title = "Chart site - OpenAPI 3.0",
+        version = "0.1.0",
+        description = "This is a swagger documentation for chart site backend application.",
+    )
+)]
 pub(super) struct ApiDoc;

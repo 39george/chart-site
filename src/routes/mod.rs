@@ -60,8 +60,8 @@ pub enum ResponseError {
     TooManyUploadsError,
     #[error("Authentication error")]
     AuthError(#[from] AuthError),
-    /// Source error is for internal use, and static str is for response
-    #[error("Can't resolve given object key as upload")]
+    /// Source error is for internal debug, and static str is for response
+    #[error("Not found error")]
     NotFoundError(#[source] anyhow::Error, &'static str),
     #[error("Have no access")]
     ForbiddenError(#[source] anyhow::Error),
@@ -114,7 +114,7 @@ impl IntoResponse for ResponseError {
             ResponseError::NotFoundError(_, param) => Response::builder()
                 .status(StatusCode::NOT_FOUND)
                 .header("Content-Type", "application/json")
-                .body(Body::from(format!("{{\"param\":{}}}", param)))
+                .body(Body::from(format!("{{\"param\":\"{}\"}}", param)))
                 .unwrap_or(StatusCode::NOT_FOUND.into_response()),
             ResponseError::ForbiddenError(_) => {
                 StatusCode::FORBIDDEN.into_response()
