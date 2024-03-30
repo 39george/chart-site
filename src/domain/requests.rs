@@ -27,7 +27,7 @@ pub struct Lyric(
     )]
     /// Should contain no control characters
     #[schema(example = "Some lyrics", min_length = 1, max_length = 5000)]
-    String,
+    pub String,
 );
 
 impl AsRef<str> for Lyric {
@@ -36,7 +36,7 @@ impl AsRef<str> for Lyric {
     }
 }
 
-#[derive(Deserialize, Validate, ToSchema)]
+#[derive(Serialize, Deserialize, Validate, ToSchema)]
 #[garde(allow_unvalidated)]
 pub struct SubmitSong {
     #[garde(
