@@ -10,6 +10,7 @@ use chart_site::{
         music_parameters::{MusicKey, Sex},
         requests::{Lyric, SubmitSong},
     },
+    startup::api_doc::FetchSongs,
 };
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 
@@ -57,11 +58,12 @@ async fn submit_song_success() {
         .unwrap();
     assert_eq!(response.status().as_u16(), 201);
 
-    let songs = open_access::fetch_songs()
-        .bind(&app.pg_client)
-        .all()
+    let response = http_client
+        .get(format!("{}/api/open/songs", &app.address))
+        .send()
         .await
         .unwrap();
+    let songs: Vec<FetchSongs> = response.json().await.unwrap();
     assert_eq!(songs.len(), 1);
     assert_eq!(&songs[0].song_name, "Lalasong");
 }
