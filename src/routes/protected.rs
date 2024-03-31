@@ -27,6 +27,7 @@ pub fn protected_router() -> Router<AppState> {
         .route("/song_data/:id", routing::put(update_song_data))
         .route("/:what", routing::post(add_data))
         .route("/:what", routing::delete(remove_data))
+        .route("/health_check", routing::get(|| async { StatusCode::OK }))
         .layer(permission_required!(
             crate::auth::users::Backend,
             "administrator"
