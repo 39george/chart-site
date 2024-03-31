@@ -2,7 +2,9 @@
 //! and derive ToResponse to all types we bind as `response = Type`.
 //! We only need ToSchema derived if we set response as `body = Type`.
 
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 use utoipa::{
     openapi::{
         security::{ApiKey, ApiKeyValue, SecurityScheme},
@@ -11,18 +13,13 @@ use utoipa::{
     Modify, OpenApi, ToResponse, ToSchema,
 };
 
+use crate::domain::requests::SubmitSong;
+use crate::domain::requests::UploadFileRequest;
+use crate::domain::{music_parameters::Sex, requests::Lyric};
 use crate::{
     auth::users::Permission, domain::music_parameters::MusicKey,
     object_storage::presigned_post_form::PresignedPostData,
     routes::development::InputWithFiles,
-};
-use crate::{
-    domain::requests::SubmitSong, object_storage::presigned_post_form,
-};
-use crate::{domain::requests::UploadFileRequest, routes::open};
-use crate::{
-    domain::{music_parameters::Sex, requests::Lyric},
-    routes::development,
 };
 
 // ───── ErrorResponses ───────────────────────────────────────────────────── //
@@ -88,8 +85,10 @@ pub struct ConflictErrorResponse;
 #[response(description = "Song data")]
 pub struct FetchSongs {
     pub id: i32,
+    pub created_at: OffsetDateTime,
+    pub updated_at: OffsetDateTime,
     pub rating: Option<i32>,
-    pub price: rust_decimal::Decimal,
+    pub price: Decimal,
     pub name: String,
     pub primary_genre: String,
     pub secondary_genre: Option<String>,
@@ -99,6 +98,7 @@ pub struct FetchSongs {
     pub key: MusicKey,
     pub duration: i16,
     pub lyric: Lyric,
+    pub moods: Vec<String>,
 }
 
 // ───── TypeWrappers ─────────────────────────────────────────────────────── //

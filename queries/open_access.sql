@@ -1,20 +1,33 @@
 --! fetch_songs : (secondary_genre?, rating?)
 SELECT
-    songs.id,
-    songs.rating,
-    songs.price,
-    songs.name,
-    p.name AS primary_genre,
-    s.name AS secondary_genre,
-    songs.cover_object_key AS cover_url,
+    sng.id,
+    sng.created_at,
+    sng.updated_at,
+    sng.rating,
+    sng.price,
+    sng.name,
+    pg.name AS primary_genre,
+    sg.name AS secondary_genre,
+    sng.cover_object_key AS cover_url,
     sex,
     tempo,
     key,
     duration,
-    lyric
-FROM songs
-LEFT JOIN genres p ON songs.primary_genre = p.id
-LEFT JOIN genres s ON songs.secondary_genre = s.id;
+    lyric,
+    COALESCE(ARRAY_AGG(DISTINCT m.name) FILTER (WHERE m.name IS NOT NULL), ARRAY[]::text[]) AS moods
+FROM songs sng
+LEFT JOIN genres pg ON sng.primary_genre = pg.id
+LEFT JOIN genres sg ON sng.secondary_genre = sg.id
+LEFT JOIN songs_moods sm ON sng.id = sm.songs_id
+LEFT JOIN moods m ON sm.moods_id = m.id
+GROUP BY
+    sng.id,
+    sng.rating,
+    sng.price,
+    sng.name,
+    pg.name,
+    sg.name
+;
 
 --! list_genres
 SELECT name FROM genres ORDER BY name;

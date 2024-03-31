@@ -318,13 +318,13 @@ name : & 'a T1,) -> Result < u64, tokio_postgres :: Error >
     client.execute(stmt, & [name,]) .await
 } }}pub mod open_access
 { use futures::{{StreamExt, TryStreamExt}};use futures; use cornucopia_async::GenericClient;#[derive(serde::Serialize, Debug, Clone, PartialEq, )] pub struct FetchSongs
-{ pub id : i32,pub rating : Option<i32>,pub price : rust_decimal::Decimal,pub name : String,pub primary_genre : String,pub secondary_genre : Option<String>,pub cover_url : String,pub sex : String,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : String,}pub struct FetchSongsBorrowed < 'a >
-{ pub id : i32,pub rating : Option<i32>,pub price : rust_decimal::Decimal,pub name : &'a str,pub primary_genre : &'a str,pub secondary_genre : Option<&'a str>,pub cover_url : &'a str,pub sex : &'a str,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : &'a str,} impl < 'a > From < FetchSongsBorrowed <
+{ pub id : i32,pub created_at : time::OffsetDateTime,pub updated_at : time::OffsetDateTime,pub rating : Option<i32>,pub price : rust_decimal::Decimal,pub name : String,pub primary_genre : String,pub secondary_genre : Option<String>,pub cover_url : String,pub sex : String,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : String,pub moods : Vec<String>,}pub struct FetchSongsBorrowed < 'a >
+{ pub id : i32,pub created_at : time::OffsetDateTime,pub updated_at : time::OffsetDateTime,pub rating : Option<i32>,pub price : rust_decimal::Decimal,pub name : &'a str,pub primary_genre : &'a str,pub secondary_genre : Option<&'a str>,pub cover_url : &'a str,pub sex : &'a str,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : &'a str,pub moods : cornucopia_async::ArrayIterator<'a, &'a str>,} impl < 'a > From < FetchSongsBorrowed <
 'a >> for FetchSongs
 {
     fn
-    from(FetchSongsBorrowed { id,rating,price,name,primary_genre,secondary_genre,cover_url,sex,tempo,key,duration,lyric,} : FetchSongsBorrowed < 'a >)
-    -> Self { Self { id,rating,price,name: name.into(),primary_genre: primary_genre.into(),secondary_genre: secondary_genre.map(|v| v.into()),cover_url: cover_url.into(),sex: sex.into(),tempo,key,duration,lyric: lyric.into(),} }
+    from(FetchSongsBorrowed { id,created_at,updated_at,rating,price,name,primary_genre,secondary_genre,cover_url,sex,tempo,key,duration,lyric,moods,} : FetchSongsBorrowed < 'a >)
+    -> Self { Self { id,created_at,updated_at,rating,price,name: name.into(),primary_genre: primary_genre.into(),secondary_genre: secondary_genre.map(|v| v.into()),cover_url: cover_url.into(),sex: sex.into(),tempo,key,duration,lyric: lyric.into(),moods: moods.map(|v| v.into()).collect(),} }
 }pub struct FetchSongsQuery < 'a, C : GenericClient, T, const N : usize >
 {
     client : & 'a  C, params :
@@ -405,21 +405,34 @@ where C : GenericClient
     }
 }pub fn fetch_songs() -> FetchSongsStmt
 { FetchSongsStmt(cornucopia_async :: private :: Stmt :: new("SELECT
-    songs.id,
-    songs.rating,
-    songs.price,
-    songs.name,
-    p.name AS primary_genre,
-    s.name AS secondary_genre,
-    songs.cover_object_key AS cover_url,
+    sng.id,
+    sng.created_at,
+    sng.updated_at,
+    sng.rating,
+    sng.price,
+    sng.name,
+    pg.name AS primary_genre,
+    sg.name AS secondary_genre,
+    sng.cover_object_key AS cover_url,
     sex,
     tempo,
     key,
     duration,
-    lyric
-FROM songs
-LEFT JOIN genres p ON songs.primary_genre = p.id
-LEFT JOIN genres s ON songs.secondary_genre = s.id")) } pub
+    lyric,
+    COALESCE(ARRAY_AGG(DISTINCT m.name) FILTER (WHERE m.name IS NOT NULL), ARRAY[]::text[]) AS moods
+FROM songs sng
+LEFT JOIN genres pg ON sng.primary_genre = pg.id
+LEFT JOIN genres sg ON sng.secondary_genre = sg.id
+LEFT JOIN songs_moods sm ON sng.id = sm.songs_id
+LEFT JOIN moods m ON sm.moods_id = m.id
+GROUP BY
+    sng.id,
+    sng.rating,
+    sng.price,
+    sng.name,
+    pg.name,
+    sg.name
+")) } pub
 struct FetchSongsStmt(cornucopia_async :: private :: Stmt) ; impl
 FetchSongsStmt { pub fn bind < 'a, C : GenericClient, >
 (& 'a mut self, client : & 'a  C,
@@ -429,7 +442,7 @@ FetchSongs, 0 >
     FetchSongsQuery
     {
         client, params : [], stmt : & mut self.0, extractor :
-        | row | { FetchSongsBorrowed { id : row.get(0),rating : row.get(1),price : row.get(2),name : row.get(3),primary_genre : row.get(4),secondary_genre : row.get(5),cover_url : row.get(6),sex : row.get(7),tempo : row.get(8),key : row.get(9),duration : row.get(10),lyric : row.get(11),} }, mapper : | it | { <FetchSongs>::from(it) },
+        | row | { FetchSongsBorrowed { id : row.get(0),created_at : row.get(1),updated_at : row.get(2),rating : row.get(3),price : row.get(4),name : row.get(5),primary_genre : row.get(6),secondary_genre : row.get(7),cover_url : row.get(8),sex : row.get(9),tempo : row.get(10),key : row.get(11),duration : row.get(12),lyric : row.get(13),moods : row.get(14),} }, mapper : | it | { <FetchSongs>::from(it) },
     }
 } }pub fn list_genres() -> ListGenresStmt
 { ListGenresStmt(cornucopia_async :: private :: Stmt :: new("SELECT name FROM genres ORDER BY name")) } pub
