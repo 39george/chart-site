@@ -1,0 +1,15 @@
+@import "../variables.scss";
+
+.main_page {
+  padding: 4.5rem clamp(0px, (100vw - 72rem) / 2, 9999px) 2rem;
+}
+
+.content {
+  margin: 0 1rem;
+}
+
+.h1 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: 0.2rem;
+}
