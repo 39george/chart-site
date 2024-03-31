@@ -187,9 +187,7 @@ impl Drop for TestApp {
         // Clean pg
         let db_config = self.pg_config_with_root_cred.clone();
         let db_username = self.pg_username.clone();
-        // NOTE: Spawn a new thread, because internally sync postgres client uses
-        // tokio runtime, but we are already in tokio runtime here. To
-        // spawn a new tokio runtime, we should do it inside new thread.
+        // Run async code in sync context
         let _ = std::thread::spawn(move || {
             // Create the runtime
             let rt = tokio::runtime::Runtime::new().unwrap();
