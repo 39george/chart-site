@@ -345,7 +345,7 @@ async fn upload_form(
         content = Vec<String>, description = "Json array with data to add", content_type = "application/json"
     ),
     responses(
-        (status = 200, description = "Inserted data successfully"),
+        (status = 201, description = "Inserted data successfully"),
         (status = 400, response = BadRequestResponse),
         (status = 403, response = ForbiddenResponse),
         (status = 500, response = InternalErrorResponse)
@@ -383,7 +383,7 @@ async fn add_data(
         _ => return Err(ResponseError::BadRequest(anyhow!("Only genres and moods available, given: {what}")))
     }
 
-    Ok(StatusCode::OK)
+    Ok(StatusCode::CREATED)
 }
 
 /// Remove existing genres or moods
