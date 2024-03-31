@@ -15,8 +15,11 @@ use super::helpers::TestApp;
 
 impl TestApp {
     async fn submit_song(&self, http_client: &Client, song_name: &str) -> u16 {
+        // Create and login admin
         let admin = self.new_admin().await.unwrap();
         assert_eq!(self.login_admin(&admin, &http_client).await.as_u16(), 200);
+
+        // Upload cover and song
         let cover = read_file("assets/Cover.png").unwrap();
         let song = read_file("assets/Song.mp3").unwrap();
         let (response, cover_obj_key) = self
@@ -38,6 +41,7 @@ impl TestApp {
             .await;
         assert_eq!(response.status().as_u16(), 200);
 
+        // Submit song
         let response = http_client
             .post(format!("{}/api/protected/song", &self.address))
             .json(&SubmitSong {
@@ -63,6 +67,7 @@ impl TestApp {
 
 #[tokio::test]
 async fn submit_song_success() {
+    // Create app
     let config = Settings::load_configuration().unwrap();
     let app = TestApp::spawn_app(config).await;
     let http_client = reqwest::Client::builder()
@@ -83,6 +88,7 @@ async fn submit_song_success() {
 
 #[tokio::test]
 async fn delete_song_success() {
+    // Create app
     let config = Settings::load_configuration().unwrap();
     let app = TestApp::spawn_app(config).await;
     let http_client = reqwest::Client::builder()
@@ -101,6 +107,7 @@ async fn delete_song_success() {
 
 #[tokio::test]
 async fn rename_song_success() {
+    // Create app
     let config = Settings::load_configuration().unwrap();
     let app = TestApp::spawn_app(config).await;
     let http_client = reqwest::Client::builder()
@@ -160,12 +167,14 @@ async fn rename_song_success() {
 
 #[tokio::test]
 async fn update_song_audio_success() {
+    // Create app
     let config = Settings::load_configuration().unwrap();
     let app = TestApp::spawn_app(config).await;
     let http_client = reqwest::Client::builder()
         .cookie_store(true)
         .build()
         .unwrap();
+
     // Fetch song closure
     let fetch_song = || async {
         http_client

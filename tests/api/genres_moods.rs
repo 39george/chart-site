@@ -4,6 +4,7 @@ use super::helpers::TestApp;
 
 #[tokio::test]
 async fn add_remove_genre_success() {
+    // Create app
     let config = Settings::load_configuration().unwrap();
     let app = TestApp::spawn_app(config).await;
     let http_client = reqwest::Client::builder()
@@ -11,7 +12,7 @@ async fn add_remove_genre_success() {
         .build()
         .unwrap();
 
-    // Create admin
+    // Create and login admin
     let admin = app.new_admin().await.unwrap();
     assert_eq!(app.login_admin(&admin, &http_client).await.as_u16(), 200);
 
@@ -56,6 +57,7 @@ async fn add_remove_genre_success() {
 
 #[tokio::test]
 async fn add_remove_mood_success() {
+    // Create app
     let config = Settings::load_configuration().unwrap();
     let app = TestApp::spawn_app(config).await;
     let http_client = reqwest::Client::builder()
@@ -63,7 +65,7 @@ async fn add_remove_mood_success() {
         .build()
         .unwrap();
 
-    // Create admin
+    // Create and login admin
     let admin = app.new_admin().await.unwrap();
     assert_eq!(app.login_admin(&admin, &http_client).await.as_u16(), 200);
 
