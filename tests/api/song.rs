@@ -14,7 +14,11 @@ use super::helpers::read_file;
 use super::helpers::TestApp;
 
 impl TestApp {
-    async fn submit_song(&self, http_client: &Client, song_name: &str) -> u16 {
+    pub async fn submit_song(
+        &self,
+        http_client: &Client,
+        song_name: &str,
+    ) -> u16 {
         // Create and login admin
         let admin = self.new_admin().await.unwrap();
         assert_eq!(self.login_admin(&admin, &http_client).await.as_u16(), 200);
