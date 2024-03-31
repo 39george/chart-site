@@ -1,0 +1,46 @@
+@import "../variables.scss";
+
+@mixin active_link {
+  text-decoration: underline;
+  text-decoration-color: $accent;
+  text-decoration-thickness: 0.125rem;
+  text-underline-offset: 0.25rem;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 2.375rem 2rem;
+}
+
+.image_wrapper {
+  width: 4.75rem;
+  height: 1.75rem;
+  margin-right: 6rem;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.link {
+  font-size: 0.875rem;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+
+  color: $main_bright;
+
+  &:not(:last-child) {
+    margin-right: 2em;
+  }
+
+  &:hover {
+    @include active_link;
+  }
+}
+
+.active_link {
+  @include active_link;
+}
