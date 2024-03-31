@@ -1,0 +1,34 @@
+@import "../variables.scss";
+
+.songs_section {
+  display: flex;
+}
+
+.songs_list {
+  width: 100%;
+  max-width: 40.25rem;
+
+  margin-top: 1rem;
+}
+
+.view_switch {
+  display: flex;
+
+  width: fit-content;
+
+  margin-bottom: 1.5rem;
+  margin-left: auto;
+
+  border-radius: 0.25rem;
+  border: 1px solid $middle_gray;
+}
+
+.switch_option {
+  padding: 0.5rem;
+  padding-bottom: 0.125rem;
+  cursor: pointer;
+}
+
+.active_option {
+  background-color: $middle_gray;
+}
