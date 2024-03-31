@@ -3,6 +3,7 @@ use axum::extract::{Path, Query};
 use axum::Json;
 use axum::{extract::State, routing, Router};
 use axum_login::permission_required;
+use deadpool_postgres::GenericClient;
 use garde::Validate;
 use http::StatusCode;
 use anyhow::anyhow;
@@ -54,6 +55,7 @@ pub fn protected_router() -> Router<AppState> {
             "lyric": "Some lyric...",
             "cover_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8b:image.png",
             "audio_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8e:song.mp3",
+            "moods": ["веселый"],
         }),
         
     ),
@@ -80,15 +82,16 @@ async fn submit_song(
     let audio_object_key = req.audio_object_key.ok_or(
         ResponseError::BadRequest(anyhow!("No audio object key provided".to_string()))
     )?;
-    let db_client = state
+    let mut db_client = state
         .pg_pool
         .get()
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
-    admin_access::insert_new_song()
+    let trans = db_client.transaction().await.context("Failed to get transaction from pg")?;
+    let id = admin_access::insert_new_song_get_id()
         .bind(
-            &db_client,
+            &trans,
             &req.name,
             &req.price,
             &req.rating,
@@ -102,8 +105,16 @@ async fn submit_song(
             &cover_object_key.as_ref(),
             &audio_object_key.as_ref(),
         )
+        .one()
         .await
         .context("Failed to insert song into pg")?;
+
+    for mood in req.moods {
+        admin_access::add_mood_to_song()
+            .bind(&trans, &id, &mood).await.context("Failed to insert mood to song")?;
+    }
+
+    trans.commit().await.context("Failed to commit pg transaction")?;
     Ok(StatusCode::CREATED)
 }
 
@@ -125,6 +136,7 @@ async fn submit_song(
             "key": "a_minor",
             "duration": 300,
             "lyric": "Some lyric...",
+            "moods": ["веселый"],
         }),
         
     ),
@@ -147,15 +159,16 @@ async fn update_song_metadata(
     Json(req): Json<SubmitSong>,
 ) -> Result<StatusCode, ResponseError> {
     req.validate(&())?;
-    let db_client = state
+    let mut db_client = state
         .pg_pool
         .get()
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
+    let trans = db_client.transaction().await.context("Failed to get transaction from pg")?;
     let update_count = admin_access::update_song_metadata()
         .bind(
-            &db_client,
+            &trans,
             &req.name,
             &req.price,
             &req.rating,
@@ -175,6 +188,15 @@ async fn update_song_metadata(
             anyhow!("Update song metadata's update_count is 0"), "No song found with given id")
         );
     }
+    admin_access::remove_moods_from_song()
+        .bind(&trans, &id)
+        .await
+        .context("Failed to remove moods from song when was updating song metadata")?;
+    for mood in req.moods {
+        admin_access::add_mood_to_song()
+            .bind(&trans, &id, &mood).await.context("Failed to insert mood to song")?;
+    }
+    trans.commit().await.context("Failed to commit pg transaction")?;
     Ok(StatusCode::OK)
 }
 

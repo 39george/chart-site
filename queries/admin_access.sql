@@ -1,4 +1,4 @@
---! insert_new_song (secondary_genre?, rating?)
+--! insert_new_song_get_id (secondary_genre?, rating?)
 INSERT INTO songs(name, price, rating, primary_genre, secondary_genre, sex, tempo, key, duration, lyric, cover_object_key, audio_object_key)
 VALUES ( 
     :name,
@@ -13,7 +13,7 @@ VALUES (
     :lyric,
     :cover_obj_key,
     :audio_obj_key
-);
+) RETURNING id;
 
 --! get_song_cover_object_key_by_id
 SELECT cover_object_key FROM songs
@@ -34,7 +34,8 @@ UPDATE songs
         tempo = :tempo,
         key = :key,
         duration = :duration,
-        lyric = :lyric
+        lyric = :lyric,
+        updated_at = CURRENT_TIMESTAMP
 WHERE songs.id = :id;
 
 --! update_song_cover
@@ -64,3 +65,14 @@ VALUES (:name);
 
 --! remove_mood
 DELETE FROM moods WHERE name = :name;
+
+--! add_mood_to_song
+INSERT INTO songs_moods (songs_id, moods_id)
+VALUES (
+    :song_id,
+    (SELECT id FROM moods WHERE name = :mood)
+);
+
+--! remove_moods_from_song
+DELETE FROM songs_moods
+WHERE songs_id = :song_id;

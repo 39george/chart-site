@@ -1,5 +1,3 @@
-use std::any::Any;
-
 use garde::Validate;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -10,6 +8,8 @@ use super::contains_no_control_characters;
 use super::forbidden_characters;
 use super::music_parameters::{MusicKey, Sex};
 use super::object_key::ObjectKey;
+use super::MOOD_MAX_LEN;
+use super::MOOD_MIN_LEN;
 use super::PRDCT_NAME_MAX_LEN;
 use super::PRDCT_NAME_MIN_LEN;
 use super::{GENRE_MAX_LEN, GENRE_MIN_LEN, MAX_TEMPO, MIN_TEMPO};
@@ -94,6 +94,13 @@ pub struct SubmitSong {
     pub lyric: Lyric,
     pub cover_object_key: Option<ObjectKey>,
     pub audio_object_key: Option<ObjectKey>,
+    #[garde(inner(
+        length(min=MOOD_MIN_LEN, max=MOOD_MAX_LEN),
+        custom(forbidden_characters),
+        custom(contains_no_control_characters)
+    ))]
+    #[schema(pattern = r#"[^/()"<>\\{};:]*"#)]
+    pub moods: Vec<String>,
 }
 
 #[derive(Deserialize, Debug, Validate, ToSchema, IntoParams)]

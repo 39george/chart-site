@@ -61,6 +61,7 @@ impl TestApp {
                 cover_object_key: Some(cover_obj_key.parse().unwrap()),
                 audio_object_key: Some(song_obj_key.parse().unwrap()),
                 rating: None,
+                moods: vec!["веселый".to_string()],
             })
             .send()
             .await
@@ -150,6 +151,7 @@ async fn rename_song_success() {
             cover_object_key: None,
             audio_object_key: None,
             rating: None,
+            moods: vec!["веселый".to_string()],
         })
         .send()
         .await
