@@ -87,17 +87,18 @@ pub struct ConflictErrorResponse;
 #[derive(Deserialize, ToResponse, ToSchema)]
 #[response(description = "Song data")]
 pub struct FetchSongs {
-    pub song_id: i32,
-    pub song_rating: Option<i32>,
-    pub song_name: String,
+    pub id: i32,
+    pub rating: Option<i32>,
+    pub price: rust_decimal::Decimal,
+    pub name: String,
     pub primary_genre: String,
     pub secondary_genre: Option<String>,
     pub cover_url: String,
-    pub sex: String,
+    pub sex: Sex,
     pub tempo: i16,
     pub key: MusicKey,
     pub duration: i16,
-    pub lyric: String,
+    pub lyric: Lyric,
 }
 
 // ───── TypeWrappers ─────────────────────────────────────────────────────── //
@@ -160,7 +161,8 @@ impl Modify for ServerAddon {
         crate::routes::protected::upload_form,
         crate::routes::protected::submit_song,
         crate::routes::protected::remove_song,
-        crate::routes::protected::update_song,
+        crate::routes::protected::update_song_metadata,
+        crate::routes::protected::update_song_data,
         crate::routes::protected::add_data,
         crate::routes::protected::remove_data,
         crate::auth::login::post::login,

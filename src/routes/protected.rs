@@ -10,7 +10,7 @@ use anyhow::anyhow;
 use crate::auth::users::AuthSession;
 use crate::cornucopia::queries::admin_access;
 use crate::domain::object_key::ObjectKey;
-use crate::domain::requests::{SubmitSong, UploadFileRequest};
+use crate::domain::requests::{SubmitSong, UploadFileRequest, WordQuery};
 use crate::object_storage::presigned_post_form::PresignedPostData;
 use crate::startup::api_doc::{BadRequestResponse, ForbiddenResponse, InternalErrorResponse, NotFoundResponse};
 use crate::startup::AppState;
@@ -23,7 +23,8 @@ pub fn protected_router() -> Router<AppState> {
         .route("/upload_form", routing::get(upload_form))
         .route("/song", routing::post(submit_song))
         .route("/song/:id", routing::delete(remove_song))
-        .route("/song/:id", routing::put(update_song))
+        .route("/song_meta/:id", routing::put(update_song_metadata))
+        .route("/song_data/:id", routing::put(update_song_data))
         .route("/:what", routing::post(add_data))
         .route("/:what", routing::delete(remove_data))
         .layer(permission_required!(
@@ -42,6 +43,7 @@ pub fn protected_router() -> Router<AppState> {
         example = json!({
             "name": "song_name",
             "price": "3000.0",
+            "rating": null,
             "primary_genre": "абстрактный",
             "secondary_genre":"свинг",
             "sex": "Male",
@@ -66,14 +68,17 @@ pub fn protected_router() -> Router<AppState> {
 )]
 #[tracing::instrument(name = "Submit new song", skip_all)]
 async fn submit_song(
-    auth_session: AuthSession,
+    _auth_session: AuthSession,
     State(state): State<AppState>,
     Json(req): Json<SubmitSong>,
 ) -> Result<StatusCode, ResponseError> {
-    let _admin = auth_session.user.ok_or(ResponseError::UnauthorizedError(
-        anyhow::anyhow!("No such user in AuthSession!"),
-    ))?;
     req.validate(&())?;
+    let cover_object_key = req.cover_object_key.ok_or(
+        ResponseError::BadRequest(anyhow!("No cover object key provided".to_string()))
+    )?;
+    let audio_object_key = req.audio_object_key.ok_or(
+        ResponseError::BadRequest(anyhow!("No audio object key provided".to_string()))
+    )?;
     let db_client = state
         .pg_pool
         .get()
@@ -85,6 +90,7 @@ async fn submit_song(
             &db_client,
             &req.name,
             &req.price,
+            &req.rating,
             &req.primary_genre,
             &req.secondary_genre,
             &req.sex.to_string(),
@@ -92,38 +98,37 @@ async fn submit_song(
             &req.key.into(),
             &req.duration,
             &req.lyric.as_ref(),
-            &req.cover_object_key.as_ref(),
-            &req.audio_object_key.as_ref(),
+            &cover_object_key.as_ref(),
+            &audio_object_key.as_ref(),
         )
         .await
         .context("Failed to insert song into pg")?;
     Ok(StatusCode::CREATED)
 }
 
-/// Update existing song
+/// Update song meta information
 #[utoipa::path(
     put ,
-    path = "/api/protected/song/{id}",
+    path = "/api/protected/song_meta/{id}",
     request_body(
         content = SubmitSong,
         content_type = "application/Json",
         example = json!({
             "name": "song_name",
             "price": "3000.0",
+            "rating": null,
             "primary_genre": "абстрактный",
             "secondary_genre":"свинг",
-            "sex": "Male",
+            "sex": "male",
             "tempo": 100,
             "key": "a_minor",
             "duration": 300,
             "lyric": "Some lyric...",
-            "cover_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8b:image.png",
-            "audio_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8e:song.mp3",
         }),
         
     ),
     responses(
-        (status = 200, description = "Song updated successfully"),
+        (status = 200, description = "Song metadata updated successfully"),
         (status = 403, response = ForbiddenResponse),
         (status = 404, response = NotFoundResponse),
         (status = 500, response = InternalErrorResponse)
@@ -133,16 +138,13 @@ async fn submit_song(
     ),
     tag = "protected.admins"
 )]
-#[tracing::instrument(name = "Update song", skip_all)]
-async fn update_song(
-    auth_session: AuthSession,
+#[tracing::instrument(name = "Update song metadata", skip(_auth_session, state, req))]
+async fn update_song_metadata(
+    _auth_session: AuthSession,
     State(state): State<AppState>,
     Path(id): Path<i32>,
     Json(req): Json<SubmitSong>,
 ) -> Result<StatusCode, ResponseError> {
-    let _admin = auth_session.user.ok_or(ResponseError::UnauthorizedError(
-        anyhow::anyhow!("No such user in AuthSession!"),
-    ))?;
     req.validate(&())?;
     let db_client = state
         .pg_pool
@@ -150,30 +152,12 @@ async fn update_song(
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
-    let obj_keys = admin_access::get_song_object_keys_by_id().bind(&db_client, &id).one().await
-        .map_err(|e| {
-            if e.to_string()
-                .eq("query returned an unexpected number of rows")
-            {
-                ResponseError::NotFoundError(
-                    anyhow!("Not found, err: {e}"),
-                    "Song not found",
-                )
-            } else {
-                ResponseError::UnexpectedError(anyhow!("{e}"))
-            }
-        })?;
-    if obj_keys.cover_object_key.ne(req.cover_object_key.as_ref()) {
-        trace_err!(state.object_storage.delete_object_by_key(&req.cover_object_key).await, ());
-    }
-    if obj_keys.audio_object_key.ne(req.audio_object_key.as_ref()) {
-        trace_err!(state.object_storage.delete_object_by_key(&req.audio_object_key).await, ());
-    }
-    admin_access::update_song()
+    let update_count = admin_access::update_song_metadata()
         .bind(
             &db_client,
             &req.name,
             &req.price,
+            &req.rating,
             &req.primary_genre,
             &req.secondary_genre,
             &req.sex.to_string(),
@@ -181,12 +165,79 @@ async fn update_song(
             &req.key.into(),
             &req.duration,
             &req.lyric.as_ref(),
-            &req.cover_object_key.as_ref(),
-            &req.audio_object_key.as_ref(),
             &id
         )
         .await
         .context("Failed to update song in pg")?;
+    if update_count == 0 {
+        return Err(ResponseError::NotFoundError(
+            anyhow!("Update song metadata's update_count is 0"), "No song found with given id")
+        );
+    }
+    Ok(StatusCode::OK)
+}
+
+/// Update song data (cover or audio)
+#[utoipa::path(
+    put ,
+    path = "/api/protected/song_data/{id}",
+    params(
+        ("what", Query, description = "which type of data to update (cover or audio)")
+    ),
+    request_body(
+        content = String,
+        content_type = "plain/text",
+        example = "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8b:image.png",
+    ),
+    responses(
+        (status = 200, description = "Song data updated successfully"),
+        (status = 400, response = BadRequestResponse),
+        (status = 403, response = ForbiddenResponse),
+        (status = 500, response = InternalErrorResponse)
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+)]
+#[tracing::instrument(name = "Update song data", skip_all)]
+async fn update_song_data(
+    _auth_session: AuthSession,
+    State(state): State<AppState>,
+    Path(id): Path<i32>,
+    Query(q): Query<WordQuery>,
+    object_key: String,
+) -> Result<StatusCode, ResponseError> {
+    let _: ObjectKey = object_key.parse().context("Failed to parse object key").map_err(ResponseError::BadRequest)?;
+    let db_client = state
+        .pg_pool
+        .get()
+        .await
+        .context("Failed to get connection from postgres pool")
+        .map_err(ResponseError::UnexpectedError)?;
+    let old_obj_key = match q.what.as_str() {
+        "cover" => {
+            let old = admin_access::get_song_cover_object_key_by_id()
+                .bind(&db_client, &id).one().await.context("Failed")?;
+            admin_access::update_song_cover()            
+                .bind(&db_client, &object_key, &id)
+            .await.context("Failed to update song cover object key")?;
+            old
+        }
+        "audio" => {
+            let old = admin_access::get_song_audio_object_key_by_id()
+                .bind(&db_client, &id).one().await.context("Failed")?;
+            admin_access::update_song_audio()            
+                .bind(&db_client, &object_key, &id)
+            .await.context("Failed to update song audio object key")?;
+            old
+        }
+        _ => return Err(ResponseError::BadRequest(anyhow!("Only 'cover' and 'audio' are allowed")))
+    };
+    trace_err!(
+        state.object_storage
+            .delete_object_by_key(&old_obj_key.parse().unwrap()).await, ()
+    );
     Ok(StatusCode::OK)
 }
 
@@ -207,13 +258,10 @@ async fn update_song(
 )]
 #[tracing::instrument(name = "Delete song by id", skip_all)]
 async fn remove_song(
-    auth_session: AuthSession,
+    _auth_session: AuthSession,
     State(state): State<AppState>,
     Path(id): Path<i32>,
 ) -> Result<StatusCode, ResponseError> {
-    let _admin = auth_session.user.ok_or(ResponseError::UnauthorizedError(
-        anyhow::anyhow!("No such user in AuthSession!"),
-    ))?;
     let db_client = state
         .pg_pool
         .get()
@@ -229,7 +277,7 @@ async fn remove_song(
         if let Ok(key) = trace_err!(song.cover_object_key.parse()) {
             trace_err!(state.object_storage.delete_object_by_key(&key).await, ());
         }
-        if let Ok(key) = trace_err!(song.cover_object_key.parse()) {
+        if let Ok(key) = trace_err!(song.audio_object_key.parse()) {
             trace_err!(state.object_storage.delete_object_by_key(&key).await, ());
         }
         Ok(StatusCode::OK)
@@ -238,7 +286,7 @@ async fn remove_song(
     }
 }
 
-/// Request presigned upload form
+/// Request presigned post form
 #[utoipa::path(
     get,
     path = "/api/protected/upload_form",
@@ -373,12 +421,14 @@ async fn remove_data(
     match what.as_str() {
         "genres" => {
             for genre in data {
-                admin_access::remove_genre().bind(&db_client, &genre).await.context("Failed to remove genre")?;
+                let count = admin_access::remove_genre().bind(&db_client, &genre).await.context("Failed to remove genre")?;
+                tracing::info!("Removed {} genres", count);
             } 
         }
         "moods" => {
             for mood in data {
-                admin_access::remove_mood().bind(&db_client, &mood).await.context("Failed to remove mood")?;
+                let count = admin_access::remove_mood().bind(&db_client, &mood).await.context("Failed to remove mood")?;
+                tracing::info!("Removed {} moods", count);
             } 
         }
         _ => return Err(ResponseError::BadRequest(anyhow!("Only genres and moods available, given: {what}")))
