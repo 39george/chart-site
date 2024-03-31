@@ -1,8 +1,9 @@
---! fetch_songs : (secondary_genre?, song_rating?)
+--! fetch_songs : (secondary_genre?, rating?)
 SELECT
-    songs.id AS song_id,
-    songs.rating AS song_rating,
-    songs.name AS song_name,
+    songs.id,
+    songs.rating,
+    songs.price,
+    songs.name,
     p.name AS primary_genre,
     s.name AS secondary_genre,
     songs.cover_object_key AS cover_url,

@@ -1,8 +1,9 @@
---! insert_new_song (secondary_genre?)
-INSERT INTO songs(name, price, primary_genre, secondary_genre, sex, tempo, key, duration, lyric, cover_object_key, audio_object_key)
+--! insert_new_song (secondary_genre?, rating?)
+INSERT INTO songs(name, price, rating, primary_genre, secondary_genre, sex, tempo, key, duration, lyric, cover_object_key, audio_object_key)
 VALUES ( 
     :name,
     :price,
+    :rating,
     (SELECT id FROM genres WHERE name = :primary_genre),
     (SELECT id FROM genres WHERE name = :secondary_genre),
     :sex,
@@ -14,23 +15,36 @@ VALUES (
     :audio_obj_key
 );
 
---! get_song_object_keys_by_id
-SELECT cover_object_key, audio_object_key FROM songs
+--! get_song_cover_object_key_by_id
+SELECT cover_object_key FROM songs
 WHERE songs.id = :id;
 
---! update_song (secondary_genre?)
+--! get_song_audio_object_key_by_id
+SELECT audio_object_key FROM songs
+WHERE songs.id = :id;
+
+--! update_song_metadata (secondary_genre?, rating?)
 UPDATE songs
     SET name = :name,
         price = :price,
+        rating = :rating,
         primary_genre = (SELECT id FROM genres WHERE name = :primary_genre),
         secondary_genre = (SELECT id FROM genres WHERE name = :secondary_genre),
         sex = :sex,
         tempo = :tempo,
         key = :key,
         duration = :duration,
-        lyric = :lyric,
-        cover_object_key = :cover_object_key,
-        audio_object_key = :audio_object_key
+        lyric = :lyric
+WHERE songs.id = :id;
+
+--! update_song_cover
+UPDATE songs
+    SET cover_object_key = :cover_object_key
+WHERE songs.id = :id;
+
+--! update_song_audio
+UPDATE songs
+    SET audio_object_key = :audio_object_key
 WHERE songs.id = :id;
 
 --! remove_song_by_id
