@@ -1,0 +1,13 @@
+@import "./variables.scss";
+
+@mixin image_wrapper($size, $border_radius) {
+  width: $size;
+  height: $size;
+  border-radius: $border_radius;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
