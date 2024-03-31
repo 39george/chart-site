@@ -2,7 +2,7 @@
 //! and derive ToResponse to all types we bind as `response = Type`.
 //! We only need ToSchema derived if we set response as `body = Type`.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use utoipa::{
     openapi::{
         security::{ApiKey, ApiKeyValue, SecurityScheme},
@@ -84,7 +84,7 @@ pub struct ConflictErrorResponse;
 // ───── Responses ────────────────────────────────────────────────────────── //
 
 /// Derived `Deserialize` for integration tests
-#[derive(Deserialize, ToResponse, ToSchema)]
+#[derive(Serialize, Deserialize, ToResponse, ToSchema)]
 #[response(description = "Song data")]
 pub struct FetchSongs {
     pub id: i32,
