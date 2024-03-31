@@ -8,9 +8,22 @@
 }
 
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+
   display: flex;
   align-items: center;
+
+  width: 100%;
+
   padding: 2.375rem 2rem;
+
+  background-color: rgba($color: $main_dark, $alpha: 0.8);
+  backdrop-filter: blur(0.25rem);
+  -webkit-backdrop-filter: blur(0.25rem);
+
+  z-index: 99;
 }
 
 .image_wrapper {
