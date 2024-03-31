@@ -1,5 +1,6 @@
 use chart_site::{
     config::Settings,
+    cornucopia::queries::open_access,
     domain::{
         music_parameters::{MusicKey, Sex},
         requests::{Lyric, SubmitSong},
@@ -157,62 +158,55 @@ async fn rename_song_success() {
     assert_eq!(&song.name, "Other name");
 }
 
-// TODO: Implement this test
 #[tokio::test]
 async fn update_song_audio_success() {
-    // let config = Settings::load_configuration().unwrap();
-    // let app = TestApp::spawn_app(config).await;
-    // let http_client = reqwest::Client::builder()
-    //     .cookie_store(true)
-    //     .build()
-    //     .unwrap();
-    // // Create song
-    // assert_eq!(app.submit_song(&http_client, "Lalasong").await, 201);
+    let config = Settings::load_configuration().unwrap();
+    let app = TestApp::spawn_app(config).await;
+    let http_client = reqwest::Client::builder()
+        .cookie_store(true)
+        .build()
+        .unwrap();
+    // Fetch song closure
+    let fetch_song = || async {
+        http_client
+            .get(format!("{}/api/open/songs", &app.address))
+            .send()
+            .await
+            .unwrap()
+            .json::<Vec<FetchSongs>>()
+            .await
+            .unwrap()
+            .pop()
+            .unwrap()
+    };
+    // Create song
+    assert_eq!(app.submit_song(&http_client, "Lalasong").await, 201);
 
-    // // Fetch song and rename it
-    // let mut song = http_client
-    //     .get(format!("{}/api/open/songs", &app.address))
-    //     .send()
-    //     .await
-    //     .unwrap()
-    //     .json::<Vec<FetchSongs>>()
-    //     .await
-    //     .unwrap()
-    //     .pop()
-    //     .unwrap();
-    // song.name = String::from("Other name");
+    // Upload new audio
+    let song = read_file("assets/Song.mp3").unwrap();
+    let (response, audio_obj_key) = app
+        .upload_file_get_objkey(&http_client, "image/png", "NewSong.mp3", song)
+        .await;
+    assert_eq!(response.status().as_u16(), 200);
 
-    // // Send request to update song
-    // let response = http_client
-    //     .put(format!("{}/api/protected/song_meta/{}", &app.address, 1))
-    //     .json(&SubmitSong {
-    //         name: song.name,
-    //         price: song.price,
-    //         primary_genre: song.primary_genre,
-    //         secondary_genre: song.secondary_genre,
-    //         sex: song.sex,
-    //         tempo: song.tempo,
-    //         key: song.key,
-    //         duration: song.duration,
-    //         lyric: song.lyric,
-    //         cover_object_key: None,
-    //         audio_object_key: None,
-    //         rating: None,
-    //     })
-    //     .send()
-    //     .await
-    //     .unwrap();
-    // assert_eq!(response.status().as_u16(), 200);
+    let song = fetch_song().await;
+    // Update song audio data
+    let response = http_client
+        .put(format!(
+            "{}/api/protected/song_data/{}?what={}",
+            &app.address, song.id, "audio"
+        ))
+        .body(audio_obj_key.clone())
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status().as_u16(), 200);
 
-    // let song = http_client
-    //     .get(format!("{}/api/open/songs", &app.address))
-    //     .send()
-    //     .await
-    //     .unwrap()
-    //     .json::<Vec<FetchSongs>>()
-    //     .await
-    //     .unwrap()
-    //     .pop()
-    //     .unwrap();
-    // assert_eq!(&song.name, "Other name");
+    // Retrieve audio obj key from db
+    let obj_key = open_access::get_song_audio_obj_key_by_id()
+        .bind(&app.pg_client, &song.id)
+        .one()
+        .await
+        .unwrap();
+    assert_eq!(audio_obj_key, obj_key);
 }
