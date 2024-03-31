@@ -1,2 +1,5 @@
+mod genres_moods;
 mod helpers;
-mod submit_song;
+mod open_api;
+mod permissions;
+mod song;

@@ -1,5 +1,9 @@
 //! This is a module with common initialization functions.
 
+use std::fs::File;
+use std::io::BufReader;
+use std::io::Read;
+
 use argon2::Argon2;
 use argon2::PasswordHasher;
 
@@ -268,4 +272,11 @@ fn hash_password(password: &str, argon2: &argon2::Argon2) -> String {
         .hash_password(password.as_bytes(), &salt)
         .unwrap()
         .to_string()
+}
+
+pub fn read_file(name: &str) -> Result<Vec<u8>, std::io::Error> {
+    let mut file = BufReader::new(File::open(name)?);
+    let mut result = Vec::new();
+    file.read_to_end(&mut result)?;
+    Ok(result)
 }
