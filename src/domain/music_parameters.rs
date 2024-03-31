@@ -5,6 +5,7 @@ use crate::cornucopia::types::public::Musickey;
 // ───── Body ─────────────────────────────────────────────────────────────── //
 
 #[derive(Serialize, Deserialize, Debug, utoipa::ToSchema)]
+#[serde(rename_all = "lowercase")]
 pub enum Sex {
     Male,
     Female,
