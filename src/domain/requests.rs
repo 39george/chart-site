@@ -17,6 +17,11 @@ use super::{MAX_AUDIO_DURATION_SEC, MIN_AUDIO_DURATION_SEC};
 use super::{MAX_FILENAME_LEN, MIN_FILENAME_LEN};
 use super::{MAX_LYRIC_LEN, MIN_LYRIC_LEN};
 
+#[derive(Deserialize, Debug)]
+pub struct WordQuery {
+    pub what: String,
+}
+
 /// Lyric (text for song).
 #[derive(Serialize, Deserialize, Debug, Validate, ToSchema)]
 #[garde(transparent)]
@@ -57,6 +62,8 @@ pub struct SubmitSong {
         example = 18.50
     )]
     pub price: Decimal,
+    #[garde(skip)]
+    pub rating: Option<i32>,
     #[garde(
         length(min=GENRE_MIN_LEN, max=GENRE_MAX_LEN),
         custom(forbidden_characters),
@@ -85,8 +92,8 @@ pub struct SubmitSong {
     pub duration: i16,
     #[garde(dive)]
     pub lyric: Lyric,
-    pub cover_object_key: ObjectKey,
-    pub audio_object_key: ObjectKey,
+    pub cover_object_key: Option<ObjectKey>,
+    pub audio_object_key: Option<ObjectKey>,
 }
 
 #[derive(Deserialize, Debug, Validate, ToSchema, IntoParams)]
