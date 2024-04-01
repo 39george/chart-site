@@ -2,13 +2,16 @@
 
 .songs_section {
   display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
 }
 
 .songs_list {
   width: 100%;
-  max-width: 40.25rem;
+}
 
-  margin-top: 1rem;
+.songs_list_short {
+  max-width: 47rem;
 }
 
 .view_switch {
