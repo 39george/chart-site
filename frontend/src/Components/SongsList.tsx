@@ -1,5 +1,5 @@
 import styles from "./SongsList.module.scss";
-import { Component, For } from "solid-js";
+import { Component, For, Show, createSignal } from "solid-js";
 import { FaSolidBars } from "solid-icons/fa";
 import { BsGridFill } from "solid-icons/bs";
 import { songs } from "../data";
@@ -7,9 +7,18 @@ import SongItem from "./SongItem";
 import CurrentSong from "./CurrentSong";
 
 const SongsList: Component = () => {
+  const [current_song_idx, set_current_song_idx] = createSignal<number>(-1);
+
+  const toggle_current_song = (idx: number) => {
+    set_current_song_idx(idx);
+  };
   return (
     <div class={styles.songs_section}>
-      <div class={styles.songs_list}>
+      <div
+        class={`${styles.songs_list} ${
+          current_song_idx() !== -1 && styles.song_list_short
+        }`}
+      >
         <div class={styles.view_switch}>
           <div class={`${styles.switch_option} ${styles.active_option}`}>
             <FaSolidBars class={styles.switch_icon} />
@@ -36,12 +45,16 @@ const SongsList: Component = () => {
                   sex: song.sex,
                 }}
                 order_number={i() + 1}
+                toggle_current_song={toggle_current_song}
+                current_song_idx={current_song_idx()}
               />
             );
           }}
         </For>
       </div>
-      <CurrentSong song={songs[0]} />
+      <Show when={current_song_idx() !== -1}>
+        <CurrentSong song={songs[current_song_idx()]} />
+      </Show>
     </div>
   );
 };
