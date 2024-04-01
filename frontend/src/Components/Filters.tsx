@@ -8,20 +8,20 @@ import {
 } from "solid-js";
 import { FiChevronDown } from "solid-icons/fi";
 import ActiveFitlers from "./ActiveFilters";
-import { genders, genres, moods } from "../data";
-import { FilterType, GenderOptions } from "../types";
-
-interface CheckedGender {
-  checked: GenderOptions;
-}
+import { genders, genres, moods, songs } from "../data";
+import { FilterType, GenderOptions, ISong } from "../types";
+import {
+  checked_gender,
+  checked_genres_moods,
+  price_value,
+  set_checked_gender,
+  set_checked_genres_moods,
+  set_price_value,
+} from "../store/global_store";
+import { format_price } from "../helpers";
 
 interface FocusedFilter {
   focused: FilterType;
-}
-
-interface CheckedGenresMoods {
-  genres: string[];
-  moods: string[];
 }
 
 interface InputRefs {
@@ -31,24 +31,39 @@ interface InputRefs {
   price_ref: HTMLDivElement | undefined;
 }
 
+function calc_max_price(songs: ISong[]) {
+  let max_price = Number.NEGATIVE_INFINITY;
+
+  songs.forEach((song) => {
+    if (Number.parseInt(song.price) > max_price) {
+      max_price = Number.parseInt(song.price);
+    }
+  });
+
+  return max_price;
+}
+
+function calc_min_price(songs: ISong[]) {
+  let min_price = Number.POSITIVE_INFINITY;
+
+  songs.forEach((song) => {
+    if (Number.parseInt(song.price) < min_price) {
+      min_price = Number.parseInt(song.price);
+    }
+  });
+
+  return min_price;
+}
+
+export const MAX_PRICE = calc_max_price(songs);
+export const MIN_PRICE = calc_min_price(songs);
+
 const Filters: Component = () => {
   const [focused_ref, set_focused_ref] = createSignal<
     HTMLDivElement | undefined
   >(undefined);
   const [focused_filter, set_focused_filter] = createSignal<FocusedFilter>({
     focused: null,
-  });
-  const [checked_gender, set_checked_gender] = createSignal<CheckedGender>({
-    checked: "Любой",
-  });
-  const [checked_genres_moods, set_checked_genres_moods] =
-    createSignal<CheckedGenresMoods>({
-      genres: [],
-      moods: [],
-    });
-  const [price_value, set_price_value] = createSignal({
-    from: "",
-    to: "",
   });
   const input_refs: InputRefs = {
     gender_ref: undefined,
@@ -366,7 +381,7 @@ const Filters: Component = () => {
                     inputMode="numeric"
                     id="from"
                     value={price_value().from}
-                    placeholder="0₽"
+                    placeholder={`${format_price(MIN_PRICE.toString())}₽`}
                     onInput={handle_change_price}
                   />
                   <p class={styles.price_to}>до</p>
@@ -379,7 +394,7 @@ const Filters: Component = () => {
                     inputMode="numeric"
                     id="to"
                     value={price_value().to}
-                    placeholder="120 000₽"
+                    placeholder={`${format_price(MAX_PRICE.toString())}₽`}
                     onInput={handle_change_price}
                   />
                 </div>
