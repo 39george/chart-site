@@ -1,5 +1,5 @@
-import cover_1 from "./assets/cover_1.jpeg";
-import cover_2 from "./assets/cover_2.jpeg";
+import cover_1 from "./assets/cover_1.jpg";
+import cover_2 from "./assets/cover_2.jpg";
 import { GenderOptions, ISong } from "./types";
 
 export const genders: GenderOptions[] = ["Любой", "Мужской", "Женский"];
@@ -20,7 +20,7 @@ export const songs: ISong[] = [
     created_at: "some_date",
     duration: 209,
     id: 1,
-    lyric: "some text",
+    lyric: `Куплет 1 За окном до утра Говорили холода Говорили холода За мое все отдам В эти злые времена Все не стынет голова Ты просто 10 баллов Пробками до вокзала`,
     name: "Думала",
     price: "100 000₽",
     primary_genre: "Поп",
