@@ -3,6 +3,7 @@ import { ISong } from "../types";
 import { Component } from "solid-js";
 import { BsPlayCircle } from "solid-icons/bs";
 import PauseIcon from "../UI/PauseIcon";
+import { format_price } from "../helpers";
 
 interface SongItemProps {
   song: ISong;
@@ -41,7 +42,7 @@ const SongItem: Component<SongItemProps> = (props) => {
           <div class={styles.meta_unit}>{props.song.primary_genre}</div>
           <div class={styles.meta_unit}>{props.song.moods[0]}</div>
         </div>
-        <p class={styles.price}>{props.song.price}</p>
+        <p class={styles.price}>{format_price(props.song.price)}₽</p>
       </div>
     </div>
   );
