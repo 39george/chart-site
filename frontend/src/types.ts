@@ -12,9 +12,18 @@ export interface ISong {
   primary_genre: string;
   moods: string[];
   raiting: number;
-  sex: string;
+  sex: GenderOptions;
   created_at: string;
   key?: string;
   secondary_genre?: string;
   tempo?: string;
+}
+
+export interface CheckedGender {
+  checked: GenderOptions;
+}
+
+export interface CheckedGenresMoods {
+  genres: string[];
+  moods: string[];
 }
