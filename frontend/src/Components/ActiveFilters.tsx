@@ -1,4 +1,4 @@
-import styles from "./ActiveFitlers.module.scss";
+import styles from "./ActiveFilters.module.scss";
 import { Component, Index, createEffect, createSignal } from "solid-js";
 import { IoCloseCircle, IoCloseOutline } from "solid-icons/io";
 import { FilterType, GenderOptions } from "../types";
