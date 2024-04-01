@@ -2,15 +2,23 @@ import styles from "./SongItem.module.scss";
 import { ISong } from "../types";
 import { Component } from "solid-js";
 import { BsPlayCircle } from "solid-icons/bs";
+import PauseIcon from "../UI/PauseIcon";
 
 interface SongItemProps {
   song: ISong;
   order_number: number;
+  toggle_current_song: (idx: number) => void;
+  current_song_idx: number;
 }
 
 const SongItem: Component<SongItemProps> = (props) => {
   return (
-    <div class={styles.song_item}>
+    <div
+      class={`${styles.song_item} ${
+        props.current_song_idx === props.order_number - 1 && styles.current_song
+      }`}
+      onclick={() => props.toggle_current_song(props.order_number - 1)}
+    >
       <p class={styles.order_number}>{props.order_number}</p>
       <div class={styles.image_wrapper}>
         <img
@@ -18,7 +26,13 @@ const SongItem: Component<SongItemProps> = (props) => {
           alt="cover"
           draggable={false}
         />
-        <BsPlayCircle class={styles.play_pause_icon} />
+        {props.current_song_idx === props.order_number - 1 && (
+          <PauseIcon
+            size="small"
+            position={{ top: "50%", left: "50%" }}
+          />
+        )}
+        <BsPlayCircle class={styles.play_icon} />
       </div>
       <p class={styles.name}>{props.song.name}</p>
       <div class={styles.meta_and_price}>
