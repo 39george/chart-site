@@ -2,6 +2,8 @@ import styles from "./ActiveFilters.module.scss";
 import { Component, Index, createEffect, createSignal } from "solid-js";
 import { IoCloseCircle, IoCloseOutline } from "solid-icons/io";
 import { FilterType, GenderOptions } from "../types";
+import { MAX_PRICE, MIN_PRICE } from "./Filters";
+import { format_price } from "../helpers";
 
 interface ActiveFiltersProps {
   filters: {
@@ -92,18 +94,30 @@ const ActiveFitlers: Component<ActiveFiltersProps> = (props) => {
           />
         </div>
       )}
-      {props.filters.price.from !== "" && (
+      {props.filters.price.from !== "" || props.filters.price.to !== "" ? (
         <div class={styles.active_filter}>
           <span class={styles.filter_type}>Цена:&nbsp;&nbsp;</span>
-          <span>{props.filters.price.from} - 120 000₽</span>
+          <span>
+            {props.filters.price.from === ""
+              ? format_price(MIN_PRICE.toString())
+              : props.filters.price.from}
+            ₽ -{" "}
+            {props.filters.price.to === ""
+              ? format_price(MAX_PRICE.toString())
+              : props.filters.price.to}
+            ₽
+          </span>
           <IoCloseOutline
             class={styles.clear_icon_outline}
             onClick={() => props.clear_filter("price")}
           />
         </div>
+      ) : (
+        ""
       )}
       {props.filters.gender !== "Любой" ||
       props.filters.price.from !== "" ||
+      props.filters.price.to !== "" ||
       props.filters.genres.length !== 0 ||
       props.filters.moods.length !== 0 ? (
         <div
