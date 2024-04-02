@@ -1,5 +1,6 @@
 # Tasks for backend
 
-Please add:
-- A field "created_at" to *FetchSongs* schema 
-- A filed "moods" to *FetchSongs* schema
+| Task                                          | Status |
+| --------------------------------------------- | ------ |
+| A field `created_at` to **FetchSongs** schema | Done   |
+| A filed `moods` to **FetchSongs** schema      | Done   |
