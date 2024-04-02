@@ -18,3 +18,9 @@
 .songs_section {
   display: flex;
 }
+
+@media (max-width: 450px) {
+  .content {
+    padding-top: 3rem;
+  }
+}
