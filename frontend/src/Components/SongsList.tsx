@@ -2,7 +2,7 @@ import styles from "./SongsList.module.scss";
 import { Component, For, Show, createEffect, createSignal } from "solid-js";
 import { FaSolidBars } from "solid-icons/fa";
 import { BsGridFill } from "solid-icons/bs";
-import { songs } from "../data";
+import { MAX_PRICE, MIN_PRICE, songs } from "../data";
 import SongItem from "./SongItem";
 import CurrentSong from "./CurrentSong";
 import { ISong } from "../types";
@@ -11,7 +11,6 @@ import {
   checked_genres_moods,
   price_value,
 } from "../store/global_store";
-import { MAX_PRICE, MIN_PRICE } from "./Filters";
 
 function is_in_bounds(min: number, max: number, song_price: number): boolean {
   return song_price >= min && song_price <= max;

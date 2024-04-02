@@ -2,14 +2,15 @@ import styles from "./Filters.module.scss";
 import {
   Component,
   For,
+  Show,
   createEffect,
   createSignal,
   onCleanup,
 } from "solid-js";
 import { FiChevronDown } from "solid-icons/fi";
 import ActiveFitlers from "./ActiveFilters";
-import { genders, genres, moods, songs } from "../data";
-import { FilterType, GenderOptions, ISong } from "../types";
+import { MAX_PRICE, MIN_PRICE, genders, genres, moods } from "../data";
+import { FilterType, GenderOptions } from "../types";
 import {
   checked_gender,
   checked_genres_moods,
@@ -31,33 +32,6 @@ interface InputRefs {
   price_ref: HTMLDivElement | undefined;
 }
 
-function calc_max_price(songs: ISong[]) {
-  let max_price = Number.NEGATIVE_INFINITY;
-
-  songs.forEach((song) => {
-    if (Number.parseInt(song.price) > max_price) {
-      max_price = Number.parseInt(song.price);
-    }
-  });
-
-  return max_price;
-}
-
-function calc_min_price(songs: ISong[]) {
-  let min_price = Number.POSITIVE_INFINITY;
-
-  songs.forEach((song) => {
-    if (Number.parseInt(song.price) < min_price) {
-      min_price = Number.parseInt(song.price);
-    }
-  });
-
-  return min_price;
-}
-
-export const MAX_PRICE = calc_max_price(songs);
-export const MIN_PRICE = calc_min_price(songs);
-
 const Filters: Component = () => {
   const [focused_ref, set_focused_ref] = createSignal<
     HTMLDivElement | undefined
@@ -71,7 +45,7 @@ const Filters: Component = () => {
     mood_ref: undefined,
     price_ref: undefined,
   };
-
+  let filters_to_choose_ref: HTMLDivElement | undefined;
   const number_format = new Intl.NumberFormat("ru");
 
   const handle_filter_click = (filter: FilterType) => {
@@ -210,7 +184,10 @@ const Filters: Component = () => {
 
   return (
     <div class={styles.filters}>
-      <div class={styles.filters_to_choose}>
+      <div
+        ref={filters_to_choose_ref}
+        class={styles.filters_to_choose}
+      >
         <p class={styles.header}>Фильтры</p>
         <div
           ref={input_refs.gender_ref}
@@ -225,7 +202,7 @@ const Filters: Component = () => {
             <p>Пол</p>
             <FiChevronDown class={styles.chevron} />
           </div>
-          {focused_filter().focused === "gender" && (
+          <Show when={focused_filter().focused === "gender"}>
             <div class={styles.pop_up}>
               <ul class={styles.pop_up_content}>
                 <li class={styles.pop_up_title}>Пол</li>
@@ -252,7 +229,7 @@ const Filters: Component = () => {
                 </For>
               </ul>
             </div>
-          )}
+          </Show>
         </div>
         <div
           ref={input_refs.genre_ref}
@@ -267,8 +244,8 @@ const Filters: Component = () => {
             <p>Жанр</p>
             <FiChevronDown class={styles.chevron} />
           </div>
-          {focused_filter().focused === "genre" && (
-            <div class={styles.pop_up}>
+          <Show when={focused_filter().focused === "genre"}>
+            <div class={`${styles.pop_up} ${styles.pop_up_genre}`}>
               <ul class={styles.pop_up_content}>
                 <li class={styles.pop_up_title}>Жанр</li>
                 <For each={genres}>
@@ -302,7 +279,7 @@ const Filters: Component = () => {
                 </For>
               </ul>
             </div>
-          )}
+          </Show>
         </div>
         <div
           ref={input_refs.mood_ref}
@@ -317,8 +294,8 @@ const Filters: Component = () => {
             <p>Настроение</p>
             <FiChevronDown class={styles.chevron} />
           </div>
-          {focused_filter().focused === "mood" && (
-            <div class={styles.pop_up}>
+          <Show when={focused_filter().focused === "mood"}>
+            <div class={`${styles.pop_up} ${styles.pop_up_mood}`}>
               <ul class={styles.pop_up_content}>
                 <li class={styles.pop_up_title}>Настроение</li>
                 <For each={moods}>
@@ -352,7 +329,7 @@ const Filters: Component = () => {
                 </For>
               </ul>
             </div>
-          )}
+          </Show>
         </div>
         <div
           ref={input_refs.price_ref}
@@ -367,8 +344,8 @@ const Filters: Component = () => {
             <p>Цена</p>
             <FiChevronDown class={styles.chevron} />
           </div>
-          {focused_filter().focused === "price" && (
-            <div class={styles.pop_up}>
+          <Show when={focused_filter().focused === "price"}>
+            <div class={`${styles.pop_up} ${styles.pop_up_price}`}>
               <div class={styles.pop_up_content}>
                 <p class={styles.pop_up_title}>Цена</p>
                 <div class={styles.price_inputs}>
@@ -400,7 +377,7 @@ const Filters: Component = () => {
                 </div>
               </div>
             </div>
-          )}
+          </Show>
         </div>
       </div>
       <ActiveFitlers

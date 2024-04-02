@@ -1,6 +1,6 @@
 import styles from "./SongItem.module.scss";
 import { ISong } from "../types";
-import { Component } from "solid-js";
+import { Component, createSignal } from "solid-js";
 import { BsPlayCircle } from "solid-icons/bs";
 import PauseIcon from "../UI/PauseIcon";
 import { format_price } from "../helpers";
@@ -13,6 +13,16 @@ interface SongItemProps {
 }
 
 const SongItem: Component<SongItemProps> = (props) => {
+  const [popup_visible, set_popup_visible] = createSignal(false);
+
+  const handle_price_click = (e: MouseEvent) => {
+    if (window.innerWidth > 378) {
+      return;
+    }
+    e.stopPropagation();
+    set_popup_visible(!popup_visible());
+  };
+
   return (
     <div
       class={`${styles.song_item} ${
@@ -35,14 +45,38 @@ const SongItem: Component<SongItemProps> = (props) => {
         )}
         <BsPlayCircle class={styles.play_icon} />
       </div>
-      <p class={styles.name}>{props.song.name}</p>
-      <div class={styles.meta_and_price}>
+      <div class={styles.name_and_meta}>
+        <p class={styles.name}>{props.song.name}</p>
         <div class={styles.meta_info}>
-          <div class={styles.meta_unit}>{props.song.sex}</div>
-          <div class={styles.meta_unit}>{props.song.primary_genre}</div>
-          <div class={styles.meta_unit}>{props.song.moods[0]}</div>
+          <div class={styles.meta_unit}>
+            <span class={styles.hash_tag}>#</span>
+            {props.song.sex}
+          </div>
+          <div class={styles.meta_unit}>
+            <span class={styles.hash_tag}>#</span>
+            {props.song.primary_genre}
+          </div>
+          <div class={styles.meta_unit}>
+            <span class={styles.hash_tag}>#</span>
+            {props.song.moods[0]}
+          </div>
         </div>
-        <p class={styles.price}>{format_price(props.song.price)}₽</p>
+      </div>
+      <div
+        class={styles.price}
+        onClick={(e) => handle_price_click(e)}
+      >
+        <span class={styles.price_number}>
+          {format_price(props.song.price)}
+        </span>
+        ₽
+        <div
+          class={`${styles.price_pop_up} ${
+            popup_visible() && styles.price_pop_up_visible
+          }`}
+        >
+          {format_price(props.song.price)}
+        </div>
       </div>
     </div>
   );

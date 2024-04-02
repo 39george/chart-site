@@ -2,8 +2,8 @@ import styles from "./ActiveFilters.module.scss";
 import { Component, Index, createEffect, createSignal } from "solid-js";
 import { IoCloseCircle, IoCloseOutline } from "solid-icons/io";
 import { FilterType, GenderOptions } from "../types";
-import { MAX_PRICE, MIN_PRICE } from "./Filters";
 import { format_price } from "../helpers";
+import { MAX_PRICE, MIN_PRICE } from "../data";
 
 interface ActiveFiltersProps {
   filters: {

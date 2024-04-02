@@ -9,33 +9,8 @@ interface CurrentSongProps {
 }
 
 const CurrentSong: Component<CurrentSongProps> = (props) => {
-  const verse_regex = /Куплет.*/;
-
   const lyric_format = (lyric: string): string[] => {
-    let substring = "";
-    let result: string[] = [];
-    const regex = /[A-Za-zА-Яа-я]+/;
-
-    for (let i = 0; i < lyric.length; i++) {
-      if (lyric.charAt(i) === lyric.charAt(i).toUpperCase()) {
-        if (!regex.test(lyric.charAt(i))) {
-          substring += lyric.charAt(i);
-        } else if (substring === "") {
-          substring += lyric.charAt(i);
-        } else {
-          result.push(substring);
-          substring = lyric.charAt(i);
-        }
-      } else {
-        substring += lyric.charAt(i);
-      }
-    }
-
-    if (substring !== "") {
-      result.push(substring);
-    }
-
-    return result;
+    return lyric.split("\n");
   };
 
   return (
@@ -81,17 +56,11 @@ const CurrentSong: Component<CurrentSongProps> = (props) => {
           <p class={styles.info_header}>Текст песни</p>
           <div class={styles.text}>
             <Index each={lyric_format(props.song.lyric)}>
-              {(string) => {
-                if (verse_regex.test(string())) {
-                  return (
-                    <>
-                      <p>{string()}</p>
-                      <br />
-                    </>
-                  );
-                } else {
-                  return <p>{string()}</p>;
+              {(s) => {
+                if (s() === "") {
+                  return <br />;
                 }
+                return <p>{s()}</p>;
               }}
             </Index>
           </div>
