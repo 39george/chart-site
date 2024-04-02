@@ -69,7 +69,7 @@ const SongsList: Component = () => {
       >
         <div
           class={`${styles.songs_list} ${
-            current_song_idx() !== -1 && styles.song_list_short
+            current_song_idx() !== -1 && styles.songs_list_short
           }`}
         >
           <div class={styles.view_switch}>

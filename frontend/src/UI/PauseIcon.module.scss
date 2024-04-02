@@ -48,3 +48,18 @@
     margin-right: 0.25rem;
   }
 }
+
+@media (max-width: 400px) {
+  .big {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .stick_big {
+    width: 0.25rem;
+    height: 1rem;
+    &:not(:last-child) {
+      margin-right: 0.25rem;
+    }
+  }
+}

@@ -15,23 +15,25 @@ const CurrentSong: Component<CurrentSongProps> = (props) => {
 
   return (
     <div class={styles.current_song_section}>
-      <div class={styles.image_section}>
-        <div class={styles.image_wrapper}>
-          <img
-            src={props.song.cover_url}
-            alt="cover"
-            draggable={false}
-          />
-          <PauseIcon
-            size="big"
-            position={{ right: "0.75rem", bottom: "0.75rem" }}
-          />
+      <div>
+        <div class={styles.image_section}>
+          <div class={styles.image_wrapper}>
+            <img
+              src={props.song.cover_url}
+              alt="cover"
+              draggable={false}
+            />
+            <PauseIcon
+              size="big"
+              position={{ right: "0.75rem", bottom: "0.75rem" }}
+            />
+          </div>
+          <div class={styles.background_decor}></div>
         </div>
-        <div class={styles.background_decor}></div>
+        <p class={styles.name}>{props.song.name}</p>
       </div>
-      <p class={styles.name}>{props.song.name}</p>
       <div class={styles.meta_info}>
-        <div class={styles.genreal}>
+        <div class={styles.general}>
           <p class={styles.info_header}>Общая информация</p>
           <div class={styles.stats}>
             <div class={styles.stat_unit}>

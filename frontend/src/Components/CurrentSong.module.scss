@@ -2,11 +2,11 @@
 @import "../genreal_styles.scss";
 
 .current_song_section {
+  position: relative;
   width: 100%;
   max-width: 27rem;
 
-  margin-top: 3.375rem;
-  margin-left: 2rem;
+  margin: 3.375rem 1rem 0 2rem;
 }
 
 .image_section {
@@ -33,9 +33,9 @@
 
 .background_decor {
   position: absolute;
-  left: 0;
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
 
   width: 27rem;
   height: 27rem;
@@ -67,12 +67,16 @@
   font-weight: 500;
 }
 
+.general {
+  width: 100%;
+  max-width: 11.75rem;
+}
+
 .info_header {
   letter-spacing: 0.08em;
 }
 
 .stats {
-  width: 11.75rem;
   margin-top: 1.75rem;
 }
 
@@ -107,6 +111,8 @@
   margin-top: 2em;
 
   font-size: 0.625rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
   cursor: pointer;
 
   &:hover {
@@ -119,4 +125,82 @@
   height: 0.75rem;
   margin-left: 0.25rem;
   transition: transform 0.15s ease-out;
+}
+
+@media (max-width: 1090px) {
+  .current_song_section {
+    display: flex;
+    justify-content: space-around;
+
+    width: initial;
+    max-width: initial;
+
+    margin: 3.375rem 0 0;
+  }
+
+  .meta_info {
+    margin-top: 0;
+    width: 50%;
+  }
+
+  .general {
+    margin-right: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .current_song_section {
+    display: block;
+  }
+
+  .meta_info {
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 3rem;
+  }
+
+  .general {
+    max-width: fit-content;
+    margin-right: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .image_wrapper {
+    width: clamp(
+      10rem,
+      calc(10rem + (204 - 160) * ((100vw - 320px) / (480 - 320))),
+      12.75rem
+    );
+    height: clamp(
+      10rem,
+      calc(10rem + (204 - 160) * ((100vw - 320px) / (480 - 320))),
+      12.75rem
+    );
+  }
+
+  .background_decor {
+    width: clamp(
+      18rem,
+      calc(18rem + (432 - 288) * ((100vw - 320px) / (480 - 320))),
+      27rem
+    );
+    height: clamp(
+      18rem,
+      calc(18rem + (432 - 288) * ((100vw - 320px) / (480 - 320))),
+      27rem
+    );
+  }
+
+  .meta_info {
+    flex-direction: column;
+    width: 80%;
+    margin: 3rem auto;
+  }
+
+  .general {
+    max-width: 100%;
+    margin-right: 0;
+    margin-bottom: 3rem;
+  }
 }

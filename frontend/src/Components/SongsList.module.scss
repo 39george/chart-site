@@ -7,11 +7,9 @@
 }
 
 .songs_list {
+  position: relative;
   width: 100%;
-}
-
-.songs_list_short {
-  max-width: 47rem;
+  z-index: 1;
 }
 
 .view_switch {
@@ -34,4 +32,21 @@
 
 .active_option {
   background-color: $middle_gray;
+}
+
+@media (max-width: 1150px) {
+  .songs_list_short {
+    max-width: 40rem;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 1090px) {
+  .songs_list_short {
+    max-width: 100%;
+  }
+
+  .songs_section {
+    flex-direction: column;
+  }
 }
