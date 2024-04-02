@@ -14,9 +14,10 @@ const Navbar: ParentComponent = (props) => {
       ? "contacts"
       : ""
   );
-  const handle_page_click = (pageName: ActivePageName) => {
+
+  function handle_page_click(pageName: ActivePageName) {
     set_active_page(pageName);
-  };
+  }
 
   return (
     <>

@@ -16,4 +16,3 @@ export const [price_value, set_price_value] = createSignal({
   from: "",
   to: "",
 });
-export const [counter, set_counter] = createSignal(0);

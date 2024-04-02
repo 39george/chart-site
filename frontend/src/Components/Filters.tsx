@@ -21,16 +21,22 @@ import {
 } from "../store/global_store";
 import { format_price } from "../helpers";
 
+// ───── Type declarations ────────────────────────────────────────────────── //
+
+// An interface that contains info of a currently clicked filter
 interface FocusedFilter {
   focused: FilterType;
 }
 
+// An interface with references to DOM filter elements
 interface InputRefs {
   gender_ref: HTMLDivElement | undefined;
   genre_ref: HTMLDivElement | undefined;
   mood_ref: HTMLDivElement | undefined;
   price_ref: HTMLDivElement | undefined;
 }
+
+// ───── Component ────────────────────────────────────────────────────────── //
 
 const Filters: Component = () => {
   const [focused_ref, set_focused_ref] = createSignal<
@@ -45,18 +51,17 @@ const Filters: Component = () => {
     mood_ref: undefined,
     price_ref: undefined,
   };
-  let filters_to_choose_ref: HTMLDivElement | undefined;
   const number_format = new Intl.NumberFormat("ru");
+  let filters_to_choose_ref: HTMLDivElement | undefined;
 
-  const handle_filter_click = (filter: FilterType) => {
+  // Handling click on filter to open corresponding popup menu
+  function handle_filter_click(filter: FilterType) {
     if (filter === focused_filter().focused) {
-      set_focused_filter((prev) => ({
-        ...prev,
+      set_focused_filter(() => ({
         focused: null,
       }));
     } else {
-      set_focused_filter((prev) => ({
-        ...prev,
+      set_focused_filter(() => ({
         focused: filter,
       }));
       switch (filter) {
@@ -74,18 +79,21 @@ const Filters: Component = () => {
           break;
       }
     }
-  };
+  }
 
-  const hanlde_checked_gender = (gender: GenderOptions) => {
+  // Toggling checked gender
+  function hanlde_checked_gender(gender: GenderOptions) {
     set_checked_gender(() => ({
       checked: gender,
     }));
-  };
+  }
 
-  const handle_checked_genres_moods = (
+  // Handling checked genres/moods. Push the item to checked array if it isn't
+  // present; filter items without the item, if it is present
+  function handle_checked_genres_moods(
     filter_type: "genres" | "moods",
     item: string
-  ) => {
+  ) {
     if (checked_genres_moods()[filter_type].includes(item)) {
       set_checked_genres_moods((prev) => ({
         ...prev,
@@ -99,11 +107,12 @@ const Filters: Component = () => {
         [filter_type]: [...prev[filter_type], item],
       }));
     }
-  };
+  }
 
-  const handle_change_price = (
+  // Handling and formatting input prices
+  function handle_change_price(
     e: Event & { currentTarget: HTMLInputElement; target: HTMLInputElement }
-  ) => {
+  ) {
     const name = e.target.name;
 
     let only_digit = e.target.value.replace(/[^\d]/g, "");
@@ -121,9 +130,9 @@ const Filters: Component = () => {
     } else {
       return;
     }
-  };
+  }
 
-  const clear_filters = () => {
+  function clear_filters() {
     set_checked_gender(() => ({
       checked: "Любой",
     }));
@@ -135,9 +144,9 @@ const Filters: Component = () => {
       from: "",
       to: "",
     }));
-  };
+  }
 
-  const clear_filter = (filter: FilterType) => {
+  function clear_filter(filter: FilterType) {
     switch (filter) {
       case "gender":
         set_checked_gender(() => ({
@@ -163,13 +172,12 @@ const Filters: Component = () => {
         }));
         break;
     }
-  };
+  }
 
   createEffect(() => {
     const handle_click_outside_filter = (e: MouseEvent) => {
       if (!focused_ref()?.contains(e.target as Node)) {
-        set_focused_filter((prev) => ({
-          ...prev,
+        set_focused_filter(() => ({
           focused: null,
         }));
       }

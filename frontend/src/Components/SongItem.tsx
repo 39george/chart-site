@@ -15,13 +15,13 @@ interface SongItemProps {
 const SongItem: Component<SongItemProps> = (props) => {
   const [popup_visible, set_popup_visible] = createSignal(false);
 
-  const handle_price_click = (e: MouseEvent) => {
+  function handle_price_click(e: MouseEvent) {
     if (window.innerWidth > 378) {
       return;
     }
     e.stopPropagation();
     set_popup_visible(!popup_visible());
-  };
+  }
 
   return (
     <div

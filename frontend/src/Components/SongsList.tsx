@@ -12,15 +12,19 @@ import {
   price_value,
 } from "../store/global_store";
 
-function is_in_bounds(min: number, max: number, song_price: number): boolean {
-  return song_price >= min && song_price <= max;
-}
-
 const SongsList: Component = () => {
   const [current_song_idx, set_current_song_idx] = createSignal<number>(-1);
   const [filtered_songs, set_filtered_songs] = createSignal<ISong[]>([
     ...songs,
   ]);
+
+  function is_in_bounds(min: number, max: number, song_price: number): boolean {
+    return song_price >= min && song_price <= max;
+  }
+
+  function toggle_current_song(idx: number) {
+    set_current_song_idx(idx);
+  }
 
   createEffect(() => {
     set_filtered_songs(
@@ -57,9 +61,6 @@ const SongsList: Component = () => {
     );
   });
 
-  const toggle_current_song = (idx: number) => {
-    set_current_song_idx(idx);
-  };
   return (
     <div class={styles.songs_section}>
       <Show
