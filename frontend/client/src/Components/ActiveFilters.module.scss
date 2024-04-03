@@ -1,0 +1,65 @@
+@import "../variables.scss";
+
+.active_filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  width: 100%;
+  max-width: 70rem;
+
+  margin-top: 0.75rem;
+
+  font-size: 0.75rem;
+}
+
+.active_filter {
+  display: flex;
+  align-items: center;
+
+  margin-right: 1.125rem;
+  margin-bottom: 1rem;
+  padding: 0.375rem 0.5rem 0.375rem 0.75rem;
+
+  border-radius: 1rem;
+  background-color: $dark_gary;
+
+  letter-spacing: 0.05em;
+}
+
+.filter_type {
+  color: $light_gray;
+}
+
+.clear_icon_outline,
+.clear_icon_circle {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.clear_icon_outline {
+  margin-left: 0.25rem;
+  stroke: $main_bright;
+}
+
+.clear_icon_circle {
+  margin-right: 0.325rem;
+}
+
+.clear_filters {
+  display: flex;
+  align-items: center;
+
+  margin-bottom: 1rem;
+
+  color: $light_gray;
+
+  letter-spacing: 0.06em;
+  transition: color 0.15s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    color: $main_bright;
+  }
+}
