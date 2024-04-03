@@ -1,0 +1,61 @@
+@import "../variables.scss";
+
+.main_page {
+  padding: 4.5rem clamp(0px, (100vw - 80rem) / 2, 9999px) 2rem;
+}
+
+.content {
+  padding: 6.5rem 1rem 3rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.h1 {
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: 0.2rem;
+}
+
+.add_song_button {
+  display: flex;
+  align-items: center;
+
+  margin-bottom: 1rem;
+  padding: 1em;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+
+  border-radius: 0.25rem;
+  color: $main_bright;
+  background-color: $accent_cyan;
+  text-decoration: none;
+
+  transition: filter 0.15s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(110%);
+  }
+}
+
+.plus_icon {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.625rem;
+  color: $main_bright;
+}
+
+@media (max-width: 450px) {
+  .content {
+    padding-top: 3rem;
+  }
+}
