@@ -19,6 +19,8 @@
 }
 
 .upload_form_content {
+  min-height: 43rem;
+
   margin-top: 0.75rem;
   padding: 2.75rem 3.125rem;
 
@@ -31,6 +33,10 @@
 }
 
 .upload_form_nav {
+  display: flex;
+  flex-wrap: wrap;
+
+  margin-bottom: 3.375rem;
   font-size: 1.125rem;
   font-weight: 500;
 }
@@ -42,6 +48,7 @@
 
   &:not(:last-child) {
     margin-right: 1.25rem;
+    margin-bottom: 1rem;
   }
 }
 
@@ -50,4 +57,10 @@
   text-decoration: underline;
   text-decoration-thickness: 0.125rem;
   text-underline-offset: 0.25rem;
+}
+
+@media (max-width: 660px) {
+  .upload_form_content {
+    padding: 2.75rem 2rem;
+  }
 }
