@@ -1,0 +1,53 @@
+@import "../variables.scss";
+
+.upload_form_container {
+  width: 100%;
+  max-width: 50rem;
+
+  margin: 3.75rem auto;
+}
+
+.steps {
+  display: flex;
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.step_count {
+  color: $light_gray;
+}
+
+.upload_form_content {
+  margin-top: 0.75rem;
+  padding: 2.75rem 3.125rem;
+
+  border-radius: 0.75rem;
+  border: 0.5px solid $light_gray;
+  box-shadow: 0 0 0.5rem rgba($color: #ffffff, $alpha: 0.2);
+
+  color: $main_bright;
+  background-color: $main_dark;
+}
+
+.upload_form_nav {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.step_link {
+  text-decoration: none;
+  color: $main_bright;
+  letter-spacing: 0.05em;
+
+  &:not(:last-child) {
+    margin-right: 1.25rem;
+  }
+}
+
+.link_active {
+  color: $accent_cyan;
+  text-decoration: underline;
+  text-decoration-thickness: 0.125rem;
+  text-underline-offset: 0.25rem;
+}
