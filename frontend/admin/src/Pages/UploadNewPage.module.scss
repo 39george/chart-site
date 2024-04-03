@@ -1,0 +1,50 @@
+@import "../variables.scss";
+
+.upload_new_section {
+  padding: 4.5rem clamp(0px, (100vw - 80rem) / 2, 9999px) 2rem;
+}
+
+.content {
+  padding: 6.5rem 1rem 3rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.h1 {
+  margin-right: 1.125rem;
+  margin-bottom: 1rem;
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: 0.2rem;
+}
+
+.return {
+  display: flex;
+  align-items: center;
+
+  margin-bottom: 1rem;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  color: $main_bright;
+  text-decoration: none;
+
+  &:hover {
+    .close_icon {
+      opacity: 1;
+    }
+  }
+}
+
+.close_icon {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
