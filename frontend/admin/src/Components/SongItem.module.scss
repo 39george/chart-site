@@ -1,0 +1,337 @@
+@import "../variables.scss";
+@import "../genreal_styles.scss";
+
+@keyframes popup_fade_in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.song_item {
+  display: flex;
+  align-items: center;
+
+  padding: 0.5rem 1.125rem;
+
+  border-radius: 0.25rem;
+  background-color: transparent;
+  cursor: pointer;
+
+  &:not(:last-child) {
+    margin-bottom: 0.125rem;
+  }
+
+  &:hover {
+    background-color: $dark_gary;
+
+    // .image_wrapper::after {
+    //   content: "";
+    //   position: absolute;
+    //   top: 0;
+    //   left: 0;
+    //   width: 100%;
+    //   height: 100%;
+    //   border-radius: 0.25rem;
+    //   background-color: rgba($color: #000000, $alpha: 0.3);
+    //   z-index: 2;
+    // }
+
+    .play_icon {
+      display: block;
+    }
+  }
+}
+
+.current_song {
+  background-color: $dark_gary;
+
+  .image_wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.25rem;
+    background-color: rgba($color: #000000, $alpha: 0.3);
+    z-index: 2;
+  }
+
+  &:hover {
+    .play_icon {
+      display: none;
+    }
+  }
+}
+
+.order_number {
+  width: 0.875rem;
+
+  margin-right: 1rem;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: end;
+}
+
+.image_wrapper {
+  @include image_wrapper(2.75rem, 0.25rem);
+
+  flex-shrink: 0;
+  position: relative;
+  margin-right: 1.375rem;
+}
+
+.play_icon {
+  display: none;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+
+  width: 2rem;
+  height: 2rem;
+
+  fill: $main_bright;
+
+  z-index: 3;
+}
+
+.name_and_meta {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.name {
+  margin-right: 1rem;
+  font-weight: 600;
+}
+
+.meta_info {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+
+  margin-left: auto;
+
+  font-size: 0.75rem;
+}
+
+.meta_unit {
+  display: flex;
+  align-items: center;
+
+  margin: 0.375rem 0;
+  padding: 0.375rem 0.625rem;
+
+  letter-spacing: 0.05em;
+
+  border-radius: 1rem;
+  background-color: $middle_gray;
+
+  &:not(:first-child) {
+    margin-left: 0.625rem;
+  }
+}
+
+.hash_tag {
+  display: none;
+}
+
+.price {
+  position: relative;
+
+  flex-shrink: 0;
+
+  margin-left: 1.75rem;
+  padding: 0.375rem 0.5rem;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+
+  border-radius: 0.25rem;
+  background-color: $accent_pink;
+}
+
+.price_pop_up {
+  visibility: hidden;
+
+  position: absolute;
+  top: 50%;
+  left: -4.875rem;
+  transform: translateY(-50%) translateX(0.75rem);
+
+  padding: 0.375rem 0.625rem;
+
+  border-radius: 1rem;
+  background-color: $accent_pink;
+
+  opacity: 0;
+
+  transition: 0.15s ease-out;
+}
+
+.price_pop_up_visible {
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+  opacity: 1;
+}
+
+.options {
+  flex-shrink: 0;
+
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 1.5rem;
+  height: 1.5rem;
+
+  margin-left: 1.5rem;
+
+  border-radius: 50%;
+  background-color: $middle_gray;
+
+  transition: 0.15s ease-out;
+
+  &:hover {
+    color: $middle_gray;
+    background-color: $main_bright;
+  }
+}
+
+.options_popup {
+  position: absolute;
+  top: 2rem;
+  right: 0;
+
+  padding: 1rem;
+
+  font-size: 0.75rem;
+
+  border-radius: 0.25rem;
+  border: 0.5px solid $light_gray;
+  box-shadow: 0 0 0.5rem rgba($color: #ffffff, $alpha: 0.2);
+  color: $main_bright;
+  background-color: $main_dark;
+
+  transform-origin: top right;
+  animation: popup_fade_in 0.15s ease-out forwards;
+
+  cursor: default;
+  z-index: 10;
+}
+
+.edit,
+.delete {
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease-out;
+  cursor: pointer;
+}
+
+.edit {
+  margin-bottom: 1rem;
+  &:hover {
+    color: $accent_cyan;
+  }
+}
+
+.delete:hover {
+  color: $warning;
+}
+
+.edit_icon,
+.delete_icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-right: 0.5rem;
+}
+
+@media (max-width: 700px) {
+  .song_item {
+    padding: 0.5rem;
+  }
+
+  .price {
+    margin-left: 1rem;
+  }
+}
+
+@media (max-width: 650px) {
+  .song_item {
+    &:hover {
+      background-color: transparent;
+
+      .image_wrapper::after {
+        display: none;
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0.25rem;
+        background-color: rgba($color: #000000, $alpha: 0.3);
+        z-index: 2;
+      }
+
+      .play_icon {
+        display: none;
+      }
+    }
+  }
+
+  .name_and_meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .meta_info {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+
+  .meta_unit {
+    padding: 0;
+
+    font-size: 0.625rem;
+    color: $light_gray;
+    background-color: transparent;
+
+    &:not(:first-child) {
+      margin-left: 0;
+    }
+
+    &:not(:last-child) {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .hash_tag {
+    font-weight: 600;
+    display: block;
+  }
+}
+
+@media (max-width: 400px) {
+  .options {
+    margin-left: 1rem;
+  }
+
+  .price {
+    display: none;
+  }
+}
