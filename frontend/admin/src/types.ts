@@ -1,3 +1,5 @@
+// ───── SongsList types ──────────────────────────────────────────────────── //
+
 export type GenderOptions = "Любой" | "Мужской" | "Женский";
 
 export type FilterType = "gender" | "genre" | "mood" | "price" | null;
@@ -17,4 +19,13 @@ export interface ISong {
   key?: string;
   secondary_genre?: string;
   tempo?: string;
+}
+
+// ───── UploadForm types ─────────────────────────────────────────────────── //
+
+export enum CurrentStep {
+  Step_1 = 1,
+  Step_2 = 2,
+  Step_3 = 3,
+  Step_4 = 4,
 }
