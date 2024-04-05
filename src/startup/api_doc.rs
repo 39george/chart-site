@@ -32,6 +32,7 @@ pub struct InternalErrorResponse;
 #[response(description = "You not allowed to access this method")]
 pub struct ForbiddenResponse;
 
+// We use middleware to make json response from BadRequest
 #[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(
@@ -48,17 +49,20 @@ pub struct BadRequestResponse(String);
 #[response(description = "Not acceptable error")]
 pub struct NotAcceptableErrorResponse;
 
+#[derive(ToResponse)]
+#[response(description = "Unauthorized error")]
+pub struct UnauthorizedErrorResponse;
+
 #[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(
-    description = "Unauthorized error",
-    content_type = "text/plain",
+    description = "Unsupported mediatype error",
+    content_type = "application/json",
     example = json!({
-        "caused_by":
-        "Auth is required"
+        "allowed_mediatypes": ["image/png"]
     }),
 )]
-pub struct UnauthorizedErrorResponse(String);
+pub struct UnsupportedMediaTypeErrorResponse(String);
 
 // We use ToSchema here, because we write manually in every case,
 // inlined, description, examples etc.
@@ -194,6 +198,7 @@ impl Modify for ServerAddon {
             UnauthorizedErrorResponse,
             NotFoundResponse,
             ConflictErrorResponse,
+            UnsupportedMediaTypeErrorResponse,
             // Other responses
             crate::object_storage::presigned_post_form::PresignedPostData,
             FetchSongs,

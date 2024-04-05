@@ -13,7 +13,7 @@ use crate::cornucopia::queries::admin_access;
 use crate::domain::object_key::ObjectKey;
 use crate::domain::requests::{SubmitSong, UploadFileRequest, WordQuery};
 use crate::object_storage::presigned_post_form::PresignedPostData;
-use crate::startup::api_doc::{BadRequestResponse, ForbiddenResponse, InternalErrorResponse, NotFoundResponse};
+use crate::startup::api_doc::{BadRequestResponse, ForbiddenResponse, InternalErrorResponse, NotFoundResponse, UnsupportedMediaTypeErrorResponse};
 use crate::startup::AppState;
 use crate::trace_err;
 
@@ -315,9 +315,10 @@ async fn remove_song(
     path = "/api/protected/upload_form",
     params(UploadFileRequest),
     responses(
-        (status = 200, description = "Song deleted successfully"),
+        (status = 200, description = "Presigned upload form created successfully"),
         (status = 403, response = ForbiddenResponse),
         (status = 404, response = NotFoundResponse),
+        (status = 415, response = UnsupportedMediaTypeErrorResponse),
         (status = 500, response = InternalErrorResponse)
     ),
     security(

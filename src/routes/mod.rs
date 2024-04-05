@@ -82,6 +82,7 @@ impl IntoResponse for ResponseError {
             ResponseError::InternalError(_) => {
                 StatusCode::INTERNAL_SERVER_ERROR.into_response()
             }
+            // We use middleware to make json response from BadRequest
             ResponseError::BadRequest(e) => Response::builder()
                 .status(StatusCode::BAD_REQUEST)
                 .body(Body::from(e.to_string()))
