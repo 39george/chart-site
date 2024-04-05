@@ -172,7 +172,7 @@ impl Application {
             .merge(auth::login::login_router(app_state.clone()))
             .layer(crate::middleware::map_response::BadRequestIntoJsonLayer) // 2
             .layer(auth_service) // 1
-            .route("/healthcheck", routing::get(|| async { StatusCode::OK }));
+            .route("api/healthcheck", routing::get(|| async { StatusCode::OK }));
 
         app = setup_test_tracing(app);
         app = setup_swagger(app, app_state);
