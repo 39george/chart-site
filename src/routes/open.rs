@@ -19,7 +19,6 @@ pub fn open_router() -> Router<AppState> {
         .route("/songs", routing::get(fetch_songs))
         .route("/audio_url/:id", routing::get(get_audio_url))
         .route("/:what", routing::get(data))
-        .route("/healthcheck", routing::get(|| async { StatusCode::OK }))
 }
 
 /// Fetch songs

@@ -5,11 +5,12 @@ use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::extract::ConnectInfo;
 use axum::middleware::AddExtension;
 use axum::serve::Serve;
-use axum::Router;
+use axum::{routing, Router};
 use axum_login::AuthManagerLayerBuilder;
 use deadpool_postgres::{Manager, ManagerConfig, Pool};
 use fred::clients::RedisPool;
 use fred::types::{ReconnectPolicy, RedisConfig};
+use http::StatusCode;
 use secrecy::ExposeSecret;
 use time::UtcOffset;
 use tokio::net::TcpListener;
@@ -170,7 +171,8 @@ impl Application {
             .with_state(app_state.clone())
             .merge(auth::login::login_router(app_state.clone()))
             .layer(crate::middleware::map_response::BadRequestIntoJsonLayer) // 2
-            .layer(auth_service); // 1
+            .layer(auth_service) // 1
+            .route("/healthcheck", routing::get(|| async { StatusCode::OK }));
 
         app = setup_test_tracing(app);
         app = setup_swagger(app, app_state);

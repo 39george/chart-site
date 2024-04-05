@@ -33,7 +33,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/open/healthcheck"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/healthcheck"]
       # The health check will first run interval seconds after the container is 
       # started, and then again interval seconds after each previous check 
       # completes.
