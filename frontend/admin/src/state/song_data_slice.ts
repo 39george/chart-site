@@ -15,6 +15,7 @@ const initial_state: ISongData = {
     name: "",
     price: "",
     primary_genre: "",
+    rating: null,
     sex: "male",
     key: "a_minor",
     secondary_genre: "поп",
