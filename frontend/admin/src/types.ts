@@ -53,6 +53,23 @@ export interface PresignedPostForm {
   };
 }
 
+export type Gender = "male" | "female";
+
+export interface SubmitSong {
+  audio_object_key: string;
+  cover_object_key: string;
+  duration?: number;
+  key?: string;
+  lyric: string;
+  moods: string[];
+  name: string;
+  price: string;
+  primary_genre: string;
+  secondary_genre?: string;
+  sex: Gender;
+  tempo?: number;
+}
+
 // ───── API Requests types ───────────────────────────────────────────────── //
 
 export enum RequestMethods {
