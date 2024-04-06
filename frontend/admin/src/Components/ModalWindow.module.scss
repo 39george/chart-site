@@ -1,0 +1,66 @@
+@import "../variables.scss";
+
+.modal_window {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: rgba($color: $main_dark, $alpha: 0.3);
+  backdrop-filter: blur(0.25rem);
+  -webkit-backdrop-filter: blur(0.25rem);
+
+  z-index: 99999;
+}
+
+.content {
+  max-width: 32rem;
+
+  margin: 0.75rem 1rem 0;
+  padding: 2rem;
+
+  border-radius: 0.75rem;
+  border: 0.5px solid $light_gray;
+  box-shadow: 0 0 0.5rem rgba($color: #ffffff, $alpha: 0.2);
+
+  color: $main_bright;
+  background-color: $main_dark;
+}
+
+.message {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  margin-top: 4rem;
+}
+
+.button {
+  transition: 0.15s ease-out;
+  cursor: pointer;
+}
+
+.delete_button:hover {
+  color: $warning;
+}
+
+.cancel_button:hover {
+  color: $accent_cyan;
+}
+
+@media (max-width: 450px) {
+  .buttons {
+    justify-content: space-between;
+  }
+}
