@@ -23,9 +23,41 @@ export interface ISong {
 
 // ───── UploadForm types ─────────────────────────────────────────────────── //
 
-export enum CurrentStep {
-  Step_1 = 1,
-  Step_2 = 2,
-  Step_3 = 3,
-  Step_4 = 4,
+export type StepName = "step_1" | "step_2" | "step_3" | "step_4";
+
+export interface IStep {
+  path: StepName;
+  active: boolean;
+}
+
+export interface ISteps {
+  step_1: IStep;
+  step_2: IStep;
+  step_3: IStep;
+  step_4: IStep;
+}
+
+export interface PresignedPostForm {
+  url: string;
+  fields: {
+    policy: string;
+    "X-Amz-Credential": string;
+    "X-Amz-Date": string;
+    "X-Amz-Algorithm": string;
+    success_action_status: string;
+    bucket: string;
+    key: string;
+    "Content-Type": string;
+    "X-Amz-Signature": string;
+    "Content-Disposition": string;
+  };
+}
+
+// ───── API Requests types ───────────────────────────────────────────────── //
+
+export enum RequestMethods {
+  Get = "GET",
+  Post = "POST",
+  Put = "PUT",
+  Delete = "DELETE",
 }
