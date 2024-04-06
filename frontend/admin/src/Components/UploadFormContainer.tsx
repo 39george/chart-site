@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { FilesUploaded } from "../state/files_uploaded_slice";
+import { ISongData } from "../state/song_data_slice";
 
 const UploadFormContainer: FC = () => {
   const [steps, set_steps] = useState<ISteps>({
@@ -13,8 +14,7 @@ const UploadFormContainer: FC = () => {
       path: "step_1",
     },
     step_2: {
-      //FIXME active should be false, true is on only for dev purposes
-      active: true,
+      active: false,
       path: "step_2",
     },
     step_3: {
@@ -32,6 +32,11 @@ const UploadFormContainer: FC = () => {
   const files_uploaded = useSelector<RootState, FilesUploaded>(
     (state) => state.files_uploaded
   );
+  const song_data = useSelector<RootState, ISongData>(
+    (state) => state.song_data
+  );
+
+  console.log(song_data.song);
 
   function handle_change_step(step: IStep) {
     if (!step.active) {
@@ -49,6 +54,10 @@ const UploadFormContainer: FC = () => {
           ...prev.step_2,
           active: true,
         },
+        step_3: {
+          ...prev.step_3,
+          active: true,
+        },
       }));
     }
   }, [files_uploaded]);
@@ -59,18 +68,19 @@ const UploadFormContainer: FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const handle_before_unload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
+  // FIXME this should be uncommented for dev mode
+  // useEffect(() => {
+  //   const handle_before_unload = (e: BeforeUnloadEvent) => {
+  //     e.preventDefault();
+  //     e.returnValue = "";
+  //   };
 
-    window.addEventListener("beforeunload", handle_before_unload);
+  //   window.addEventListener("beforeunload", handle_before_unload);
 
-    return () => {
-      window.removeEventListener("beforeunload", handle_before_unload);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handle_before_unload);
+  //   };
+  // }, []);
 
   return (
     <UploadFormComponent
