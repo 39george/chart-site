@@ -48,7 +48,7 @@ pub fn protected_router() -> Router<AppState> {
             "rating": null,
             "primary_genre": "абстрактный",
             "secondary_genre":"свинг",
-            "sex": "Male",
+            "sex": "male",
             "tempo": 100,
             "key": "a_minor",
             "duration": 300,
