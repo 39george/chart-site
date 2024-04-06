@@ -4,6 +4,7 @@ import MainLayout from "./Components/MainLayout";
 import MainPage from "./Pages/MainPage";
 import UploadNewPage from "./Pages/UploadNewPage";
 import UploadStep1 from "./Components/UploadStep1";
+import UploadStep2 from "./Components/UploadStep2";
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
             />
             <Route
               path="step_2"
-              element={<div>step 2</div>}
+              element={<UploadStep2 />}
             />
             <Route
               path="step_3"
