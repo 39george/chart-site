@@ -31,6 +31,7 @@ const useAxios = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
+          //TODO Process all the error cases
           switch (error.response.status) {
             case 400:
               console.error("Bad request:", error.response);
