@@ -14,12 +14,18 @@ import {
 } from "../state/files_uploaded_slice";
 import { RootState } from "../state/store";
 import Step1FilesUploaded from "./Step1FilesUploaded";
+import { ISongData, set_song_data } from "../state/song_data_slice";
 
 // ───── Custom types ─────────────────────────────────────────────────────── //
 
 enum FileInputNames {
   Audio = "audio",
   Img = "img",
+}
+
+interface PresignedForms {
+  [FileInputNames.Audio]: PresignedPostForm;
+  [FileInputNames.Img]: PresignedPostForm;
 }
 
 interface UploadData {
@@ -87,8 +93,8 @@ const UploadStep1: FC = () => {
     audio: "",
     img: "",
   });
-  const [presigned_post_form, set_presigned_post_form] =
-    useState<PresignedPostForm>({
+  const presigned_post_forms = useRef<PresignedForms>({
+    audio: {
       url: "",
       fields: {
         policy: "",
@@ -102,11 +108,30 @@ const UploadStep1: FC = () => {
         "X-Amz-Signature": "",
         "Content-Disposition": "",
       },
-    });
+    },
+    img: {
+      url: "",
+      fields: {
+        policy: "",
+        "X-Amz-Credential": "",
+        "X-Amz-Date": "",
+        "X-Amz-Algorithm": "",
+        success_action_status: "",
+        bucket: "",
+        key: "",
+        "Content-Type": "",
+        "X-Amz-Signature": "",
+        "Content-Disposition": "",
+      },
+    },
+  });
   const audio_input_ref = useRef<HTMLInputElement>(null);
   const img_input_ref = useRef<HTMLInputElement>(null);
   const files_uploaded = useSelector<RootState, FilesUploaded>(
     (state) => state.files_uploaded
+  );
+  const song_data = useSelector<RootState, ISongData>(
+    (state) => state.song_data
   );
   const { error_data: upload_form_error, fetch_data: fetch_upload_form } =
     useAxios();
@@ -140,6 +165,7 @@ const UploadStep1: FC = () => {
           file_selecting: true,
         },
       }));
+
       // Handling multiple chosen files
       if (files.length > 1) {
         set_err_messages((prev) => ({
@@ -152,17 +178,26 @@ const UploadStep1: FC = () => {
 
       // Handling single file
       const file = files[0];
-      file_params.current = {
-        ...file_params.current,
-        [name]: {
-          media_type: file.type,
-          file_name: transliterate(file.name),
-        },
-      };
 
-      // Checking file size
       if (check_file_size(name, file)) {
-        fetch_data(name, file);
+        // Setting upload data
+        set_upload_data((prev) => ({
+          ...prev,
+          [name]: {
+            ...prev[name],
+            file_selecting: false,
+            selected_file: file,
+            upload_button_visible: true,
+          },
+        }));
+        // Setting file params
+        file_params.current = {
+          ...file_params.current,
+          [name]: {
+            media_type: file.type,
+            file_name: transliterate(file.name),
+          },
+        };
       }
     } else {
       // Hiding loader if browser wasn't able to read the files
@@ -224,12 +259,14 @@ const UploadStep1: FC = () => {
     // Handle wrong input file type
     if (check_file_type_correctness(input_name, file)) {
       if (check_file_size(input_name, file)) {
-        // Showing loader while file is uploading to borwser
+        // Setting upload data
         set_upload_data((prev) => ({
           ...prev,
           [input_name]: {
             ...prev[input_name],
-            file_selecting: true,
+            file_selecting: false,
+            selected_file: file,
+            upload_button_visible: true,
           },
         }));
         // Setting file params
@@ -240,8 +277,6 @@ const UploadStep1: FC = () => {
             file_name: transliterate(file.name),
           },
         };
-
-        fetch_data(input_name, file);
       }
     }
   }
@@ -360,7 +395,7 @@ const UploadStep1: FC = () => {
   }
 
   // API requests
-  async function fetch_data(name: FileInputNames, file: File) {
+  async function fetch_data(name: FileInputNames) {
     const search_params = new URLSearchParams(
       file_params.current[name]
     ).toString();
@@ -369,18 +404,12 @@ const UploadStep1: FC = () => {
       `${API_URL}/protected/upload_form?${search_params}`
     );
     if (response?.status === 200) {
-      set_upload_data((prev) => ({
-        ...prev,
+      presigned_post_forms.current = {
+        ...presigned_post_forms.current,
         [name]: {
-          ...prev[name],
-          file_selecting: false,
-          selected_file: file,
-          upload_button_visible: true,
+          ...response?.data,
         },
-      }));
-      set_presigned_post_form({
-        ...response?.data,
-      });
+      };
     }
   }
 
@@ -390,11 +419,15 @@ const UploadStep1: FC = () => {
   ) {
     e.preventDefault();
 
+    await fetch_data(name);
+
     let form_data = new FormData();
-    for (let key in presigned_post_form.fields) {
+    for (let key in presigned_post_forms.current[name].fields) {
       form_data.append(
         key,
-        presigned_post_form.fields[key as keyof PresignedPostForm["fields"]]
+        presigned_post_forms.current[name].fields[
+          key as keyof PresignedPostForm["fields"]
+        ]
       );
     }
 
@@ -417,7 +450,7 @@ const UploadStep1: FC = () => {
 
     const response = await fetch_presigned_post_form(
       RequestMethods.Post,
-      presigned_post_form.url,
+      presigned_post_forms.current[name].url,
       form_data,
       {
         onUploadProgress: (progressEvent) => {
@@ -441,16 +474,28 @@ const UploadStep1: FC = () => {
       switch (name) {
         case FileInputNames.Audio:
           dispatch(set_audio_file_uploaded(true));
+          dispatch(
+            set_song_data({
+              ...song_data.song,
+              audio_object_key: presigned_post_forms.current[name].fields.key,
+            })
+          );
           break;
         case FileInputNames.Img:
           dispatch(set_img_file_uploaded(true));
+          dispatch(
+            set_song_data({
+              ...song_data.song,
+              cover_object_key: presigned_post_forms.current[name].fields.key,
+            })
+          );
           break;
       }
     }
   }
 
-  //TODO Setting error messages based on api response
-  useEffect(() => {}, [upload_form_error, presigned_post_form_error]);
+  // TODO Setting error messages based on api response
+  // useEffect(() => {}, [upload_form_error, presigned_post_form_error]);
 
   // Full reset if files aren't loaded
   useEffect(() => {

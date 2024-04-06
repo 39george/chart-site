@@ -13,7 +13,8 @@ const UploadFormContainer: FC = () => {
       path: "step_1",
     },
     step_2: {
-      active: false,
+      //FIXME active should be false, true is on only for dev purposes
+      active: true,
       path: "step_2",
     },
     step_3: {
