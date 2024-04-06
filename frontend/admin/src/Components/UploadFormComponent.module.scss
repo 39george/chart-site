@@ -43,8 +43,9 @@
 
 .step_link {
   text-decoration: none;
-  color: $main_bright;
+  color: $light_gray;
   letter-spacing: 0.05em;
+  cursor: default;
 
   &:not(:last-child) {
     margin-right: 1.25rem;
@@ -53,14 +54,25 @@
 }
 
 .link_active {
+  color: $main_bright;
+  cursor: pointer;
+}
+
+.link_current {
   color: $accent_cyan;
   text-decoration: underline;
   text-decoration-thickness: 0.125rem;
   text-underline-offset: 0.25rem;
 }
 
-@media (max-width: 660px) {
+@media (max-width: 760px) {
   .upload_form_content {
     padding: 2.75rem 2rem;
+  }
+}
+
+@media (max-width: 450px) {
+  .upload_form_content {
+    padding: 2rem 1.25rem;
   }
 }

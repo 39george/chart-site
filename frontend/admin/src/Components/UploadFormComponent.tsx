@@ -1,12 +1,13 @@
 import styles from "./UploadFormComponent.module.scss";
 import { FC } from "react";
-import { NavLink, Outlet } from "react-router-dom";
-import { CurrentStep } from "../types";
+import { Outlet } from "react-router-dom";
+import { IStep, ISteps, StepName } from "../types";
 
 interface UploadFormComponentProps {
   state: {
-    current_step: CurrentStep;
-    change_step: (step: CurrentStep) => void;
+    steps: ISteps;
+    current_step: StepName;
+    change_step: (step: IStep) => void;
   };
 }
 
@@ -16,55 +17,51 @@ const UploadFormComponent: FC<UploadFormComponentProps> = ({ state }) => {
       <div className={styles.steps}>
         <p className={styles.step_name}>Файлы</p>
         <p className={styles.step_count}>
-          &nbsp;- Шаг {state.current_step} из 4
+          &nbsp;- Шаг {state.current_step.substring(5)} из 4
         </p>
       </div>
       <div className={styles.upload_form_content}>
         <div className={styles.upload_form_nav}>
-          <NavLink
-            to="step_1"
-            className={({ isActive }) =>
-              isActive
-                ? `${styles.step_link} ${styles.link_active}`
-                : `${styles.step_link}`
-            }
-            onClick={() => state.change_step(CurrentStep.Step_1)}
+          <p
+            className={`${styles.step_link} ${
+              state.steps.step_1.active
+                ? styles.link_active
+                : styles.link_inactive
+            } ${state.current_step === "step_1" && styles.link_current}`}
+            onClick={() => state.change_step(state.steps.step_1)}
           >
             Файлы
-          </NavLink>
-          <NavLink
-            to="step_2"
-            className={({ isActive }) =>
-              isActive
-                ? `${styles.step_link} ${styles.link_active}`
-                : `${styles.step_link}`
-            }
-            onClick={() => state.change_step(CurrentStep.Step_2)}
+          </p>
+          <p
+            className={`${styles.step_link} ${
+              state.steps.step_2.active
+                ? styles.link_active
+                : styles.link_inactive
+            } ${state.current_step === "step_2" && styles.link_current}`}
+            onClick={() => state.change_step(state.steps.step_2)}
           >
             Общая информация
-          </NavLink>
-          <NavLink
-            to="step_3"
-            className={({ isActive }) =>
-              isActive
-                ? `${styles.step_link} ${styles.link_active}`
-                : `${styles.step_link}`
-            }
-            onClick={() => state.change_step(CurrentStep.Step_3)}
+          </p>
+          <p
+            className={`${styles.step_link} ${
+              state.steps.step_3.active
+                ? styles.link_active
+                : styles.link_inactive
+            } ${state.current_step === "step_3" && styles.link_current}`}
+            onClick={() => state.change_step(state.steps.step_3)}
           >
             Метадата
-          </NavLink>
-          <NavLink
-            to="step_4"
-            className={({ isActive }) =>
-              isActive
-                ? `${styles.step_link} ${styles.link_active}`
-                : `${styles.step_link}`
-            }
-            onClick={() => state.change_step(CurrentStep.Step_4)}
+          </p>
+          <p
+            className={`${styles.step_link} ${
+              state.steps.step_4.active
+                ? styles.link_active
+                : styles.link_inactive
+            } ${state.current_step === "step_4" && styles.link_current}`}
+            onClick={() => state.change_step(state.steps.step_4)}
           >
             Предпросмотр
-          </NavLink>
+          </p>
         </div>
         <Outlet />
       </div>
