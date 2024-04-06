@@ -65,6 +65,7 @@ export interface SubmitSong {
   name: string;
   price: string;
   primary_genre: string;
+  rating: number | null;
   secondary_genre?: string;
   sex: Gender;
   tempo?: number;
