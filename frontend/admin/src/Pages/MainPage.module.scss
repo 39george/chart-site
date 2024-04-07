@@ -23,7 +23,13 @@
   letter-spacing: 0.2rem;
 }
 
-.add_song_button {
+.action_buttons {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.add_song_button,
+.edit_genres_moods_button {
   display: flex;
   align-items: center;
 
@@ -35,23 +41,44 @@
   letter-spacing: 0.05em;
 
   border-radius: 0.25rem;
+  border: 1px solid $accent_cyan;
   color: $main_bright;
-  background-color: $accent_cyan;
   text-decoration: none;
 
-  transition: filter 0.15s ease-out;
+  transition: 0.15s ease-out;
   cursor: pointer;
 
   &:hover {
-    filter: brightness(110%);
+    background-color: $accent_cyan;
   }
 }
 
-.plus_icon {
+.edit_genres_moods_button {
+  background-color: $main_dark;
+  border: 1px solid $main_bright;
+  margin-right: 1.5rem;
+
+  &:hover {
+    background-color: $main_bright;
+    color: $main_dark;
+
+    .edit_icon {
+      color: $main_dark;
+    }
+  }
+}
+
+.plus_icon,
+.edit_icon {
+  flex-shrink: 0;
+
   width: 1rem;
   height: 1rem;
+
   margin-left: 0.625rem;
+
   color: $main_bright;
+  transition: 0.15s ease-out;
 }
 
 @media (max-width: 450px) {
