@@ -53,8 +53,6 @@ export interface PresignedPostForm {
   };
 }
 
-export type Gender = "male" | "female";
-
 export interface SubmitSong {
   audio_object_key: string;
   cover_object_key: string;
@@ -67,7 +65,7 @@ export interface SubmitSong {
   primary_genre: string;
   rating: number | null;
   secondary_genre?: string;
-  sex: Gender;
+  sex: string;
   tempo?: number;
 }
 
