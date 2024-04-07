@@ -2,10 +2,8 @@ import styles from "./UploadStep3.module.scss";
 import { ISongData, set_song_data } from "../state/song_data_slice";
 import { FC, useState } from "react";
 import { GoTriangleDown } from "react-icons/go";
-import { FiEdit } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { format_input_price } from "../helpers";
-import EditGenresMoods from "./EditGenresMoods";
 
 interface UploadStep3Props {
   song_data: ISongData;
@@ -21,13 +19,9 @@ const UploadStep3: FC<UploadStep3Props> = ({
   moods_list,
 }) => {
   const [popup_visible, set_popup_visibe] = useState<InputPopup>("");
-  const [edit_window_visible, set_edit_window_visible] = useState<
-    "genres" | "moods" | ""
-  >("");
   const dispatch = useDispatch();
 
   function handle_input_change(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log("here");
     const { name } = e.target;
     let only_digit = e.target.value.replace(/[^\d]/g, "");
 
@@ -88,19 +82,8 @@ const UploadStep3: FC<UploadStep3Props> = ({
     }
   }
 
-  function handle_close_edit_window() {
-    set_edit_window_visible("");
-  }
-
   return (
     <div className={styles.upload_step_3}>
-      {edit_window_visible === "genres" && (
-        <EditGenresMoods
-          kind="genres"
-          items_list={genres_list}
-          close_window={handle_close_edit_window}
-        />
-      )}
       <div className={`${styles.input_container} ${styles.input_gender}`}>
         <p className={styles.label}>Пол</p>
         <div
@@ -152,59 +135,50 @@ const UploadStep3: FC<UploadStep3Props> = ({
         )}
       </div>
       <div className={`${styles.input_container} ${styles.container_genres}`}>
-        <div>
-          <p className={styles.label}>Жанр</p>
-          <div
-            className={`${styles.input_field} ${
-              !song_data.song.primary_genre && styles.input_default
-            }`}
-            onClick={() => handle_popup_visible("genres")}
-          >
-            {song_data.song.primary_genre
-              ? song_data.song.primary_genre
-              : "Жанр песни"}
-            <GoTriangleDown
-              className={`${styles.triangle_icon} ${
-                popup_visible === "genres" && styles.popup_visible
-              }`}
-            />
-          </div>
-          {popup_visible === "genres" && (
-            <ul className={styles.popup}>
-              {genres_list.map((genre, idx) => {
-                return (
-                  <li
-                    key={idx}
-                    className={styles.input_options}
-                  >
-                    <input
-                      type="radio"
-                      id={genre}
-                      name="primary_genre"
-                      onChange={handle_input_change}
-                    />
-                    <span className={styles.custom_checkbox}></span>
-                    <label
-                      htmlFor={genre}
-                      className={styles.input_option}
-                    >
-                      &nbsp;&nbsp;{genre}
-                    </label>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+        <p className={styles.label}>Жанр</p>
         <div
-          className={styles.edit_button}
-          onClick={() => set_edit_window_visible("genres")}
+          className={`${styles.input_field} ${
+            !song_data.song.primary_genre && styles.input_default
+          }`}
+          onClick={() => handle_popup_visible("genres")}
         >
-          <p className={styles.edit_text}>Редактировать жанры</p>
-          <FiEdit className={styles.edit_icon} />
+          {song_data.song.primary_genre
+            ? song_data.song.primary_genre
+            : "Жанр песни"}
+          <GoTriangleDown
+            className={`${styles.triangle_icon} ${
+              popup_visible === "genres" && styles.popup_visible
+            }`}
+          />
         </div>
+        {popup_visible === "genres" && (
+          <ul className={styles.popup}>
+            {genres_list.map((genre, idx) => {
+              return (
+                <li
+                  key={idx}
+                  className={styles.input_options}
+                >
+                  <input
+                    type="radio"
+                    id={genre}
+                    name="primary_genre"
+                    onChange={handle_input_change}
+                  />
+                  <span className={styles.custom_checkbox}></span>
+                  <label
+                    htmlFor={genre}
+                    className={styles.input_option}
+                  >
+                    &nbsp;&nbsp;{genre}
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
-      <div className={styles.input_container}>
+      <div className={`${styles.input_container} ${styles.container_moods}`}>
         <p className={styles.label}>Настроение</p>
         <div
           className={`${styles.input_field} ${
