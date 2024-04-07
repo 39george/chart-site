@@ -1,4 +1,5 @@
 @import "../variables.scss";
+@import "../genreal_styles.scss";
 
 .edit_window {
   position: fixed;
@@ -23,7 +24,7 @@
   width: 30rem;
 
   margin: 0.75rem 1rem 0;
-  padding: 2rem;
+  padding: 1.5rem 2rem;
 
   border-radius: 0.75rem;
   border: 0.5px solid $light_gray;
@@ -52,10 +53,25 @@
   font-weight: 600;
 }
 
+.add_modal {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+.list_and_options {
+  position: relative;
+  margin-top: 2rem;
+}
+
+.label {
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  color: $light_gray;
+}
+
 .list {
   max-height: 40rem;
-
-  margin-top: 2rem;
 
   overflow-y: scroll;
 
@@ -115,6 +131,35 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
+.check_options {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  font-size: 0.875rem;
+  text-align: end;
+  color: $light_gray;
+}
+
+.check_all {
+  margin-bottom: 1em;
+  transition: color 0.15s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    color: $main_bright;
+  }
+}
+
+.uncheck_all {
+  transition: color 0.15s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    color: $main_bright;
+  }
+}
+
 .action_buttons {
   display: flex;
   justify-content: space-between;
@@ -148,12 +193,62 @@ input[type="checkbox"] {
   color: $accent_cyan;
 }
 
-.delete_button:hover {
-  border: 1px solid $warning;
-  color: $warning;
+.delete_button {
+  margin-left: auto;
+  &:hover {
+    border: 1px solid $warning;
+    color: $warning;
+  }
+}
+
+.confirm_button:hover {
+  border: 1px solid $accent_cyan;
+  color: $accent_cyan;
+}
+
+.cancel_button:hover {
+  border: 1px solid $main_bright;
+  color: $main_bright;
 }
 
 .action_icon {
   flex-shrink: 0;
   margin-left: 0.5rem;
+}
+
+.input_empty {
+  margin-top: 0.25rem;
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: $warning;
+}
+
+@media (max-height: 950px) {
+  .list {
+    max-height: 30rem;
+  }
+}
+
+@media (max-height: 780px) {
+  .list {
+    max-height: 20rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .list {
+    max-height: 10rem;
+  }
+}
+
+@media (max-height: 450px) {
+  .list {
+    max-height: 3rem;
+  }
+}
+
+@media (max-width: 450px) {
+  .content {
+    padding: 1.5rem 1rem;
+  }
 }
