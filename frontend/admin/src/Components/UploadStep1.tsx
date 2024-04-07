@@ -215,7 +215,7 @@ const UploadStep1: FC = () => {
   }
 
   // Drag and drop logic
-  // TODO check strange behaviour of drag over event (many rerenders)
+  // TODO check strange behaviour of drag over event (many rerenderes)
   function handle_drag_over(
     e: React.DragEvent<HTMLLabelElement>,
     input_name: FileInputNames
