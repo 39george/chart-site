@@ -1,10 +1,7 @@
 import { useDispatch } from "react-redux";
 import styles from "./ModalWindow.module.scss";
 import { FC } from "react";
-import {
-  set_audio_file_uploaded,
-  set_img_file_uploaded,
-} from "../state/files_uploaded_slice";
+import { set_audio_url, set_img_url } from "../state/files_url_slice";
 
 interface ModalWindowProps {
   close_window: () => void;
@@ -15,8 +12,8 @@ const ModalWindow: FC<ModalWindowProps> = ({ close_window, reset_all }) => {
   const dispatch = useDispatch();
 
   function select_new_files() {
-    dispatch(set_audio_file_uploaded(false));
-    dispatch(set_img_file_uploaded(false));
+    dispatch(set_audio_url(""));
+    dispatch(set_img_url(""));
     reset_all;
   }
 
