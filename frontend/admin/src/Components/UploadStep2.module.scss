@@ -16,4 +16,6 @@
   font-family: "Inter Tight", sans-serif;
   height: 21.75rem;
   resize: none;
+
+  @include custom_scrollbar;
 }
