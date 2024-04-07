@@ -7,4 +7,5 @@
 | Correct swagger docs presigned url            | Done   |
 | Disable health checks                         | Done   |
 | Try WebAssembly rust translit                 |        |
-| Endpoint to fetch uploaded to garage files    |        |
+| Endpoint to fetch uploaded files to garage    |        |
+| Fix nginx DELETE method restriction           |        |
