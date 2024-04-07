@@ -1,7 +1,13 @@
 // Format price
+const number_format = new Intl.NumberFormat("ru");
+
 export const format_price = (number_string: string) => {
   return number_string.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 };
+
+export function format_input_price(price: string) {
+  return number_format.format(parseInt(price, 10));
+}
 
 // Transliterate
 export function transliterate(text: string): string {
