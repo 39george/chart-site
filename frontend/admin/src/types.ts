@@ -68,12 +68,3 @@ export interface SubmitSong {
   sex: string;
   tempo?: number;
 }
-
-// ───── API Requests types ───────────────────────────────────────────────── //
-
-export enum RequestMethods {
-  Get = "GET",
-  Post = "POST",
-  Put = "PUT",
-  Delete = "DELETE",
-}
