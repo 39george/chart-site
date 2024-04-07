@@ -3,18 +3,14 @@ import React, { FC, FormEvent, useEffect, useRef, useState } from "react";
 import { FaCirclePlus, FaRegCircleCheck, FaXmark } from "react-icons/fa6";
 import { PiFileAudioFill, PiFileImageFill } from "react-icons/pi";
 import { API_URL } from "../config";
-import { PresignedPostForm, RequestMethods } from "../types";
+import { PresignedPostForm } from "../types";
 import { bytes_to_mb, fileToBlob, transliterate } from "../helpers";
 import useAxios from "../Hooks/APIRequests";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  FilesUploaded,
-  set_audio_file_uploaded,
-  set_img_file_uploaded,
-} from "../state/files_uploaded_slice";
 import { RootState } from "../state/store";
 import Step1FilesUploaded from "./Step1FilesUploaded";
 import { ISongData, set_song_data } from "../state/song_data_slice";
+import { set_audio_url, set_img_url } from "../state/files_url_slice";
 
 // ───── Custom types ─────────────────────────────────────────────────────── //
 
@@ -127,12 +123,17 @@ const UploadStep1: FC = () => {
   });
   const audio_input_ref = useRef<HTMLInputElement>(null);
   const img_input_ref = useRef<HTMLInputElement>(null);
-  const files_uploaded = useSelector<RootState, FilesUploaded>(
-    (state) => state.files_uploaded
+  const audio_url = useSelector<RootState, string>(
+    (state) => state.files_url.audio
   );
+  const img_url = useSelector<RootState, string>(
+    (state) => state.files_url.img
+  );
+
   const song_data = useSelector<RootState, ISongData>(
     (state) => state.song_data
   );
+
   const { error_data: upload_form_error, fetch_data: fetch_upload_form } =
     useAxios();
   const {
@@ -396,24 +397,6 @@ const UploadStep1: FC = () => {
   }
 
   // API requests
-  async function fetch_data(name: FileInputNames) {
-    const search_params = new URLSearchParams(
-      file_params.current[name]
-    ).toString();
-    const response = await fetch_upload_form(
-      RequestMethods.Get,
-      `${API_URL}/protected/upload_form?${search_params}`
-    );
-    if (response?.status === 200) {
-      presigned_post_forms.current = {
-        ...presigned_post_forms.current,
-        [name]: {
-          ...response?.data,
-        },
-      };
-    }
-  }
-
   async function submit_data(
     e: FormEvent<HTMLFormElement>,
     name: FileInputNames
@@ -438,6 +421,24 @@ const UploadStep1: FC = () => {
     await post_data(form_data, name);
   }
 
+  async function fetch_data(name: FileInputNames) {
+    const search_params = new URLSearchParams(
+      file_params.current[name]
+    ).toString();
+    const response = await fetch_upload_form({
+      method: "GET",
+      url: `${API_URL}/protected/upload_form?${search_params}`,
+    });
+    if (response?.status === 200) {
+      presigned_post_forms.current = {
+        ...presigned_post_forms.current,
+        [name]: {
+          ...response?.data,
+        },
+      };
+    }
+  }
+
   async function post_data(form_data: FormData, name: FileInputNames) {
     // Set progress bar visible
     set_upload_data((prev) => ({
@@ -449,46 +450,48 @@ const UploadStep1: FC = () => {
       },
     }));
 
-    const response = await fetch_presigned_post_form(
-      RequestMethods.Post,
-      presigned_post_forms.current[name].url,
-      form_data,
-      {
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const progress = Math.round(
-              (progressEvent.loaded / progressEvent.total) * 100
-            );
-            set_upload_data((prev) => ({
-              ...prev,
-              [name]: {
-                ...prev[name],
-                upload_progress: progress,
-              },
-            }));
-          }
-        },
-      }
-    );
+    const response = await fetch_presigned_post_form({
+      method: "POST",
+      url: presigned_post_forms.current[name].url,
+      data: form_data,
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          const progress = Math.round(
+            (progressEvent.loaded / progressEvent.total) * 100
+          );
+          set_upload_data((prev) => ({
+            ...prev,
+            [name]: {
+              ...prev[name],
+              upload_progress: progress,
+            },
+          }));
+        }
+      },
+    });
 
     if (response?.status === 200) {
       switch (name) {
         case FileInputNames.Audio:
-          dispatch(set_audio_file_uploaded(true));
           dispatch(
             set_song_data({
               ...song_data.song,
               audio_object_key: presigned_post_forms.current[name].fields.key,
             })
           );
+          dispatch(
+            set_audio_url(URL.createObjectURL(form_data.get("file") as Blob))
+          );
           break;
         case FileInputNames.Img:
-          dispatch(set_img_file_uploaded(true));
           dispatch(
             set_song_data({
               ...song_data.song,
               cover_object_key: presigned_post_forms.current[name].fields.key,
             })
+          );
+          dispatch(
+            set_img_url(URL.createObjectURL(form_data.get("file") as Blob))
           );
           break;
       }
@@ -500,15 +503,15 @@ const UploadStep1: FC = () => {
 
   // Full reset if files aren't loaded
   useEffect(() => {
-    if (!files_uploaded.audio && !files_uploaded.img) {
+    if (!audio_url && !img_url) {
       reset_all();
     }
-  }, [files_uploaded.audio, files_uploaded.img]);
+  }, [audio_url, img_url]);
 
   // Rendering component
   return (
     <>
-      {files_uploaded.audio && files_uploaded.img ? (
+      {audio_url && img_url ? (
         <Step1FilesUploaded reset_all={reset_all} />
       ) : (
         <div className={styles.step_1}>
@@ -603,6 +606,13 @@ const UploadStep1: FC = () => {
                     <FaRegCircleCheck className={styles.checkmark} />
                   )}
                 </div>
+              )}
+              {audio_url && (
+                <audio
+                  controls
+                  className={styles.audio_player}
+                  src={audio_url}
+                />
               )}
             </form>
             {err_messages[FileInputNames.Audio] && (
