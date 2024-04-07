@@ -1,0 +1,159 @@
+@import "../variables.scss";
+
+.edit_window {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: rgba($color: $main_dark, $alpha: 0.3);
+  backdrop-filter: blur(0.25rem);
+  -webkit-backdrop-filter: blur(0.25rem);
+
+  z-index: 99999;
+}
+
+.content {
+  width: 30rem;
+
+  margin: 0.75rem 1rem 0;
+  padding: 2rem;
+
+  border-radius: 0.75rem;
+  border: 0.5px solid $light_gray;
+  box-shadow: 0 0 0.5rem rgba($color: #ffffff, $alpha: 0.2);
+
+  color: $main_bright;
+  background-color: $main_dark;
+}
+
+.close_icon_container {
+  width: fit-content;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.close_icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: $main_bright;
+}
+
+.header {
+  width: fit-content;
+  margin: 0 auto;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.list {
+  max-height: 40rem;
+
+  margin-top: 2rem;
+
+  overflow-y: scroll;
+
+  --ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+input[type="checkbox"] {
+  display: none;
+
+  &:checked + span {
+    border: 1px solid $accent_cyan;
+
+    &::after {
+      display: block;
+    }
+  }
+}
+
+.custom_checkbox {
+  position: relative;
+
+  width: 0.875rem;
+  height: 0.875rem;
+
+  border-radius: 0.125rem;
+  border: 1px solid $main_bright;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: $accent_cyan;
+    display: none;
+  }
+}
+
+.input_options {
+  display: flex;
+  align-items: center;
+
+  &:not(:last-child) {
+    margin-bottom: 0.875em;
+  }
+}
+
+.input_option {
+  font-size: 0.875rem;
+  list-style: none;
+  cursor: pointer;
+}
+
+.action_buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+
+  padding: 0.75rem;
+
+  font-size: 0.75rem;
+
+  border-radius: 2rem;
+  border: 1px solid $light_gray;
+  color: $light_gray;
+
+  transition: 0.15s ease-out;
+  cursor: pointer;
+
+  &:not(:last-child) {
+    margin-right: 1rem;
+  }
+}
+
+.add_button:hover {
+  border: 1px solid $accent_cyan;
+  color: $accent_cyan;
+}
+
+.delete_button:hover {
+  border: 1px solid $warning;
+  color: $warning;
+}
+
+.action_icon {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
