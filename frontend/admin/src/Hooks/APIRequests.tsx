@@ -2,31 +2,26 @@ import { useState } from "react";
 import { MAX_RETRIES, RETRY_DELAY_MS } from "../config";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { wait } from "../helpers";
-import { RequestMethods } from "../types";
 
 const useAxios = () => {
   const [error_data, set_error_data] = useState<string | undefined>();
 
   const fetch_data = async (
-    method: RequestMethods,
-    url: string,
-    data?: any,
-    config?: AxiosRequestConfig,
+    config: AxiosRequestConfig,
     attempts: number = 1
   ) => {
     let response: AxiosResponse;
     try {
-      switch (method) {
-        case RequestMethods.Get:
-          response = await axios.get(url);
+      switch (config.method) {
+        case "GET":
+          response = await axios.get(config.url || "");
           return response;
-        case RequestMethods.Post:
-          response = await axios.post(url, data, config);
+        case "POST":
+          response = await axios.post(config.url || "", config.data, config);
           return response;
-        case RequestMethods.Put:
-          break;
-        case RequestMethods.Delete:
-          break;
+        case "DELETE":
+          response = await axios.delete(config.url || "", config);
+          return response;
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -46,7 +41,7 @@ const useAxios = () => {
             case 500:
               if (attempts < MAX_RETRIES) {
                 await wait(RETRY_DELAY_MS);
-                fetch_data(method, url, data, config, attempts + 1);
+                fetch_data(config, attempts + 1);
               } else {
                 set_error_data(
                   "Что-то не так с нашим сервером, мы уже работаем над этим. Пожалуйста, попробуйте обновить страницу"
@@ -63,7 +58,7 @@ const useAxios = () => {
         } else if (error.request) {
           if (attempts < MAX_RETRIES) {
             await wait(RETRY_DELAY_MS);
-            fetch_data(method, url, data, config, attempts + 1);
+            fetch_data(config, attempts + 1);
           } else {
             console.error(
               "Сервер не отвечает, пожалуйста, обновите страницу и попробуйте еще раз",
