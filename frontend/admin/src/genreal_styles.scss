@@ -13,6 +13,43 @@
   }
 }
 
+// ───── Input settings ───────────────────────────────────────────────────── //
+
+.input_container {
+  display: flex;
+  flex-direction: column;
+
+  max-width: 32.25rem;
+
+  &:not(:last-child) {
+    margin-bottom: 2.125rem;
+  }
+}
+
+.input_field {
+  padding: 0.875rem 1.125rem;
+
+  font-size: 0.875rem;
+  letter-spacing: 0.03em;
+
+  border: 1px solid $light_gray;
+  border-radius: 0.25rem;
+
+  color: $main_bright;
+  background-color: $main_dark;
+  outline: 1px solid transparent;
+
+  transition: outline 0.1s ease-out;
+
+  &::placeholder {
+    color: $light_gray;
+  }
+
+  &:focus {
+    outline: 1px solid $main_bright;
+  }
+}
+
 // ───── Loaders ──────────────────────────────────────────────────────────── //
 
 @keyframes spin {
