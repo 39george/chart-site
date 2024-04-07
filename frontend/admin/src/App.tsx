@@ -6,18 +6,29 @@ import UploadNewPage from "./Pages/UploadNewPage";
 import UploadStep1 from "./Components/UploadStep1";
 import UploadStep2 from "./Components/UploadStep2";
 import UploadStep3 from "./Components/UploadStep3";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./state/store";
 import { ISongData } from "./state/song_data_slice";
 import useAxios from "./Hooks/APIRequests";
-import { RequestMethods } from "./types";
 import { API_URL } from "./config";
 import { useEffect, useState } from "react";
+import UploadStep4 from "./Components/UploadStep4";
+import {
+  set_genres_changed,
+  set_moods_changed,
+} from "./state/genres_moods_changed_slice";
 
 function App() {
   const song_data = useSelector<RootState, ISongData>(
     (state) => state.song_data
   );
+  const genres_changed = useSelector<RootState, boolean>(
+    (state) => state.genres_moods_changed.genres
+  );
+  const moods_changed = useSelector<RootState, boolean>(
+    (state) => state.genres_moods_changed.moods
+  );
+  const dispatch = useDispatch();
   const [genres_list, set_genres_list] = useState<string[]>([]);
   const [moods_list, set_moods_list] = useState<string[]>([]);
   const { error_data: genres_error, fetch_data: fetch_genres } = useAxios();
@@ -37,20 +48,20 @@ function App() {
   }
 
   async function get_genres_list() {
-    const response = await fetch_genres(
-      RequestMethods.Get,
-      `${API_URL}/open/genres`
-    );
+    const response = await fetch_genres({
+      method: "GET",
+      url: `${API_URL}/open/genres`,
+    });
     if (response?.status === 200) {
       return response.data;
     }
   }
 
   async function get_moods_list() {
-    const response = await fetch_moods(
-      RequestMethods.Get,
-      `${API_URL}/open/moods`
-    );
+    const response = await fetch_moods({
+      method: "GET",
+      url: `${API_URL}/open/moods`,
+    });
     if (response?.status === 200) {
       return response.data;
     }
@@ -61,6 +72,28 @@ function App() {
     get_genres_moods();
   }, []);
 
+  // Call Genres or Moods lists if they were changed
+  useEffect(() => {
+    async function refetch_genres() {
+      const response = await get_genres_list();
+      dispatch(set_genres_changed(false));
+      set_genres_list(response);
+    }
+
+    async function refetch_moods() {
+      const response = await get_moods_list();
+      dispatch(set_moods_changed(false));
+      set_moods_list(response);
+    }
+
+    if (genres_changed) {
+      refetch_genres();
+    }
+    if (moods_changed) {
+      refetch_moods();
+    }
+  }, [genres_changed, moods_changed]);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -70,7 +103,12 @@ function App() {
         >
           <Route
             index
-            element={<MainPage />}
+            element={
+              <MainPage
+                genres_list={genres_list}
+                moods_list={moods_list}
+              />
+            }
           />
           <Route
             path="upload_new_song"
@@ -96,7 +134,7 @@ function App() {
             />
             <Route
               path="step_4"
-              element={<div>step 4</div>}
+              element={<UploadStep4 song_data={song_data} />}
             />
             <Route
               index
