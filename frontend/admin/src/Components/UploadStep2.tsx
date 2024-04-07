@@ -1,17 +1,17 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { ISongData, set_song_data } from "../state/song_data_slice";
-import { RootState } from "../state/store";
 import styles from "./UploadStep2.module.scss";
 import { FC, useEffect, useState } from "react";
 
-const UploadStep2: FC = () => {
+interface UploadStep2Props {
+  song_data: ISongData;
+}
+
+const UploadStep2: FC<UploadStep2Props> = ({ song_data }) => {
   const [size_counters, set_size_counters] = useState({
     name: 0,
     lyric: 0,
   });
-  const song_data = useSelector<RootState, ISongData>(
-    (state) => state.song_data
-  );
   const dispatch = useDispatch();
 
   function handle_input_change(
@@ -58,7 +58,7 @@ const UploadStep2: FC = () => {
           id="name"
           placeholder="Новая песня"
           value={song_data.song.name}
-          className={styles.input_filed}
+          className={styles.input_field}
           onChange={handle_input_change}
           autoComplete="off"
         />
@@ -80,7 +80,7 @@ const UploadStep2: FC = () => {
           id="lyric"
           placeholder="Текст новой песни"
           value={song_data.song.lyric}
-          className={`${styles.input_filed} ${styles.lyric_input}`}
+          className={`${styles.input_field} ${styles.lyric_input}`}
           onChange={handle_input_change}
           autoComplete="off"
         />
