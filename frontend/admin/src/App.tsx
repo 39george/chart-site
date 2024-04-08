@@ -17,8 +17,13 @@ import {
   set_genres_changed,
   set_moods_changed,
 } from "./state/genres_moods_changed_slice";
+import Login from "./Pages/Login";
+import { set_permissions } from "./state/permissions_slice";
 
 function App() {
+  const permissions_granted = useSelector<RootState, boolean>(
+    (state) => state.permissions.premissions
+  );
   const song_data = useSelector<RootState, ISongData>(
     (state) => state.song_data
   );
@@ -33,6 +38,20 @@ function App() {
   const [moods_list, set_moods_list] = useState<string[]>([]);
   const { error_data: genres_error, fetch_data: fetch_genres } = useAxios();
   const { error_data: moods_error, fetch_data: fetch_moods } = useAxios();
+  const { error_data: health_check_error, fetch_data: fetch_healthcheck } =
+    useAxios();
+
+  async function get_healthcheck() {
+    const response = await fetch_healthcheck({
+      method: "GET",
+      url: `${API_URL}/protected/health_check`,
+    });
+    if (response?.status === 200) {
+      dispatch(set_permissions(true));
+    } else {
+      dispatch(set_permissions(false));
+    }
+  }
 
   async function get_genres_moods() {
     try {
@@ -69,7 +88,10 @@ function App() {
 
   // Call API
   useEffect(() => {
-    get_genres_moods();
+    get_healthcheck();
+    if (permissions_granted) {
+      get_genres_moods();
+    }
   }, []);
 
   // Call Genres or Moods lists if they were changed
@@ -99,7 +121,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<MainLayout />}
+          element={permissions_granted ? <MainLayout /> : <Login />}
         >
           <Route
             index
