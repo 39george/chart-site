@@ -13,8 +13,11 @@
   font-weight: 600;
   letter-spacing: 0.05em;
 
+  span {
+    margin-right: 1rem;
+  }
+
   a {
-    margin-left: 1rem;
     color: $accent;
     text-decoration: none;
 

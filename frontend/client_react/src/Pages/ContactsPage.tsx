@@ -6,7 +6,7 @@ const ContactsPage: FC = () => {
     <section className={styles.contacts_page}>
       <div className={styles.content}>
         <p className={styles.contacts}>
-          Телеграмм для связи{" "}
+          <span>Телеграмм для связи</span>
           <a
             href="https://t.me/nai_alyona"
             target="_blank"
