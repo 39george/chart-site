@@ -4,6 +4,10 @@ import { TbDots } from "react-icons/tb";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { format_price } from "../helpers";
 import { FC, useState } from "react";
+import useAxios from "../Hooks/APIRequests";
+import { API_URL } from "../config";
+import { useDispatch } from "react-redux";
+import { set_song_list_updated } from "../state/song_list_updated_slice";
 
 interface SongItemProps {
   song: ISong;
@@ -13,6 +17,8 @@ interface SongItemProps {
 const SongItem: FC<SongItemProps> = (props) => {
   const [price_popup_visible, set_price_popup_visible] = useState(false);
   const [options_popup_visible, set_options_popup_visible] = useState(false);
+  const { error_data: delete_error_data, fetch_data: delete_song } = useAxios();
+  const dispatch = useDispatch();
 
   function handle_price_click(e: React.MouseEvent<HTMLDivElement>) {
     if (window.innerWidth > 378) {
@@ -20,6 +26,16 @@ const SongItem: FC<SongItemProps> = (props) => {
     }
     e.stopPropagation();
     set_price_popup_visible(!price_popup_visible);
+  }
+
+  async function try_to_delete(id: number) {
+    const response = await delete_song({
+      method: "DELETE",
+      url: `${API_URL}/protected/song/${id}`,
+    });
+    if (response?.status === 200) {
+      dispatch(set_song_list_updated(true));
+    }
   }
 
   return (
@@ -37,7 +53,7 @@ const SongItem: FC<SongItemProps> = (props) => {
         <div className={styles.meta_info}>
           <div className={styles.meta_unit}>
             <span className={styles.hash_tag}>#</span>
-            {props.song.sex}
+            {props.song.sex === "female" ? "Женский" : "Мужской"}
           </div>
           <div className={styles.meta_unit}>
             <span className={styles.hash_tag}>#</span>
@@ -79,7 +95,10 @@ const SongItem: FC<SongItemProps> = (props) => {
               <FiEdit className={styles.edit_icon} />
               <p>редактировать</p>
             </div>
-            <div className={styles.delete}>
+            <div
+              className={styles.delete}
+              onClick={() => try_to_delete(props.song.id)}
+            >
               <FiTrash2 className={styles.delete_icon} />
               <p>удалить</p>
             </div>
