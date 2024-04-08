@@ -30,9 +30,12 @@ const song_data_slice = createSlice({
     set_song_data: (state: ISongData, actions: PayloadAction<SubmitSong>) => {
       state.song = actions.payload;
     },
+    reset_song_data: () => {
+      return initial_state;
+    },
   },
 });
 
-export const { set_song_data } = song_data_slice.actions;
+export const { set_song_data, reset_song_data } = song_data_slice.actions;
 
 export default song_data_slice.reducer;
