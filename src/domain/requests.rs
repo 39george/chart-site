@@ -28,7 +28,6 @@ pub struct WordQuery {
 pub struct Lyric(
     #[garde(
         length(min = MIN_LYRIC_LEN, max = MAX_LYRIC_LEN),
-        custom(contains_no_control_characters)
     )]
     /// Should contain no control characters
     #[schema(example = "Some lyrics", min_length = 1, max_length = 5000)]
