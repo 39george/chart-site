@@ -65,6 +65,33 @@
   text-underline-offset: 0.25rem;
 }
 
+.submit_button {
+  display: flex;
+  align-items: center;
+
+  width: fit-content;
+
+  margin-top: 3.125rem;
+  margin-left: auto;
+  padding: 1em;
+
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+
+  border-radius: 0.25rem;
+  border: 1px solid $accent_cyan;
+  color: $main_bright;
+  text-decoration: none;
+
+  transition: 0.15s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $accent_cyan;
+  }
+}
+
 @media (max-width: 760px) {
   .upload_form_content {
     padding: 2.75rem 2rem;

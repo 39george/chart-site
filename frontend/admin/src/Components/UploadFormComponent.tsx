@@ -1,19 +1,25 @@
 import styles from "./UploadFormComponent.module.scss";
 import { FC } from "react";
 import { Outlet } from "react-router-dom";
-import { IStep, ISteps, StepName } from "../types";
+import { IStep, ISteps, StepName, SubmitSong, SubmitStatus } from "../types";
+import InfoModalWindow from "./InfoModalWindow";
 
 interface UploadFormComponentProps {
   state: {
     steps: ISteps;
     current_step: StepName;
     change_step: (step: IStep) => void;
+    fields_not_empty: (song: SubmitSong) => boolean;
+    song: SubmitSong;
+    submit_song: () => Promise<void>;
+    song_submit_status: SubmitStatus;
   };
 }
 
 const UploadFormComponent: FC<UploadFormComponentProps> = ({ state }) => {
   return (
     <div className={styles.upload_form_container}>
+      {state.song_submit_status && <InfoModalWindow />}
       <div className={styles.steps}>
         <p className={styles.step_name}>Файлы</p>
         <p className={styles.step_count}>
@@ -65,6 +71,14 @@ const UploadFormComponent: FC<UploadFormComponentProps> = ({ state }) => {
         </div>
         <Outlet />
       </div>
+      {state.fields_not_empty(state.song) && (
+        <div
+          className={styles.submit_button}
+          onClick={state.submit_song}
+        >
+          Опубликовать
+        </div>
+      )}
     </div>
   );
 };
