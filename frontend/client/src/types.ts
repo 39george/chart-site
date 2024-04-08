@@ -1,4 +1,4 @@
-export type GenderOptions = "Любой" | "Мужской" | "Женский";
+export type GenderOptions = "Любой" | "male" | "female";
 
 export type FilterType = "gender" | "genre" | "mood" | "price" | null;
 
@@ -11,12 +11,13 @@ export interface ISong {
   price: string;
   primary_genre: string;
   moods: string[];
-  raiting: number;
+  raiting: number | null;
   sex: GenderOptions;
-  created_at: string;
+  created_at: number[];
+  updated_at: string;
   key?: string;
-  secondary_genre?: string;
-  tempo?: string;
+  secondary_genre?: null;
+  tempo?: number;
 }
 
 export interface CheckedGender {

@@ -1,5 +1,5 @@
 import styles from "./CurrentSong.module.scss";
-import { Component, Index } from "solid-js";
+import { Component, Index, createSignal } from "solid-js";
 import { FiChevronDown } from "solid-icons/fi";
 import { ISong } from "../types";
 import PauseIcon from "../UI/PauseIcon";
@@ -9,6 +9,7 @@ interface CurrentSongProps {
 }
 
 const CurrentSong: Component<CurrentSongProps> = (props) => {
+  const [expanded, set_expanded] = createSignal(false);
   const lyric_format = (lyric: string): string[] => {
     return lyric.split("\n");
   };
@@ -56,7 +57,7 @@ const CurrentSong: Component<CurrentSongProps> = (props) => {
         </div>
         <div class={styles.text_section}>
           <p class={styles.info_header}>Текст песни</p>
-          <div class={styles.text}>
+          <div class={`${styles.text} ${expanded() && styles.text_expanded}`}>
             <Index each={lyric_format(props.song.lyric)}>
               {(s) => {
                 if (s() === "") {
@@ -66,8 +67,13 @@ const CurrentSong: Component<CurrentSongProps> = (props) => {
               }}
             </Index>
           </div>
-          <div class={styles.expand_button}>
-            <p>развернуть</p>
+          <div
+            class={`${styles.expand_button} ${
+              expanded() && styles.button_expanded
+            }`}
+            onclick={() => set_expanded(!expanded())}
+          >
+            {!expanded() ? <p>показать</p> : <p>свернуть</p>}
             <FiChevronDown class={styles.chevron} />
           </div>
         </div>

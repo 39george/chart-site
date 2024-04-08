@@ -94,12 +94,27 @@
   color: $light_gray;
 }
 
+.text_section {
+  max-width: 11.25rem;
+  margin-left: 1rem;
+}
+
 .text {
+  height: 10.375rem;
+
   margin-top: 1.75rem;
+
   font-size: 0.875rem;
   font-weight: 400;
+
   letter-spacing: 0.05em;
+
   mask-image: linear-gradient(180deg, #000 0, transparent);
+}
+
+.text_expanded {
+  height: 100%;
+  mask-image: none;
 }
 
 .expand_button {
@@ -111,7 +126,6 @@
   margin-top: 2em;
 
   font-size: 0.625rem;
-  font-weight: 300;
   letter-spacing: 0.05em;
   cursor: pointer;
 
@@ -125,6 +139,12 @@
   height: 0.75rem;
   margin-left: 0.25rem;
   transition: transform 0.15s ease-out;
+}
+
+.button_expanded {
+  .chevron {
+    transform: rotate(-180deg);
+  }
 }
 
 @media (max-width: 1090px) {

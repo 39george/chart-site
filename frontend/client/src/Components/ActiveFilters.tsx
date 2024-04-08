@@ -3,7 +3,7 @@ import { Component, Index, createEffect, createSignal } from "solid-js";
 import { IoCloseCircle, IoCloseOutline } from "solid-icons/io";
 import { FilterType, GenderOptions } from "../types";
 import { format_price } from "../helpers";
-import { MAX_PRICE, MIN_PRICE } from "../data";
+import { MAX_PRICE, MIN_PRICE } from "../store/global_store";
 
 interface ActiveFiltersProps {
   filters: {
@@ -37,7 +37,9 @@ const ActiveFitlers: Component<ActiveFiltersProps> = (props) => {
       {props.filters.gender !== "Любой" && (
         <div class={styles.active_filter}>
           <span class={styles.filter_type}>Пол:&nbsp;&nbsp;</span>
-          <span>{props.filters.gender}</span>
+          <span>
+            {props.filters.gender === "female" ? "Женский" : "Мужской"}
+          </span>
           <IoCloseOutline
             class={styles.clear_icon_outline}
             onClick={() => props.clear_filter("gender")}
@@ -99,11 +101,11 @@ const ActiveFitlers: Component<ActiveFiltersProps> = (props) => {
           <span class={styles.filter_type}>Цена:&nbsp;&nbsp;</span>
           <span>
             {props.filters.price.from === ""
-              ? format_price(MIN_PRICE.toString())
+              ? format_price(MIN_PRICE().toString())
               : props.filters.price.from}
             ₽ -{" "}
             {props.filters.price.to === ""
-              ? format_price(MAX_PRICE.toString())
+              ? format_price(MAX_PRICE().toString())
               : props.filters.price.to}
             ₽
           </span>

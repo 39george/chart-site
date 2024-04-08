@@ -2,18 +2,23 @@ import styles from "./Filters.module.scss";
 import {
   Component,
   For,
+  Match,
   Show,
+  Switch,
   createEffect,
   createSignal,
   onCleanup,
 } from "solid-js";
 import { FiChevronDown } from "solid-icons/fi";
 import ActiveFitlers from "./ActiveFilters";
-import { MAX_PRICE, MIN_PRICE, genders, genres, moods } from "../data";
+import { genders } from "../data";
 import { FilterType, GenderOptions } from "../types";
 import {
+  MAX_PRICE,
+  MIN_PRICE,
   checked_gender,
   checked_genres_moods,
+  genres_moods,
   price_value,
   set_checked_gender,
   set_checked_genres_moods,
@@ -229,7 +234,10 @@ const Filters: Component = () => {
                           class={styles.label}
                         >
                           <span class={styles.custom_checkbox}></span>
-                          {gender}
+                          <Switch fallback="Любой">
+                            <Match when={gender === "female"}>Женский</Match>
+                            <Match when={gender === "male"}>Мужской</Match>
+                          </Switch>
                         </label>
                       </li>
                     );
@@ -256,7 +264,7 @@ const Filters: Component = () => {
             <div class={`${styles.pop_up} ${styles.pop_up_genre}`}>
               <ul class={styles.pop_up_content}>
                 <li class={styles.pop_up_title}>Жанр</li>
-                <For each={genres}>
+                <For each={genres_moods().genres}>
                   {(genre) => {
                     return (
                       <li class={styles.li_item}>
@@ -306,7 +314,7 @@ const Filters: Component = () => {
             <div class={`${styles.pop_up} ${styles.pop_up_mood}`}>
               <ul class={styles.pop_up_content}>
                 <li class={styles.pop_up_title}>Настроение</li>
-                <For each={moods}>
+                <For each={genres_moods().moods}>
                   {(mood) => {
                     return (
                       <li class={styles.li_item}>
@@ -366,7 +374,7 @@ const Filters: Component = () => {
                     inputMode="numeric"
                     id="from"
                     value={price_value().from}
-                    placeholder={`${format_price(MIN_PRICE.toString())}₽`}
+                    placeholder={`${format_price(MIN_PRICE().toString())}₽`}
                     onInput={handle_change_price}
                   />
                   <p class={styles.price_to}>до</p>
@@ -379,7 +387,7 @@ const Filters: Component = () => {
                     inputMode="numeric"
                     id="to"
                     value={price_value().to}
-                    placeholder={`${format_price(MAX_PRICE.toString())}₽`}
+                    placeholder={`${format_price(MAX_PRICE().toString())}₽`}
                     onInput={handle_change_price}
                   />
                 </div>

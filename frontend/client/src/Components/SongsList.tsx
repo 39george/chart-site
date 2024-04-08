@@ -2,21 +2,30 @@ import styles from "./SongsList.module.scss";
 import { Component, For, Show, createEffect, createSignal } from "solid-js";
 import { FaSolidBars } from "solid-icons/fa";
 import { BsGridFill } from "solid-icons/bs";
-import { MAX_PRICE, MIN_PRICE, songs } from "../data";
 import SongItem from "./SongItem";
 import CurrentSong from "./CurrentSong";
 import { ISong } from "../types";
 import {
+  MAX_PRICE,
+  MIN_PRICE,
+  SET_MAX_PRICE,
+  SET_MIN_PRICE,
   checked_gender,
   checked_genres_moods,
   price_value,
+  set_genres_moods,
+  set_songs,
+  songs,
 } from "../store/global_store";
+import useAxios from "../Hooks/APIRequests";
+import { API_URL } from "../config";
+import { extract_genres, extract_moods } from "../helpers";
 
 const SongsList: Component = () => {
   const [current_song_idx, set_current_song_idx] = createSignal<number>(-1);
-  const [filtered_songs, set_filtered_songs] = createSignal<ISong[]>([
-    ...songs,
-  ]);
+  const [filtered_songs, set_filtered_songs] = createSignal<ISong[]>([]);
+  const { error_data: fetch_songs_error_data, fetch_data: fetch_songs } =
+    useAxios();
 
   function is_in_bounds(min: number, max: number, song_price: number): boolean {
     return song_price >= min && song_price <= max;
@@ -26,9 +35,39 @@ const SongsList: Component = () => {
     set_current_song_idx(idx);
   }
 
+  async function try_to_fetch_songs() {
+    const response = await fetch_songs({
+      method: "GET",
+      url: `${API_URL}/open/songs`,
+    });
+    if (response?.status === 200) {
+      set_songs([...response.data]);
+      set_genres_moods(() => ({
+        genres: extract_genres(songs()),
+        moods: extract_moods(songs()),
+      }));
+      SET_MAX_PRICE(
+        Math.max.apply(
+          Math,
+          songs().map((song) => Number.parseFloat(song.price))
+        )
+      );
+      SET_MIN_PRICE(
+        Math.min.apply(
+          Math,
+          songs().map((song) => Number.parseFloat(song.price))
+        )
+      );
+    }
+  }
+
+  createEffect(() => {
+    try_to_fetch_songs();
+  });
+
   createEffect(() => {
     set_filtered_songs(
-      songs
+      songs()
         .filter((song) => {
           let gender = checked_gender().checked;
           if (gender === "Любой") {
@@ -53,9 +92,9 @@ const SongsList: Component = () => {
         })
         .filter((song) => {
           let min = Number.parseInt(price_value().from.replace(/\s/g, ""));
-          min = Number.isNaN(min) ? MIN_PRICE : min;
+          min = Number.isNaN(min) ? MIN_PRICE() : min;
           let max = Number.parseInt(price_value().to.replace(/\s/g, ""));
-          max = Number.isNaN(max) ? MAX_PRICE : max;
+          max = Number.isNaN(max) ? MAX_PRICE() : max;
           return is_in_bounds(min, max, Number.parseFloat(song.price));
         })
     );
@@ -65,7 +104,7 @@ const SongsList: Component = () => {
     <div class={styles.songs_section}>
       <Show
         when={filtered_songs().length !== 0}
-        fallback={<div>no songs matched the filters</div>}
+        fallback={<div>Нет песен с такими параметрами</div>}
       >
         <div
           class={`${styles.songs_list} ${
@@ -87,6 +126,7 @@ const SongsList: Component = () => {
                   song={{
                     cover_url: song.cover_url,
                     created_at: song.created_at,
+                    updated_at: song.updated_at,
                     duration: song.duration,
                     id: song.id,
                     lyric: song.lyric,
