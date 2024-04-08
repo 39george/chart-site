@@ -25,6 +25,10 @@ const UploadStep2: FC<UploadStep2Props> = ({ song_data }) => {
       return;
     }
 
+    if (name === "lyric" && value.length > 5000) {
+      return;
+    }
+
     dispatch(
       set_song_data({
         ...song_data.song,

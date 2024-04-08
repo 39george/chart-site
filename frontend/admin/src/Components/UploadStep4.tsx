@@ -14,18 +14,10 @@ function lyric_format(lyric: string): string[] {
 }
 
 const UploadStep4: FC<UploadStep4Props> = ({ song_data }) => {
-  const [lyric_height, set_lyric_height] = useState("10.375rem");
+  const [expanded, set_expanded] = useState(false);
   const img_url = useSelector<RootState, string>(
     (state) => state.files_url.img
   );
-
-  function handle_expand_click() {
-    if (lyric_height === "10.375rem") {
-      set_lyric_height("100%");
-    } else {
-      set_lyric_height("10.375rem");
-    }
-  }
 
   return (
     <div className={styles.upload_step_4}>
@@ -74,8 +66,7 @@ const UploadStep4: FC<UploadStep4Props> = ({ song_data }) => {
           <div className={styles.text_section}>
             <p className={styles.text_header}>Текст песни</p>
             <div
-              className={styles.text}
-              style={{ height: `${lyric_height}` }}
+              className={`${styles.text} ${expanded && styles.text_expanded}`}
             >
               {lyric_format(song_data.song.lyric).map((line, idx) => {
                 if (line === "") {
@@ -86,10 +77,12 @@ const UploadStep4: FC<UploadStep4Props> = ({ song_data }) => {
               })}
             </div>
             <div
-              className={styles.expand_button}
-              onClick={handle_expand_click}
+              className={`${styles.expand_button} ${
+                expanded && styles.button_expanded
+              }`}
+              onClick={() => set_expanded(!expanded)}
             >
-              <p>развернуть</p>
+              <p>{!expanded ? "развернуть" : "свернуть"}</p>
               <HiOutlineChevronDown className={styles.chevron} />
             </div>
           </div>

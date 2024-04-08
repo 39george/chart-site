@@ -1,6 +1,6 @@
 import styles from "./UploadStep3.module.scss";
 import { ISongData, set_song_data } from "../state/song_data_slice";
-import { FC, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { GoTriangleDown } from "react-icons/go";
 import { useDispatch } from "react-redux";
 import { format_input_price } from "../helpers";
@@ -13,12 +13,26 @@ interface UploadStep3Props {
 
 type InputPopup = "gender" | "genres" | "moods" | "";
 
+interface InputRefs {
+  gender_ref: React.RefObject<HTMLDivElement>;
+  genre_ref: React.RefObject<HTMLDivElement>;
+  mood_ref: React.RefObject<HTMLDivElement>;
+}
+
+type FocusRef = React.RefObject<HTMLDivElement>;
+
 const UploadStep3: FC<UploadStep3Props> = ({
   song_data,
   genres_list,
   moods_list,
 }) => {
   const [popup_visible, set_popup_visibe] = useState<InputPopup>("");
+  const input_refs: InputRefs = {
+    gender_ref: useRef(null),
+    genre_ref: useRef(null),
+    mood_ref: useRef(null),
+  };
+  const [focus_ref, set_focus_ref] = useState<HTMLDivElement | null>();
   const dispatch = useDispatch();
 
   function handle_input_change(e: React.ChangeEvent<HTMLInputElement>) {
@@ -80,11 +94,49 @@ const UploadStep3: FC<UploadStep3Props> = ({
     } else {
       set_popup_visibe(popup);
     }
+
+    switch (popup) {
+      case "":
+        set_focus_ref(null);
+        break;
+      case "gender":
+        if (input_refs.gender_ref.current) {
+          set_focus_ref(input_refs.gender_ref.current);
+        }
+        break;
+      case "genres":
+        if (input_refs.genre_ref.current) {
+          set_focus_ref(input_refs.genre_ref.current);
+        }
+        break;
+      case "moods":
+        if (input_refs.mood_ref.current) {
+          set_focus_ref(input_refs.mood_ref.current);
+        }
+        break;
+    }
   }
+
+  useEffect(() => {
+    const handle_click_outside_filter = (e: MouseEvent) => {
+      if (!focus_ref?.contains(e.target as Node)) {
+        set_popup_visibe("");
+      }
+    };
+
+    document.addEventListener("mousedown", handle_click_outside_filter);
+
+    return () => {
+      document.removeEventListener("mousedown", handle_click_outside_filter);
+    };
+  }, [focus_ref]);
 
   return (
     <div className={styles.upload_step_3}>
-      <div className={`${styles.input_container} ${styles.input_gender}`}>
+      <div
+        ref={input_refs.gender_ref}
+        className={`${styles.input_container} ${styles.input_gender}`}
+      >
         <p className={styles.label}>Пол</p>
         <div
           className={`${styles.input_field} ${styles.field_gender}`}
@@ -121,7 +173,7 @@ const UploadStep3: FC<UploadStep3Props> = ({
                 id="female"
                 name="sex"
                 onChange={handle_input_change}
-                checked={song_data.song.sex !== "male"}
+                checked={song_data.song.sex === "female"}
               />
               <span className={styles.custom_checkbox}></span>
               <label
@@ -134,7 +186,10 @@ const UploadStep3: FC<UploadStep3Props> = ({
           </div>
         )}
       </div>
-      <div className={`${styles.input_container} ${styles.container_genres}`}>
+      <div
+        ref={input_refs.genre_ref}
+        className={`${styles.input_container} ${styles.container_genres}`}
+      >
         <p className={styles.label}>Жанр</p>
         <div
           className={`${styles.input_field} ${
@@ -164,6 +219,7 @@ const UploadStep3: FC<UploadStep3Props> = ({
                     id={genre}
                     name="primary_genre"
                     onChange={handle_input_change}
+                    checked={song_data.song.primary_genre === genre}
                   />
                   <span className={styles.custom_checkbox}></span>
                   <label
@@ -178,7 +234,10 @@ const UploadStep3: FC<UploadStep3Props> = ({
           </ul>
         )}
       </div>
-      <div className={`${styles.input_container} ${styles.container_moods}`}>
+      <div
+        ref={input_refs.mood_ref}
+        className={`${styles.input_container} ${styles.container_moods}`}
+      >
         <p className={styles.label}>Настроение</p>
         <div
           className={`${styles.input_field} ${
@@ -208,6 +267,7 @@ const UploadStep3: FC<UploadStep3Props> = ({
                     id={mood}
                     name="moods"
                     onChange={handle_input_change}
+                    checked={song_data.song.moods[0] === mood}
                   />
                   <span className={styles.custom_checkbox}></span>
                   <label
