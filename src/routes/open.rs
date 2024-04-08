@@ -5,6 +5,7 @@ use anyhow::Context;
 use axum::extract::Path;
 use axum::Json;
 use axum::{extract::State, routing, Router};
+use futures::future::try_join_all;
 use http::StatusCode;
 
 use crate::cornucopia::queries::open_access::{self, FetchSongs};
@@ -41,11 +42,18 @@ async fn fetch_songs(
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
-    let songs = open_access::fetch_songs()
+    // TODO: simplify code
+    let futures = open_access::fetch_songs()
         .bind(&db_client)
         .all()
         .await
-        .context("Failed to fetch songs from pg")?;
+        .context("Failed to fetch songs from pg")?.into_iter().map(|mut entry| async {
+            let expiration = std::time::Duration::from_secs(30 * 60);
+            entry.cover_url = state.object_storage.generate_presigned_url(&entry.cover_url.parse().context("Failed to parse object key")?, expiration).await.context("Failed to generate presigned url")?;
+            Ok::<FetchSongs, anyhow::Error>(entry)
+        });
+    let songs = try_join_all(futures).await?;
+
     Ok(Json(songs))
 }
 
