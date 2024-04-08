@@ -12,3 +12,140 @@ body {
   background-color: $main_dark;
   color: $main_bright;
 }
+
+// ───── Audio Player ─────────────────────────────────────────────────────── //
+
+:root {
+  .rhap_container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+
+    height: 5rem;
+
+    background-color: #191919;
+  }
+
+  // Progress section
+  .rhap_progress-section {
+    margin-right: 1rem;
+    margin-left: 14rem;
+  }
+
+  // Progress bar
+  .rhap_progress-bar-show-download {
+    background-color: rgba($color: $main_bright, $alpha: 0.1);
+  }
+
+  .rhap_progress-filled {
+    background-color: $accent;
+  }
+
+  .rhap_progress-indicator {
+    background-color: $accent;
+    box-shadow: none;
+  }
+
+  .rhap_download-progress {
+    background-color: $light_gray;
+  }
+
+  // Main controls
+  .rhap_controls-section {
+    flex: 0;
+    min-width: 18rem;
+  }
+
+  .rhap_main-controls {
+    margin-right: 1rem;
+  }
+
+  .rhap_main-controls-button {
+    width: fit-content;
+    height: fit-content;
+  }
+
+  .rhap_volume-controls {
+    flex: initial;
+    width: 6.875rem;
+  }
+
+  .rhap_horizontal .rhap_controls-section {
+    margin-left: 0;
+  }
+
+  // Additional contronls
+  .rhap_additional-controls {
+    flex: initial;
+    margin-right: 1rem;
+  }
+
+  .rhap_repeat-button {
+    margin: 0;
+  }
+
+  // Playback buttons
+  .rhap_button-clear {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  // Time
+  .rhap_time {
+    font-size: 0.75rem;
+    color: $main_bright;
+  }
+
+  // Volume
+  .rhap_volume-container {
+    margin-right: 1rem;
+  }
+
+  .rhap_volume-indicator {
+    background-color: $main_bright;
+    box-shadow: none;
+  }
+
+  .rhap_volume-filled {
+    background-color: $main_bright;
+  }
+
+  .rhap_volume-bar {
+    background-color: $light_gray;
+  }
+
+  @media (max-width: 768px) {
+    .rhap_container {
+      height: 6.25rem;
+    }
+
+    .rhap_horizontal {
+      flex-direction: column;
+    }
+
+    .rhap_horizontal .rhap_controls-section {
+      margin-left: auto;
+    }
+  }
+
+  @media (max-width: 545px) {
+    .rhap_progress-section {
+      margin-left: 6rem;
+    }
+
+    .rhap_controls-section {
+      min-width: initial;
+    }
+  }
+
+  @media (max-width: 378px) {
+    .rhap_progress-section {
+      margin-left: 4.5rem;
+    }
+
+    .rhap_additional-controls {
+      display: none;
+    }
+  }
+}
