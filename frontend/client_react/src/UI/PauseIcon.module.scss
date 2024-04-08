@@ -16,9 +16,9 @@
 .big {
   width: 3.75rem;
   height: 3.75rem;
-  outline: 3px solid $main_bright;
-  backdrop-filter: blur(0.25rem);
-  -webkit-backdrop-filter: blur(0.25rem);
+  outline: 4px solid $main_bright;
+  // backdrop-filter: blur(0.25rem);
+  // -webkit-backdrop-filter: blur(0.25rem);
 }
 
 .small {
@@ -42,7 +42,7 @@
 }
 
 .stick_small {
-  width: 0.25rem;
+  width: 0.215rem;
   height: 1rem;
   &:not(:last-child) {
     margin-right: 0.25rem;

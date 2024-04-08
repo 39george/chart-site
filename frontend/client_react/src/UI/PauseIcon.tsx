@@ -9,6 +9,7 @@ interface PauseIconProps {
     bottom?: string;
     left?: string;
   };
+  handle_click?: () => void;
 }
 
 const PauseIcon: FC<PauseIconProps> = (props) => {
@@ -23,6 +24,7 @@ const PauseIcon: FC<PauseIconProps> = (props) => {
         bottom: `${props.position.bottom}`,
         left: `${props.position.left}`,
       }}
+      onClick={props.handle_click}
     >
       <div
         className={`${styles.pause_stick} ${
