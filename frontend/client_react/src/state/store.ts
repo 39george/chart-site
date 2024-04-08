@@ -5,6 +5,8 @@ import genres_moods_reducer from "./genres_moods_slice";
 import min_max_price_reducer from "./min_max_price_slice";
 import price_value_reducer from "./price_value_slice";
 import songs_reducer from "./songs_slice";
+import song_url_reducer from "./song_url_slice";
+import current_song_data_reducer from "./current_song_data_slice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ const store = configureStore({
     min_max_price: min_max_price_reducer,
     price_value: price_value_reducer,
     songs: songs_reducer,
+    song_url: song_url_reducer,
+    current_song_data: current_song_data_reducer,
   },
 });
 
