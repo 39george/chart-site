@@ -1,0 +1,62 @@
+@import "../variables.scss";
+@import "../genreal_styles.scss";
+
+.login_window {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 100vh;
+}
+
+.content {
+  padding: 1rem;
+}
+
+.header {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.input_form {
+  margin-top: 2rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  color: $light_gray;
+}
+
+.submit_button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+
+  padding: 1rem;
+
+  font-size: 1rem;
+  font-weight: 500;
+
+  border: 1px solid $main_bright;
+  border-radius: 0.25rem;
+  color: $main_bright;
+  background-color: $main_dark;
+
+  transition: 0.15s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    color: $main_dark;
+    background-color: $main_bright;
+  }
+}
+
+.err_msg {
+  width: fit-content;
+  margin: 1rem auto 0;
+  font-size: 0.875rem;
+  color: $warning;
+}
