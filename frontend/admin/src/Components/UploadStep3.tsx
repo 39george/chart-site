@@ -19,8 +19,6 @@ interface InputRefs {
   mood_ref: React.RefObject<HTMLDivElement>;
 }
 
-type FocusRef = React.RefObject<HTMLDivElement>;
-
 const UploadStep3: FC<UploadStep3Props> = ({
   song_data,
   genres_list,
