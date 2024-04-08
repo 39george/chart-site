@@ -1,11 +1,12 @@
 @import "../variables.scss";
+@import "../genreal_styles.scss";
 
 .main_page {
   padding: 4.5rem clamp(0px, (100vw - 80rem) / 2, 9999px) 2rem;
 }
 
 .content {
-  padding: 6.5rem 1rem 3rem;
+  padding: 6.5rem 1rem;
 }
 
 .h1 {
@@ -16,6 +17,53 @@
 
 .songs_section {
   display: flex;
+}
+
+.player_meta_info {
+  position: fixed;
+  left: 2rem;
+  bottom: 0.875rem;
+  display: flex;
+  align-items: center;
+  z-index: 99;
+}
+
+.image_wrapper {
+  @include image_wrapper(3.25rem, 0.25rem);
+}
+
+.name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-left: 1em;
+}
+
+// ───── Auido Player ─────────────────────────────────────────────────────── //
+.playback_icon {
+  color: $main_bright;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .player_meta_info {
+    bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 545px) {
+  .player_meta_info {
+    left: 1rem;
+    bottom: 0.75rem;
+    flex-direction: column;
+  }
+
+  .name {
+    font-size: 0.75rem;
+    margin-top: 0.5em;
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 450px) {
