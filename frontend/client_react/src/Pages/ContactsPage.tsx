@@ -5,7 +5,16 @@ const ContactsPage: FC = () => {
   return (
     <section className={styles.contacts_page}>
       <div className={styles.content}>
-        <div>contacts page</div>
+        <p className={styles.contacts}>
+          Телеграмм для связи{" "}
+          <a
+            href="https://t.me/nai_alyona"
+            target="_blank"
+            className={styles.telegramm_link}
+          >
+            @Alyonaaas
+          </a>
+        </p>
       </div>
     </section>
   );

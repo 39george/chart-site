@@ -1,9 +1,25 @@
 @import "../variables.scss";
 
 .contacts_page {
-  padding: 8.875rem clamp(0px, (100vw - 72rem) / 2, 9999px) 2rem;
+  padding: 4.5rem clamp(0px, (100vw - 80rem) / 2, 9999px) 2rem;
 }
 
 .content {
-  margin: 0 1rem;
+  padding: 6.5rem 1rem;
+}
+
+.contacts {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+
+  a {
+    margin-left: 1rem;
+    color: $accent;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
