@@ -1,0 +1,50 @@
+@import "../variables.scss";
+@import "../genreal_styles.scss";
+
+.info_modal {
+  @include modal_window_bg();
+}
+
+.content {
+  @include modal_window_content();
+
+  width: 30rem;
+  padding: 1.5rem 2rem;
+}
+
+.header {
+  width: fit-content;
+  margin: 0 auto;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.info {
+  width: fit-content;
+  margin: 3rem auto 0;
+  font-size: 0.875rem;
+}
+
+.return_button {
+  display: block;
+  width: fit-content;
+
+  margin: 4rem auto 0;
+  padding: 0.75rem;
+
+  font-size: 0.75rem;
+  text-decoration: none;
+
+  border-radius: 2rem;
+  border: 1px solid $light_gray;
+  color: $light_gray;
+
+  transition: 0.15s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    border: 1px solid $main_bright;
+    color: $main_bright;
+  }
+}
