@@ -1,5 +1,5 @@
 import styles from "./Step1FilesUploaded.module.scss";
-import ModalWindow from "./ModalWindow";
+import ModalWindow from "./SongsUploadedModal";
 import { FC, useState } from "react";
 
 interface Step1FilesUploadedProps {
