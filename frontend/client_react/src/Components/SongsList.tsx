@@ -13,13 +13,16 @@ import { set_songs } from "../state/songs_slice";
 import { set_genres, set_moods } from "../state/genres_moods_slice";
 import { RootState } from "../state/store";
 import { set_max_price, set_min_price } from "../state/min_max_price_slice";
+import { set_current_song_id } from "../state/current_song_data_slice";
 
 const SongsList: FC = () => {
-  const [current_song_idx, set_current_song_idx] = useState<number>(-1);
   const [filtered_songs, set_filtered_songs] = useState<ISong[]>([]);
   const { error_data: fetch_songs_error_data, fetch_data: fetch_songs } =
     useAxios();
   const songs = useSelector<RootState, ISong[]>((state) => state.songs.songs);
+  const current_song_id = useSelector<RootState, number>(
+    (state) => state.current_song_data.id
+  );
   const checked_gender = useSelector<RootState, GenderOptions>(
     (state) => state.checked_gender.checked
   );
@@ -41,8 +44,8 @@ const SongsList: FC = () => {
     return song_price >= min && song_price <= max;
   }
 
-  function toggle_current_song(idx: number) {
-    set_current_song_idx(idx);
+  function toggle_current_song(id: number) {
+    dispatch(set_current_song_id(id));
   }
 
   async function try_to_fetch_songs() {
@@ -78,7 +81,9 @@ const SongsList: FC = () => {
         )
       )
     );
+  }, [songs]);
 
+  useEffect(() => {
     set_filtered_songs(
       songs
         .filter((song) => {
@@ -111,7 +116,7 @@ const SongsList: FC = () => {
           return is_in_bounds(min, max, Number.parseFloat(song.price));
         })
     );
-  }, [songs]);
+  }, [songs, checked_gender, checked_genres_moods, price_value]);
 
   return (
     <div className={styles.songs_section}>
@@ -120,7 +125,7 @@ const SongsList: FC = () => {
       ) : (
         <div
           className={`${styles.songs_list} ${
-            current_song_idx !== -1 && styles.songs_list_short
+            current_song_id !== -1 && styles.songs_list_short
           }`}
         >
           <div className={styles.view_switch}>
@@ -151,14 +156,15 @@ const SongsList: FC = () => {
                 }}
                 order_number={idx + 1}
                 toggle_current_song={toggle_current_song}
-                current_song_idx={current_song_idx}
               />
             );
           })}
         </div>
       )}
-      {current_song_idx !== -1 && (
-        <CurrentSong song={filtered_songs[current_song_idx]} />
+      {filtered_songs.find((song) => song.id === current_song_id) && (
+        <CurrentSong
+          song={filtered_songs.find((song) => song.id === current_song_id)}
+        />
       )}
     </div>
   );

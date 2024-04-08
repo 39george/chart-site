@@ -4,16 +4,30 @@ import { BsPlayCircle } from "react-icons/bs";
 import PauseIcon from "../UI/PauseIcon";
 import { format_price } from "../helpers";
 import { FC, useState } from "react";
+import useAxios from "../Hooks/APIRequests";
+import { API_URL } from "../config";
+import { useDispatch, useSelector } from "react-redux";
+import { set_song_url } from "../state/song_url_slice";
+import { RootState } from "../state/store";
+import { set_current_song_playing } from "../state/current_song_data_slice";
 
 interface SongItemProps {
   song: ISong;
   order_number: number;
-  toggle_current_song: (idx: number) => void;
-  current_song_idx: number;
+  toggle_current_song: (id: number) => void;
 }
 
 const SongItem: FC<SongItemProps> = (props) => {
   const [popup_visible, set_popup_visible] = useState(false);
+  const { error_data: song_url_fetch_error, fetch_data: fetch_song_url } =
+    useAxios();
+  const current_song_id = useSelector<RootState, number>(
+    (state) => state.current_song_data.id
+  );
+  const current_song_playing = useSelector<RootState, boolean>(
+    (state) => state.current_song_data.is_palying
+  );
+  const dispatch = useDispatch();
 
   function handle_price_click(e: React.MouseEvent) {
     if (window.innerWidth > 378) {
@@ -23,12 +37,32 @@ const SongItem: FC<SongItemProps> = (props) => {
     set_popup_visible(!popup_visible);
   }
 
+  function handle_song_click(id: number) {
+    if (current_song_id !== props.song.id) {
+      get_url(id);
+      dispatch(set_current_song_playing(true));
+      props.toggle_current_song(id);
+    } else {
+      dispatch(set_current_song_playing(!current_song_playing));
+    }
+  }
+
+  async function get_url(id: number) {
+    const response = await fetch_song_url({
+      method: "GET",
+      url: `${API_URL}/open/audio_url/${id}`,
+    });
+    if (response?.status === 200) {
+      dispatch(set_song_url(response.data));
+    }
+  }
+
   return (
     <div
       className={`${styles.song_item} ${
-        props.current_song_idx === props.order_number - 1 && styles.current_song
+        current_song_id === props.song.id && styles.current_song
       }`}
-      onClick={() => props.toggle_current_song(props.order_number - 1)}
+      onClick={() => handle_song_click(props.song.id)}
     >
       <p className={styles.order_number}>{props.order_number}</p>
       <div className={styles.image_wrapper}>
@@ -37,20 +71,25 @@ const SongItem: FC<SongItemProps> = (props) => {
           alt="cover"
           draggable={false}
         />
-        {props.current_song_idx === props.order_number - 1 && (
-          <PauseIcon
-            size="small"
-            position={{ top: "50%", left: "50%" }}
-          />
+        {current_song_id === props.song.id && (
+          <>
+            {!current_song_playing ? (
+              <BsPlayCircle className={styles.play_icon} />
+            ) : (
+              <PauseIcon
+                size="small"
+                position={{ top: "50%", left: "50%" }}
+              />
+            )}
+          </>
         )}
-        <BsPlayCircle className={styles.play_icon} />
       </div>
       <div className={styles.name_and_meta}>
         <p className={styles.name}>{props.song.name}</p>
         <div className={styles.meta_info}>
           <div className={styles.meta_unit}>
             <span className={styles.hash_tag}>#</span>
-            {props.song.sex}
+            {props.song.sex === "female" ? "Женский" : "Мужской"}
           </div>
           <div className={styles.meta_unit}>
             <span className={styles.hash_tag}>#</span>

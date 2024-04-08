@@ -58,10 +58,10 @@ const ActiveFitlers: FC<ActiveFiltersProps> = (props) => {
           <span className={styles.filter_type}>Жанр:&nbsp;&nbsp;</span>
           {props.filters.genres.map((genre, idx) => {
             if (idx === 0) {
-              return <p>{genre}</p>;
+              return <p key={idx}>{genre}</p>;
             }
             if (idx === 1) {
-              return <p>, {genre}</p>;
+              return <p key={idx}>, {genre}</p>;
             }
             if (idx >= 2) {
               return;
@@ -81,10 +81,10 @@ const ActiveFitlers: FC<ActiveFiltersProps> = (props) => {
           <span className={styles.filter_type}>Настроение:&nbsp;&nbsp;</span>
           {props.filters.moods.map((mood, idx) => {
             if (idx === 0) {
-              return <p>{mood}</p>;
+              return <p key={idx}>{mood}</p>;
             }
             if (idx === 1) {
-              return <p>, {mood}</p>;
+              return <p key={idx}>, {mood}</p>;
             }
             if (idx >= 2) {
               return;
