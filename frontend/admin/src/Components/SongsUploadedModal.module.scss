@@ -1,0 +1,45 @@
+@import "../variables.scss";
+@import "../genreal_styles.scss";
+
+.modal_window {
+  @include modal_window_bg;
+}
+
+.content {
+  @include modal_window_content;
+
+  max-width: 32rem;
+  padding: 2rem;
+}
+
+.message {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  margin-top: 4rem;
+}
+
+.button {
+  transition: 0.15s ease-out;
+  cursor: pointer;
+}
+
+.delete_button:hover {
+  color: $warning;
+}
+
+.cancel_button:hover {
+  color: $accent_cyan;
+}
+
+@media (max-width: 450px) {
+  .buttons {
+    justify-content: space-between;
+  }
+}

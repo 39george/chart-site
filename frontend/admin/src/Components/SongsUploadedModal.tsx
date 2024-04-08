@@ -1,14 +1,17 @@
 import { useDispatch } from "react-redux";
-import styles from "./ModalWindow.module.scss";
+import styles from "./SongsUploadedModal.module.scss";
 import { FC } from "react";
 import { set_audio_url, set_img_url } from "../state/files_url_slice";
 
-interface ModalWindowProps {
+interface SongsUploadedModalProps {
   close_window: () => void;
   reset_all: () => void;
 }
 
-const ModalWindow: FC<ModalWindowProps> = ({ close_window, reset_all }) => {
+const SongsUploadedModal: FC<SongsUploadedModalProps> = ({
+  close_window,
+  reset_all,
+}) => {
   const dispatch = useDispatch();
 
   function select_new_files() {
@@ -43,4 +46,4 @@ const ModalWindow: FC<ModalWindowProps> = ({ close_window, reset_all }) => {
   );
 };
 
-export default ModalWindow;
+export default SongsUploadedModal;
