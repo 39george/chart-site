@@ -70,18 +70,10 @@
   margin-right: 1.375rem;
 }
 
-.play_icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+.playpause_icon {
+  @include play_pause_icon(50% 0 0 50%, 2rem);
+
   transform: translateX(-50%) translateY(-50%);
-
-  width: 2rem;
-  height: 2rem;
-
-  color: $main_bright;
-
-  z-index: 8;
 }
 
 .name_and_meta {
@@ -145,11 +137,8 @@
 }
 
 .price_pop_up {
-  visibility: hidden;
-
   position: absolute;
   top: 50%;
-  left: -4.875rem;
   transform: translateY(-50%) translateX(0.75rem);
 
   padding: 0.375rem 0.625rem;
@@ -157,14 +146,15 @@
   border-radius: 1rem;
   background-color: $accent;
 
+  visibility: hidden;
   opacity: 0;
 
   transition: 0.15s ease-out;
 }
 
 .price_pop_up_visible {
-  visibility: visible;
   transform: translateY(-50%) translateX(0);
+  visibility: visible;
   opacity: 1;
 }
 

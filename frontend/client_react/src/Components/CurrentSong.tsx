@@ -1,12 +1,12 @@
 import styles from "./CurrentSong.module.scss";
-import { BsPlayCircle } from "react-icons/bs";
+import { BsPlayCircle, BsPauseCircle } from "react-icons/bs";
 import { IoChevronDown } from "react-icons/io5";
 import { ISong } from "../types";
-import PauseIcon from "../UI/PauseIcon";
 import { FC, useState } from "react";
 import { RootState } from "../state/store";
 import { useDispatch, useSelector } from "react-redux";
 import { set_current_song_playing } from "../state/current_song_data_slice";
+import { format_price } from "../helpers";
 
 interface CurrentSongProps {
   song: ISong | undefined;
@@ -48,14 +48,13 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
                   <>
                     {!current_song_playing ? (
                       <BsPlayCircle
-                        className={styles.play_icon}
+                        className={styles.playpause_icon}
                         onClick={handle_playback_click}
                       />
                     ) : (
-                      <PauseIcon
-                        handle_click={handle_playback_click}
-                        size="big"
-                        position={{ right: "0.75rem", bottom: "0.75rem" }}
+                      <BsPauseCircle
+                        className={styles.playpause_icon}
+                        onClick={handle_playback_click}
                       />
                     )}
                   </>
@@ -71,7 +70,9 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
               <div className={styles.stats}>
                 <div className={styles.stat_unit}>
                   <p className={styles.stat_type}>Пол</p>
-                  <p className={styles.stat_value}>{props.song.sex}</p>
+                  <p className={styles.stat_value}>
+                    {props.song.sex === "female" ? "Женский" : "Мужской"}
+                  </p>
                 </div>
                 <div className={styles.stat_unit}>
                   <p className={styles.stat_type}>Жанр</p>
@@ -85,7 +86,9 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
                 </div>
                 <div className={styles.stat_unit}>
                   <p className={styles.stat_type}>Цена</p>
-                  <p className={styles.stat_value}>{props.song.price}</p>
+                  <p className={styles.stat_value}>
+                    {format_price(props.song.price)}
+                  </p>
                 </div>
               </div>
             </div>

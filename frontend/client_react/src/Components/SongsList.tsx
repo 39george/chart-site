@@ -17,8 +17,7 @@ import { set_current_song_id } from "../state/current_song_data_slice";
 
 const SongsList: FC = () => {
   const [filtered_songs, set_filtered_songs] = useState<ISong[]>([]);
-  const { error_data: fetch_songs_error_data, fetch_data: fetch_songs } =
-    useAxios();
+  const { fetch_data: fetch_songs } = useAxios();
   const songs = useSelector<RootState, ISong[]>((state) => state.songs.songs);
   const current_song_id = useSelector<RootState, number>(
     (state) => state.current_song_data.id

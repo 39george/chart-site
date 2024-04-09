@@ -7,6 +7,7 @@
   max-width: 27rem;
 
   margin: 3.375rem 1rem 0 2rem;
+  margin-top: 0;
 }
 
 .image_section {
@@ -21,27 +22,15 @@
   @include image_wrapper(12.75rem, 0.375rem);
 
   position: relative;
-  box-shadow: 0 0 1rem rgba($color: #fff, $alpha: 0.37);
+  box-shadow: 0 0 1rem rgba($color: #fff, $alpha: 0.2);
   z-index: 2;
-
-  &:hover {
-    img {
-      transform: scale(1.1);
-    }
-  }
 }
-.play_icon {
-  position: absolute;
-  right: 0.75rem;
-  bottom: 0.75rem;
 
-  width: 3.875rem;
-  height: 3.875rem;
+.playpause_icon {
+  @include play_pause_icon(auto 0.75rem 0.75rem auto, 3.875rem);
 
-  color: $main_bright;
-
-  z-index: 8;
-  cursor: pointer;
+  backdrop-filter: blur(0.25rem);
+  -webkit-backdrop-filter: blur(0.25rem);
 }
 
 .background_decor {
@@ -57,7 +46,7 @@
 
   background: radial-gradient(circle, #fff, rgba(17, 14, 14, 0) 55%);
   filter: blur(3rem);
-  opacity: 0.5;
+  opacity: 0.4;
 
   z-index: 1;
 }
@@ -111,6 +100,7 @@
 
 .text_section {
   max-width: 11.25rem;
+  min-width: 10rem;
   margin-left: 1rem;
 }
 
@@ -118,6 +108,7 @@
   height: 10.375rem;
 
   margin-top: 1.75rem;
+  padding: 0.1em;
 
   font-size: 0.875rem;
   font-weight: 400;
@@ -125,11 +116,15 @@
   letter-spacing: 0.05em;
 
   mask-image: linear-gradient(180deg, #000 0, transparent);
+  -webkit-mask-image: linear-gradient(180deg, #000 0, transparent);
+
+  overflow-y: hidden;
 }
 
 .text_expanded {
   height: 100%;
   mask-image: none;
+  -webkit-mask-image: none;
 }
 
 .expand_button {
@@ -140,7 +135,7 @@
 
   margin-top: 2em;
 
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   cursor: pointer;
 
@@ -237,5 +232,9 @@
     max-width: 100%;
     margin-right: 0;
     margin-bottom: 3rem;
+  }
+
+  .text_section {
+    margin-left: 0;
   }
 }

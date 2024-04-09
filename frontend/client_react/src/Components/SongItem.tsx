@@ -1,9 +1,8 @@
 import styles from "./SongItem.module.scss";
 import { ISong } from "../types";
-import { BsPlayCircle } from "react-icons/bs";
-import PauseIcon from "../UI/PauseIcon";
+import { BsPlayCircle, BsPauseCircle } from "react-icons/bs";
 import { format_price } from "../helpers";
-import { FC, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import useAxios from "../Hooks/APIRequests";
 import { API_URL } from "../config";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,8 +18,9 @@ interface SongItemProps {
 
 const SongItem: FC<SongItemProps> = (props) => {
   const [popup_visible, set_popup_visible] = useState(false);
-  const { error_data: song_url_fetch_error, fetch_data: fetch_song_url } =
-    useAxios();
+  const popup_ref = useRef<HTMLDivElement>(null);
+  const [popup_width, set_popup_width] = useState<number | undefined>(0);
+  const { fetch_data: fetch_song_url } = useAxios();
   const current_song_id = useSelector<RootState, number>(
     (state) => state.current_song_data.id
   );
@@ -57,6 +57,10 @@ const SongItem: FC<SongItemProps> = (props) => {
     }
   }
 
+  useEffect(() => {
+    set_popup_width(popup_ref.current?.clientWidth);
+  }, [popup_ref, popup_visible]);
+
   return (
     <div
       className={`${styles.song_item} ${
@@ -74,12 +78,9 @@ const SongItem: FC<SongItemProps> = (props) => {
         {current_song_id === props.song.id && (
           <>
             {!current_song_playing ? (
-              <BsPlayCircle className={styles.play_icon} />
+              <BsPlayCircle className={styles.playpause_icon} />
             ) : (
-              <PauseIcon
-                size="small"
-                position={{ top: "50%", left: "50%" }}
-              />
+              <BsPauseCircle className={styles.playpause_icon} />
             )}
           </>
         )}
@@ -110,9 +111,15 @@ const SongItem: FC<SongItemProps> = (props) => {
         </span>
         ₽
         <div
+          ref={popup_ref}
           className={`${styles.price_pop_up} ${
             popup_visible && styles.price_pop_up_visible
           }`}
+          style={{
+            left: `calc((${Math.floor(
+              popup_width ? popup_width : 0
+            )}px + .75rem) * -1)`,
+          }}
         >
           {format_price(props.song.price)}
         </div>
