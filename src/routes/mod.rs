@@ -67,6 +67,8 @@ pub enum ResponseError {
     ForbiddenError(#[source] anyhow::Error),
     #[error("Conflict error")]
     ConflictError(#[source] anyhow::Error),
+    #[error("Unprocessable entity")]
+    UnprocessableError,
 }
 
 impl_debug!(ResponseError);
@@ -122,6 +124,9 @@ impl IntoResponse for ResponseError {
             }
             ResponseError::ConflictError(_) => {
                 StatusCode::CONFLICT.into_response()
+            }
+            ResponseError::UnprocessableError => {
+                StatusCode::UNPROCESSABLE_ENTITY.into_response()
             }
         }
     }

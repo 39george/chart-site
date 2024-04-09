@@ -107,3 +107,38 @@ async fn add_remove_mood_success() {
     let moods_list = get_moods().await;
     assert!(!moods_list.contains(&"newmood".to_string()));
 }
+
+#[tokio::test]
+async fn fail_removing_referenced_genre_and_mood() {
+    // Create app
+    let config = Settings::load_configuration().unwrap();
+    let app = TestApp::spawn_app(config).await;
+    let http_client = reqwest::Client::builder()
+        .cookie_store(true)
+        .build()
+        .unwrap();
+
+    // Create and login admin
+    assert_eq!(
+        app.create_admin_submit_song(&http_client, "song").await,
+        201
+    );
+
+    // Try to remove genre
+    let response = http_client
+        .delete(format!("{}/api/protected/genres", app.address))
+        .json(&vec!["поп"])
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status().as_u16(), 422);
+
+    // Try to remove mood
+    let response = http_client
+        .delete(format!("{}/api/protected/moods", app.address))
+        .json(&vec!["веселый"])
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status().as_u16(), 422);
+}

@@ -7,6 +7,7 @@ use deadpool_postgres::GenericClient;
 use garde::Validate;
 use http::StatusCode;
 use anyhow::anyhow;
+use tokio_postgres::error::SqlState;
 
 use crate::auth::users::AuthSession;
 use crate::cornucopia::queries::admin_access;
@@ -421,6 +422,7 @@ async fn add_data(
         (status = 200, description = "Removed data successfully"),
         (status = 400, response = BadRequestResponse),
         (status = 403, response = ForbiddenResponse),
+        (status = 422, description = "Your data is correct, but it causes reference violation with existing song"),
         (status = 500, response = InternalErrorResponse)
     ),
     security(
@@ -442,20 +444,43 @@ async fn remove_data(
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
 
+    let check = |result: Result<u64, tokio_postgres::Error>| match result {
+        Ok(c) => Ok(c),
+        Err(e) => {
+            if e.as_db_error()
+                .ok_or(ResponseError::UnexpectedError(anyhow!("{e}")))?
+                .code()
+                .eq(&SqlState::FOREIGN_KEY_VIOLATION)
+            {
+                return Err(ResponseError::UnprocessableError);
+            } else {
+                return Err(ResponseError::UnexpectedError(anyhow!("{e}")));
+            }
+        }
+    };
+
     match what.as_str() {
         "genres" => {
             for genre in data {
-                let count = admin_access::remove_genre().bind(&db_client, &genre).await.context("Failed to remove genre")?;
+                let count = check(
+                    admin_access::remove_genre().bind(&db_client, &genre).await,
+                )?;
                 tracing::info!("Removed {} genres", count);
-            } 
+            }
         }
         "moods" => {
             for mood in data {
-                let count = admin_access::remove_mood().bind(&db_client, &mood).await.context("Failed to remove mood")?;
+                let count = check(
+                    admin_access::remove_mood().bind(&db_client, &mood).await,
+                )?;
                 tracing::info!("Removed {} moods", count);
-            } 
+            }
         }
-        _ => return Err(ResponseError::BadRequest(anyhow!("Only genres and moods available, given: {what}")))
+        _ => {
+            return Err(ResponseError::BadRequest(anyhow!(
+                "Only genres and moods available, given: {what}"
+            )))
+        }
     }
     Ok(StatusCode::OK)
 }

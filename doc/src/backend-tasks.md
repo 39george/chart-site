@@ -9,5 +9,5 @@
 | Try WebAssembly rust translit                                                | Done                    |
 | Endpoint to fetch uploaded files to garage                                   | Delegated to frontender |
 | Fix nginx DELETE method restriction                                          | Done                    |
-| Handle case when admin tries to delete gengre/mood referenced in songs table |                         |
+| Handle case when admin tries to delete gengre/mood referenced in songs table | Done                    |
 | Change `created_at` and `updated_at` data format                             | Done                    |
