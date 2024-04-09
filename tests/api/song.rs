@@ -1,3 +1,4 @@
+use chart_site::domain::open::FetchSongs;
 use chart_site::{
     config::Settings,
     cornucopia::queries::open_access,
@@ -5,7 +6,6 @@ use chart_site::{
         music_parameters::{MusicKey, Sex},
         requests::{Lyric, SubmitSong},
     },
-    startup::api_doc::FetchSongs,
 };
 use reqwest::Client;
 use rust_decimal::{prelude::FromPrimitive, Decimal};

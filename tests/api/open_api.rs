@@ -1,4 +1,4 @@
-use chart_site::{config::Settings, startup::api_doc::FetchSongs};
+use chart_site::{config::Settings, domain::open::FetchSongs};
 
 use super::helpers::TestApp;
 
@@ -12,7 +12,10 @@ async fn get_song_audio_success() {
         .build()
         .unwrap();
 
-    assert_eq!(app.submit_song(&http_client, "NewSong").await, 201);
+    assert_eq!(
+        app.create_admin_submit_song(&http_client, "NewSong").await,
+        201
+    );
 
     let response = http_client
         .get(format!("{}/api/open/songs", &app.address))

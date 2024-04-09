@@ -13,9 +13,9 @@ use utoipa::{
     Modify, OpenApi, ToResponse, ToSchema,
 };
 
-use crate::domain::requests::SubmitSong;
 use crate::domain::requests::UploadFileRequest;
 use crate::domain::{music_parameters::Sex, requests::Lyric};
+use crate::domain::{open::FetchSongs, requests::SubmitSong};
 use crate::{
     auth::users::Permission, domain::music_parameters::MusicKey,
     object_storage::presigned_post_form::PresignedPostData,
