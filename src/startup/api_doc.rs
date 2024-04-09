@@ -82,29 +82,6 @@ pub struct NotFoundResponse {
 #[response(description = "Conflict error")]
 pub struct ConflictErrorResponse;
 
-// ───── Responses ────────────────────────────────────────────────────────── //
-
-/// Derived `Deserialize` for integration tests
-#[derive(Serialize, Deserialize, ToResponse, ToSchema)]
-#[response(description = "Song data")]
-pub struct FetchSongs {
-    pub id: i32,
-    pub created_at: OffsetDateTime,
-    pub updated_at: OffsetDateTime,
-    pub rating: Option<i32>,
-    pub price: Decimal,
-    pub name: String,
-    pub primary_genre: String,
-    pub secondary_genre: Option<String>,
-    pub cover_url: String,
-    pub sex: Sex,
-    pub tempo: i16,
-    pub key: MusicKey,
-    pub duration: i16,
-    pub lyric: Lyric,
-    pub moods: Vec<String>,
-}
-
 // ───── TypeWrappers ─────────────────────────────────────────────────────── //
 
 #[allow(dead_code)]

@@ -8,7 +8,8 @@ use axum::{extract::State, routing, Router};
 use futures::future::try_join_all;
 use http::StatusCode;
 
-use crate::cornucopia::queries::open_access::{self, FetchSongs};
+use crate::cornucopia::queries::open_access::{self};
+use crate::domain::open::FetchSongs;
 use crate::startup::api_doc::BadRequestResponse;
 use crate::startup::api_doc::InternalErrorResponse;
 use crate::startup::AppState;
@@ -27,7 +28,7 @@ pub fn open_router() -> Router<AppState> {
     get,
     path = "/api/open/songs",
     responses(
-        (status = 200, response = crate::startup::api_doc::FetchSongs),
+        (status = 200, response = crate::domain::open::FetchSongs),
         (status = 500, response = InternalErrorResponse)
     ),
     tag = "open"
@@ -50,7 +51,7 @@ async fn fetch_songs(
         .context("Failed to fetch songs from pg")?.into_iter().map(|mut entry| async {
             let expiration = std::time::Duration::from_secs(30 * 60);
             entry.cover_url = state.object_storage.generate_presigned_url(&entry.cover_url.parse().context("Failed to parse object key")?, expiration).await.context("Failed to generate presigned url")?;
-            Ok::<FetchSongs, anyhow::Error>(entry)
+            Ok::<FetchSongs, anyhow::Error>(entry.into())
         });
     let songs = try_join_all(futures).await?;
 

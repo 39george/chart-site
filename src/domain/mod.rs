@@ -1,5 +1,6 @@
 pub mod music_parameters;
 pub mod object_key;
+pub mod open;
 pub mod requests;
 pub mod user_name;
 pub mod user_password;

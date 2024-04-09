@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
 use crate::cornucopia::types::public::Musickey;
@@ -16,6 +18,17 @@ impl std::fmt::Display for Sex {
         match self {
             Sex::Male => f.write_str("male"),
             Sex::Female => f.write_str("female"),
+        }
+    }
+}
+
+impl FromStr for Sex {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "male" => Ok(Self::Male),
+            "female" => Ok(Self::Female),
+            _ => Err(()),
         }
     }
 }
@@ -77,6 +90,37 @@ impl From<MusicKey> for Musickey {
             MusicKey::g_major => Musickey::g_major,
             MusicKey::a_flat_minor => Musickey::a_flat_minor,
             MusicKey::a_flat_major => Musickey::a_flat_major,
+        }
+    }
+}
+
+impl From<Musickey> for MusicKey {
+    fn from(value: Musickey) -> Self {
+        match value {
+            Musickey::a_minor => MusicKey::a_minor,
+            Musickey::a_major => MusicKey::a_major,
+            Musickey::b_flat_minor => MusicKey::b_flat_minor,
+            Musickey::b_flat_major => MusicKey::b_flat_major,
+            Musickey::b_minor => MusicKey::b_minor,
+            Musickey::b_major => MusicKey::b_major,
+            Musickey::c_minor => MusicKey::c_minor,
+            Musickey::c_major => MusicKey::c_major,
+            Musickey::c_sharp_minor => MusicKey::c_sharp_minor,
+            Musickey::c_sharp_major => MusicKey::c_sharp_major,
+            Musickey::d_minor => MusicKey::d_minor,
+            Musickey::d_major => MusicKey::d_major,
+            Musickey::e_flat_minor => MusicKey::e_flat_minor,
+            Musickey::e_flat_major => MusicKey::e_flat_major,
+            Musickey::e_minor => MusicKey::e_minor,
+            Musickey::e_major => MusicKey::e_major,
+            Musickey::f_minor => MusicKey::f_minor,
+            Musickey::f_major => MusicKey::f_major,
+            Musickey::f_sharp_minor => MusicKey::f_sharp_minor,
+            Musickey::f_sharp_major => MusicKey::f_sharp_major,
+            Musickey::g_minor => MusicKey::g_minor,
+            Musickey::g_major => MusicKey::g_major,
+            Musickey::a_flat_minor => MusicKey::a_flat_minor,
+            Musickey::a_flat_major => MusicKey::a_flat_major,
         }
     }
 }
