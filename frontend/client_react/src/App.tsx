@@ -22,7 +22,16 @@ function App() {
           />
           <Route
             path="*"
-            element={<div>Старница не найдена</div>}
+            element={
+              <div
+                style={{
+                  width: "fit-content",
+                  margin: "11rem auto 0",
+                }}
+              >
+                Старница не найдена
+              </div>
+            }
           />
         </Route>
       </Routes>
