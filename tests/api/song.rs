@@ -14,7 +14,7 @@ use super::helpers::read_file;
 use super::helpers::TestApp;
 
 impl TestApp {
-    pub async fn submit_song(
+    pub async fn create_admin_submit_song(
         &self,
         http_client: &Client,
         song_name: &str,
@@ -79,7 +79,10 @@ async fn submit_song_success() {
         .cookie_store(true)
         .build()
         .unwrap();
-    assert_eq!(app.submit_song(&http_client, "Lalasong").await, 201);
+    assert_eq!(
+        app.create_admin_submit_song(&http_client, "Lalasong").await,
+        201
+    );
 
     let response = http_client
         .get(format!("{}/api/open/songs", &app.address))
@@ -100,7 +103,10 @@ async fn delete_song_success() {
         .cookie_store(true)
         .build()
         .unwrap();
-    assert_eq!(app.submit_song(&http_client, "Lalasong").await, 201);
+    assert_eq!(
+        app.create_admin_submit_song(&http_client, "Lalasong").await,
+        201
+    );
 
     let response = http_client
         .delete(format!("{}/api/protected/song/{}", &app.address, 1))
@@ -120,7 +126,10 @@ async fn rename_song_success() {
         .build()
         .unwrap();
     // Create song
-    assert_eq!(app.submit_song(&http_client, "Lalasong").await, 201);
+    assert_eq!(
+        app.create_admin_submit_song(&http_client, "Lalasong").await,
+        201
+    );
 
     // Fetch song and rename it
     let mut song = http_client
@@ -195,7 +204,10 @@ async fn update_song_audio_success() {
             .unwrap()
     };
     // Create song
-    assert_eq!(app.submit_song(&http_client, "Lalasong").await, 201);
+    assert_eq!(
+        app.create_admin_submit_song(&http_client, "Lalasong").await,
+        201
+    );
 
     // Upload new audio
     let song = read_file("assets/Song.mp3").unwrap();
