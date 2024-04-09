@@ -23,7 +23,7 @@ export interface ISong {
   moods: string[];
   raiting: number | null;
   sex: GenderOptions;
-  created_at: number[];
+  created_at: string;
   updated_at: string;
   key?: string;
   secondary_genre?: null;
