@@ -18,9 +18,13 @@ import {
   set_moods_changed,
 } from "./state/genres_moods_changed_slice";
 import Login from "./Pages/Login";
-import { set_permissions } from "./state/permissions_slice";
+import { set_is_loading, set_permissions } from "./state/permissions_slice";
+import LoadingScreen from "./Components/LoadingScreen";
 
 function App() {
+  const is_loading = useSelector<RootState, boolean>(
+    (state) => state.permissions.is_loading
+  );
   const permissions_granted = useSelector<RootState, boolean>(
     (state) => state.permissions.premissions
   );
@@ -36,10 +40,9 @@ function App() {
   const dispatch = useDispatch();
   const [genres_list, set_genres_list] = useState<string[]>([]);
   const [moods_list, set_moods_list] = useState<string[]>([]);
-  const { error_data: genres_error, fetch_data: fetch_genres } = useAxios();
-  const { error_data: moods_error, fetch_data: fetch_moods } = useAxios();
-  const { error_data: health_check_error, fetch_data: fetch_healthcheck } =
-    useAxios();
+  const { fetch_data: fetch_genres } = useAxios();
+  const { fetch_data: fetch_moods } = useAxios();
+  const { fetch_data: fetch_healthcheck } = useAxios();
 
   async function get_healthcheck() {
     const response = await fetch_healthcheck({
@@ -48,8 +51,10 @@ function App() {
     });
     if (response?.status === 200) {
       dispatch(set_permissions(true));
+      dispatch(set_is_loading(false));
     } else {
       dispatch(set_permissions(false));
+      dispatch(set_is_loading(false));
     }
   }
 
@@ -92,7 +97,7 @@ function App() {
     if (permissions_granted) {
       get_genres_moods();
     }
-  }, []);
+  }, [permissions_granted]);
 
   // Call Genres or Moods lists if they were changed
   useEffect(() => {
@@ -121,7 +126,15 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={permissions_granted ? <MainLayout /> : <Login />}
+          element={
+            is_loading ? (
+              <LoadingScreen />
+            ) : permissions_granted ? (
+              <MainLayout />
+            ) : (
+              <Login />
+            )
+          }
         >
           <Route
             index
@@ -190,7 +203,7 @@ function App() {
                 страница не найдена
               </div>
               <Link
-                to="/"
+                to="/admin"
                 style={{
                   marginTop: "2rem",
                   color: "white",
