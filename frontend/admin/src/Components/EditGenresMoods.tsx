@@ -28,9 +28,8 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
     item: "",
   });
   const [input_empty, set_input_empty] = useState(false);
-  const { error_data, fetch_data: delete_items } = useAxios();
-  const { error_data: add_items_error_data, fetch_data: add_items } =
-    useAxios();
+  const { fetch_data: delete_items } = useAxios();
+  const { fetch_data: add_items } = useAxios();
   const dispatch = useDispatch();
 
   function handle_checkbox_input_change(

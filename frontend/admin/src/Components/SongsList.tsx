@@ -10,7 +10,7 @@ import { set_song_list_updated } from "../state/song_list_updated_slice";
 
 const SongsList: FC = () => {
   const [songs_list, set_songs_list] = useState<ISong[]>([]);
-  const { error_data: songs_fetch_error, fetch_data: fetch_songs } = useAxios();
+  const { fetch_data: fetch_songs } = useAxios();
   const song_list_updated = useSelector<RootState, boolean>(
     (state) => state.song_list_updated.song_list_updated
   );

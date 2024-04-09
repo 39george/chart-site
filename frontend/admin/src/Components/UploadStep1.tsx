@@ -134,12 +134,8 @@ const UploadStep1: FC = () => {
     (state) => state.song_data
   );
 
-  const { error_data: upload_form_error, fetch_data: fetch_upload_form } =
-    useAxios();
-  const {
-    error_data: presigned_post_form_error,
-    fetch_data: fetch_presigned_post_form,
-  } = useAxios();
+  const { fetch_data: fetch_upload_form } = useAxios();
+  const { fetch_data: fetch_presigned_post_form } = useAxios();
   const dispatch = useDispatch();
 
   // Handle input change
@@ -351,11 +347,13 @@ const UploadStep1: FC = () => {
         if (audio_input_ref.current) {
           audio_input_ref.current.value = "";
         }
+        dispatch(set_audio_url(""));
         break;
       case FileInputNames.Img:
         if (img_input_ref.current) {
           img_input_ref.current.value = "";
         }
+        dispatch(set_img_url(""));
         break;
     }
     // Reset data state
@@ -669,7 +667,7 @@ const UploadStep1: FC = () => {
                 id="img_input"
                 name={FileInputNames.Img}
                 type="file"
-                accept=".jpeg"
+                accept=".jpg"
                 disabled={
                   upload_data[FileInputNames.Img].selected_file !== null
                 }

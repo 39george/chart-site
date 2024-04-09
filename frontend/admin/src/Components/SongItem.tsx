@@ -17,7 +17,7 @@ interface SongItemProps {
 const SongItem: FC<SongItemProps> = (props) => {
   const [price_popup_visible, set_price_popup_visible] = useState(false);
   const [options_popup_visible, set_options_popup_visible] = useState(false);
-  const { error_data: delete_error_data, fetch_data: delete_song } = useAxios();
+  const { fetch_data: delete_song } = useAxios();
   const dispatch = useDispatch();
 
   function handle_price_click(e: React.MouseEvent<HTMLDivElement>) {

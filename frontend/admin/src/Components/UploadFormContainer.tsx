@@ -41,7 +41,7 @@ const UploadFormContainer: FC = () => {
   const song_submit_status = useSelector<RootState, SubmitStatus>(
     (state) => state.song_submit_data.submit_status
   );
-  const { error_data: submit_error, fetch_data: submit_song } = useAxios();
+  const { fetch_data: submit_song } = useAxios();
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
