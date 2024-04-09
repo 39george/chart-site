@@ -54,6 +54,10 @@ export interface PresignedPostForm {
   };
 }
 
+export interface FileParams {
+  [key: string]: string;
+}
+
 export interface SubmitSong {
   audio_object_key: string;
   cover_object_key: string;
