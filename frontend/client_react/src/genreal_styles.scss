@@ -13,3 +13,19 @@
     object-fit: cover;
   }
 }
+
+@mixin play_pause_icon($inset, $size) {
+  position: absolute;
+  inset: $inset;
+
+  width: $size;
+  height: $size;
+
+  color: $main_bright;
+
+  border-radius: 50%;
+
+  overflow: hidden;
+  z-index: 8;
+  cursor: pointer;
+}
