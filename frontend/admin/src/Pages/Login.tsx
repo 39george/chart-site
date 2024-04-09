@@ -12,7 +12,7 @@ const Login: FC = () => {
   });
   const [err_msg, set_err_msg] = useState("");
   const dispatch = useDispatch();
-  const { error_data: login_error, fetch_data: login } = useAxios();
+  const { fetch_data: login } = useAxios();
 
   function handle_input_change(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -46,7 +46,7 @@ const Login: FC = () => {
   return (
     <div className={styles.login_window}>
       <div className={styles.content}>
-        <p className={styles.header}>Зарегистрируйтесь, чтобы продолжить</p>
+        <p className={styles.header}>Авторизуйтесь, чтобы продолжить</p>
         <form
           onSubmit={handle_submit}
           className={styles.input_form}
@@ -92,7 +92,7 @@ const Login: FC = () => {
             type="submit"
             className={styles.submit_button}
           >
-            Зарегистрироваться
+            Авторизоваться
           </button>
         </form>
         {err_msg && <div className={styles.err_msg}>{err_msg}</div>}
