@@ -66,8 +66,8 @@ impl TestApp {
                 "
                 INSERT INTO users_groups (users_id, groups_id)
                 VALUES (
-                    (SELECT id FROM groups WHERE name = 'group.administrators'),
-                    $1
+                    $1,
+                    (SELECT id FROM groups WHERE name = 'group.administrators')
                 )
             ",
                 &[&id],
