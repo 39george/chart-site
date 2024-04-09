@@ -14,10 +14,11 @@ import {
   IoVolumeMute,
 } from "react-icons/io5";
 import { RiLoopLeftFill } from "react-icons/ri";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import H5AudioPlayer from "react-h5-audio-player";
 import { ISong } from "../types";
+import { set_current_song_playing } from "../state/current_song_data_slice";
 
 const MainPage: FC = () => {
   const songs = useSelector<RootState, ISong[]>((state) => state.songs.songs);
@@ -31,6 +32,19 @@ const MainPage: FC = () => {
     (state) => state.current_song_data.is_palying
   );
   const audio_player_ref = useRef<H5AudioPlayer>(null);
+  const dispatch = useDispatch();
+
+  function handle_player_play_click() {
+    if (audio_player_ref.current?.audio.current) {
+      dispatch(set_current_song_playing(true));
+    }
+  }
+
+  function handle_player_pause_click() {
+    if (audio_player_ref.current?.audio.current) {
+      dispatch(set_current_song_playing(false));
+    }
+  }
 
   // FIXME strange logic, why !song_playing???
   useEffect(() => {
@@ -72,6 +86,8 @@ const MainPage: FC = () => {
           display: `${current_song_id !== -1 ? "flex" : "none"}`,
         }}
         showFilledVolume
+        onPlay={handle_player_play_click}
+        onPause={handle_player_pause_click}
         layout="horizontal"
         customIcons={{
           play: (
