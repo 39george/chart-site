@@ -60,16 +60,6 @@
   min-width: 17.625rem;
 }
 
-.unselect_file_icon {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  width: 1rem;
-  height: 1rem;
-  color: $main_bright;
-  cursor: pointer;
-}
-
 .custom_input_img {
   flex-direction: column;
 
@@ -92,10 +82,48 @@
 .custom_input_file_selected_audio {
   min-width: fit-content;
   border: 1px solid $accent_cyan;
+  cursor: default;
 }
 
 .custom_input_file_selected_img {
+  position: relative;
   border: 1px solid $accent_cyan;
+  cursor: default;
+}
+
+.custom_input_image_uploaded {
+  border: 1px solid transparent;
+
+  .unselect_file_icon {
+    background-color: $main_dark;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  &:hover {
+    border: 1px solid transparent;
+    .unselect_file_icon {
+      opacity: 1;
+    }
+  }
+}
+
+.image_wrapper {
+  @include image_wrapper(14rem, 0.25rem);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.unselect_file_icon {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  color: $main_bright;
+  cursor: pointer;
 }
 
 .plus_icon {

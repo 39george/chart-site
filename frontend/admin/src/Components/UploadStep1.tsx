@@ -1,16 +1,19 @@
 import styles from "./UploadStep1.module.scss";
-import React, { FC, FormEvent, useEffect, useRef, useState } from "react";
+import React, { FC, FormEvent, useRef, useState } from "react";
 import { FaCirclePlus, FaRegCircleCheck, FaXmark } from "react-icons/fa6";
 import { PiFileAudioFill, PiFileImageFill } from "react-icons/pi";
 import { API_URL } from "../config";
-import { PresignedPostForm } from "../types";
+import { FileParams, PresignedPostForm } from "../types";
 import { bytes_to_mb, fileToBlob, transliterate } from "../helpers";
 import useAxios from "../Hooks/APIRequests";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
-import Step1FilesUploaded from "./Step1FilesUploaded";
 import { ISongData, set_song_data } from "../state/song_data_slice";
 import { set_audio_url, set_img_url } from "../state/files_url_slice";
+import {
+  set_chosen_audio_params,
+  set_chosen_img_params,
+} from "../state/chosen_files_slice";
 
 // ───── Custom types ─────────────────────────────────────────────────────── //
 
@@ -75,16 +78,6 @@ const UploadStep1: FC = () => {
     audio: false,
     img: false,
   });
-  const file_params = useRef({
-    audio: {
-      media_type: "",
-      file_name: "",
-    },
-    img: {
-      media_type: "",
-      file_name: "",
-    },
-  });
   const [err_messages, set_err_messages] = useState<ErrorMessages>({
     audio: "",
     img: "",
@@ -123,6 +116,13 @@ const UploadStep1: FC = () => {
   });
   const audio_input_ref = useRef<HTMLInputElement>(null);
   const img_input_ref = useRef<HTMLInputElement>(null);
+
+  const audio_params = useSelector<RootState, FileParams>(
+    (state) => state.chosen_file.audio
+  );
+  const img_params = useSelector<RootState, FileParams>(
+    (state) => state.chosen_file.img
+  );
   const audio_url = useSelector<RootState, string>(
     (state) => state.files_url.audio
   );
@@ -188,13 +188,24 @@ const UploadStep1: FC = () => {
           },
         }));
         // Setting file params
-        file_params.current = {
-          ...file_params.current,
-          [name]: {
-            media_type: file.type,
-            file_name: transliterate(file.name),
-          },
-        };
+        switch (name) {
+          case FileInputNames.Audio:
+            dispatch(
+              set_chosen_audio_params({
+                media_type: file.type,
+                file_name: transliterate(file.name),
+              })
+            );
+            break;
+          case FileInputNames.Img:
+            dispatch(
+              set_chosen_img_params({
+                media_type: file.type,
+                file_name: transliterate(file.name),
+              })
+            );
+            break;
+        }
       }
     } else {
       // Hiding loader if browser wasn't able to read the files
@@ -268,13 +279,24 @@ const UploadStep1: FC = () => {
           },
         }));
         // Setting file params
-        file_params.current = {
-          ...file_params.current,
-          [input_name]: {
-            media_type: file.type,
-            file_name: transliterate(file.name),
-          },
-        };
+        switch (input_name) {
+          case FileInputNames.Audio:
+            dispatch(
+              set_chosen_audio_params({
+                media_type: file.type,
+                file_name: transliterate(file.name),
+              })
+            );
+            break;
+          case FileInputNames.Img:
+            dispatch(
+              set_chosen_img_params({
+                media_type: file.type,
+                file_name: transliterate(file.name),
+              })
+            );
+            break;
+        }
       }
     }
   }
@@ -338,6 +360,11 @@ const UploadStep1: FC = () => {
     return true;
   }
 
+  // Helper func to check if values not empty
+  function values_not_empty(obj: FileParams): boolean {
+    return Object.values(obj).every((val) => val !== "");
+  }
+
   // Handle unselect file
   function unselect_file(e: React.MouseEvent, name: FileInputNames) {
     e.preventDefault();
@@ -348,12 +375,24 @@ const UploadStep1: FC = () => {
           audio_input_ref.current.value = "";
         }
         dispatch(set_audio_url(""));
+        dispatch(
+          set_chosen_audio_params({
+            media_type: "",
+            file_name: "",
+          })
+        );
         break;
       case FileInputNames.Img:
         if (img_input_ref.current) {
           img_input_ref.current.value = "";
         }
         dispatch(set_img_url(""));
+        dispatch(
+          set_chosen_img_params({
+            media_type: "",
+            file_name: "",
+          })
+        );
         break;
     }
     // Reset data state
@@ -367,31 +406,6 @@ const UploadStep1: FC = () => {
         upload_progress: 0,
       },
     }));
-  }
-
-  // Full reset function
-  function reset_all() {
-    if (audio_input_ref.current && img_input_ref.current) {
-      audio_input_ref.current.value = "";
-      img_input_ref.current.value = "";
-    }
-
-    set_upload_data({
-      audio: {
-        file_selecting: false,
-        selected_file: null,
-        upload_button_visible: false,
-        progress_bar_visible: false,
-        upload_progress: 0,
-      },
-      img: {
-        file_selecting: false,
-        selected_file: null,
-        upload_button_visible: false,
-        progress_bar_visible: false,
-        upload_progress: 0,
-      },
-    });
   }
 
   // API requests
@@ -420,9 +434,16 @@ const UploadStep1: FC = () => {
   }
 
   async function fetch_data(name: FileInputNames) {
-    const search_params = new URLSearchParams(
-      file_params.current[name]
-    ).toString();
+    let search_params: string = "";
+    switch (name) {
+      case FileInputNames.Audio:
+        search_params = new URLSearchParams(audio_params).toString();
+        break;
+      case FileInputNames.Img:
+        search_params = new URLSearchParams(img_params).toString();
+        break;
+    }
+    // new URLSearchParams(file_params.current[name]).toString();
     const response = await fetch_upload_form({
       method: "GET",
       url: `${API_URL}/protected/upload_form?${search_params}`,
@@ -499,224 +520,209 @@ const UploadStep1: FC = () => {
   // TODO Setting error messages based on api response
   // useEffect(() => {}, [upload_form_error, presigned_post_form_error]);
 
-  // Full reset if files aren't loaded
-  useEffect(() => {
-    if (!audio_url && !img_url) {
-      reset_all();
-    }
-  }, [audio_url, img_url]);
-
   // Rendering component
   return (
-    <>
-      {audio_url && img_url ? (
-        <Step1FilesUploaded reset_all={reset_all} />
-      ) : (
-        <div className={styles.step_1}>
-          <div className={styles.upload_auido}>
-            <p className={styles.input_name}>
-              Трек одним файлом в формате .mp3
-            </p>
-            <p className={styles.input_description}>
-              Master файл, который будет отображаться на основной странице. Файл
-              должен быть в формате mp3, 44100 hz, 320 kbps и весить не более
-              15MB
-            </p>
-            <form
-              onSubmit={(e) => submit_data(e, FileInputNames.Audio)}
-              className={`${styles.form} ${styles.form_audio}`}
-            >
-              <label
-                htmlFor="audio_input"
-                className={`${styles.custom_input} ${
-                  styles.custom_input_audio
-                } ${
-                  dragging[FileInputNames.Audio] && styles.custom_input_dragging
-                } ${
-                  upload_data.audio.selected_file &&
-                  styles.custom_input_file_selected_audio
-                }`}
-                onDragOver={(e) => handle_drag_over(e, FileInputNames.Audio)}
-                onDragLeave={(e) => handle_drag_leave(e, FileInputNames.Audio)}
-                onDrop={(e) => handle_file_drop(e, FileInputNames.Audio)}
-              >
-                {upload_data.audio.selected_file ? (
-                  <>
-                    <FaXmark
-                      onClick={(e) => unselect_file(e, FileInputNames.Audio)}
-                      className={styles.unselect_file_icon}
-                    />
-                    <PiFileAudioFill className={styles.icon_audio} />
-                    <p>{file_params.current.audio.file_name}</p>
-                  </>
-                ) : (
-                  <>
-                    <p>
-                      {dragging[FileInputNames.Audio]
-                        ? "Бросайте здесь!"
-                        : "Перетащите или выберите аудио"}
-                    </p>
-                    <FaCirclePlus className={styles.plus_icon} />
-                  </>
-                )}
-              </label>
-              <input
-                ref={audio_input_ref}
-                id="audio_input"
-                name={FileInputNames.Audio}
-                type="file"
-                accept=".mp3"
-                disabled={
-                  upload_data[FileInputNames.Audio].selected_file !== null
-                }
-                style={{
-                  display: "none",
-                }}
-                onChange={handle_input_chage}
-              />
-              {upload_data.audio.file_selecting && (
-                <div className={styles.loader_small}></div>
-              )}
-              {upload_data.audio.upload_button_visible && (
-                <button
-                  type="submit"
-                  className={styles.submit_button}
-                >
-                  Загрузить аудио
-                </button>
-              )}
-              {upload_data.audio.progress_bar_visible && (
-                <div className={styles.upload_info}>
-                  <div>
-                    <p
-                      className={styles.upload_status}
-                    >{`Загружено ${upload_data.audio.upload_progress}%`}</p>
-                    <div className={styles.progress_bar_track}>
-                      <div
-                        className={styles.progress_bar_thumb}
-                        style={{
-                          width: `${upload_data.audio.upload_progress}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                  {upload_data.audio.upload_progress === 100 && (
-                    <FaRegCircleCheck className={styles.checkmark} />
-                  )}
-                </div>
-              )}
-              {audio_url && (
-                <audio
-                  controls
-                  className={styles.audio_player}
-                  src={audio_url}
+    <div className={styles.step_1}>
+      <div className={styles.upload_auido}>
+        <p className={styles.input_name}>Трек одним файлом в формате .mp3</p>
+        <p className={styles.input_description}>
+          Master файл, который будет отображаться на основной странице. Файл
+          должен быть в формате mp3, 44100 hz, 320 kbps и весить не более 15MB
+        </p>
+        <form
+          onSubmit={(e) => submit_data(e, FileInputNames.Audio)}
+          className={`${styles.form} ${styles.form_audio}`}
+        >
+          <label
+            htmlFor="audio_input"
+            className={`${styles.custom_input} ${styles.custom_input_audio} ${
+              dragging[FileInputNames.Audio] && styles.custom_input_dragging
+            } ${
+              values_not_empty(audio_params) &&
+              styles.custom_input_file_selected_audio
+            }`}
+            onDragOver={(e) => handle_drag_over(e, FileInputNames.Audio)}
+            onDragLeave={(e) => handle_drag_leave(e, FileInputNames.Audio)}
+            onDrop={(e) => handle_file_drop(e, FileInputNames.Audio)}
+          >
+            {values_not_empty(audio_params) ? (
+              <>
+                <FaXmark
+                  onClick={(e) => unselect_file(e, FileInputNames.Audio)}
+                  className={styles.unselect_file_icon}
                 />
-              )}
-            </form>
-            {err_messages[FileInputNames.Audio] && (
-              <p className={styles.err_message}>
-                {err_messages[FileInputNames.Audio]}
-              </p>
+                <PiFileAudioFill className={styles.icon_audio} />
+                <p>{audio_params.file_name}</p>
+              </>
+            ) : (
+              <>
+                <p>
+                  {dragging[FileInputNames.Audio]
+                    ? "Бросайте здесь!"
+                    : "Перетащите или выберите аудио"}
+                </p>
+                <FaCirclePlus className={styles.plus_icon} />
+              </>
             )}
-          </div>
-          <div className={styles.upload_cover}>
-            <p className={styles.input_name}>Обложка трека в формате .jpeg</p>
-            <p className={styles.input_description}>
-              Обложка вашего трека. Файл должен быть в формате .jpeg.
-              Минимальный размер обложки - 600 x 600, максимальный размер файла
-              - 2MB
-            </p>
-            <form
-              onSubmit={(e) => submit_data(e, FileInputNames.Img)}
-              className={`${styles.form} ${styles.form_img}`}
+          </label>
+          <input
+            ref={audio_input_ref}
+            id="audio_input"
+            name={FileInputNames.Audio}
+            type="file"
+            accept=".mp3"
+            disabled={values_not_empty(audio_params)}
+            style={{
+              display: "none",
+            }}
+            onChange={handle_input_chage}
+          />
+          {upload_data.audio.file_selecting && (
+            <div className={styles.loader_small}></div>
+          )}
+          {upload_data.audio.upload_button_visible && (
+            <button
+              type="submit"
+              className={styles.submit_button}
             >
-              <label
-                htmlFor="img_input"
-                className={`${styles.custom_input} ${styles.custom_input_img} ${
-                  dragging[FileInputNames.Img] && styles.custom_input_dragging
-                } ${
-                  upload_data.img.selected_file &&
-                  styles.custom_input_file_selected_img
-                }`}
-                onDragOver={(e) => handle_drag_over(e, FileInputNames.Img)}
-                onDragLeave={(e) => handle_drag_leave(e, FileInputNames.Img)}
-                onDrop={(e) => handle_file_drop(e, FileInputNames.Img)}
-              >
-                {upload_data.img.selected_file ? (
-                  <>
-                    <FaXmark
-                      onClick={(e) => unselect_file(e, FileInputNames.Img)}
-                      className={styles.unselect_file_icon}
-                    />
-                    <PiFileImageFill className={styles.icon_img} />
-                    <p>{file_params.current.img.file_name}</p>
-                  </>
-                ) : (
-                  <>
-                    <p>
-                      {dragging[FileInputNames.Img]
-                        ? "Бросайте здесь!"
-                        : "Перетащите или выберите изображение"}
-                    </p>
-                    <FaCirclePlus className={styles.plus_icon} />
-                  </>
-                )}
-              </label>
-              <input
-                ref={img_input_ref}
-                id="img_input"
-                name={FileInputNames.Img}
-                type="file"
-                accept=".jpg"
-                disabled={
-                  upload_data[FileInputNames.Img].selected_file !== null
-                }
-                style={{
-                  display: "none",
-                }}
-                onChange={handle_input_chage}
-              />
-              {upload_data.img.file_selecting && (
-                <div className={styles.loader_small}></div>
-              )}
-              {upload_data.img.upload_button_visible && (
-                <button
-                  type="submit"
-                  className={styles.submit_button}
-                >
-                  Загрузить изображение
-                </button>
-              )}
-              {upload_data.img.progress_bar_visible && (
-                <div className={styles.upload_info}>
-                  <div>
-                    <p
-                      className={styles.upload_status}
-                    >{`Загружено ${upload_data.img.upload_progress}%`}</p>
-                    <div className={styles.progress_bar_track}>
-                      <div
-                        className={styles.progress_bar_thumb}
-                        style={{
-                          width: `${upload_data.img.upload_progress}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                  {upload_data.img.upload_progress === 100 && (
-                    <FaRegCircleCheck className={styles.checkmark} />
-                  )}
+              Загрузить аудио
+            </button>
+          )}
+          {upload_data.audio.progress_bar_visible && (
+            <div className={styles.upload_info}>
+              <div>
+                <p
+                  className={styles.upload_status}
+                >{`Загружено ${upload_data.audio.upload_progress}%`}</p>
+                <div className={styles.progress_bar_track}>
+                  <div
+                    className={styles.progress_bar_thumb}
+                    style={{
+                      width: `${upload_data.audio.upload_progress}%`,
+                    }}
+                  ></div>
                 </div>
+              </div>
+              {upload_data.audio.upload_progress === 100 && (
+                <FaRegCircleCheck className={styles.checkmark} />
               )}
-            </form>
-            {err_messages[FileInputNames.Img] && (
-              <p className={styles.err_message}>
-                {err_messages[FileInputNames.Img]}
-              </p>
+            </div>
+          )}
+          {audio_url && (
+            <audio
+              controls
+              className={styles.audio_player}
+              src={audio_url}
+            />
+          )}
+        </form>
+        {err_messages[FileInputNames.Audio] && (
+          <p className={styles.err_message}>
+            {err_messages[FileInputNames.Audio]}
+          </p>
+        )}
+      </div>
+      <div className={styles.upload_cover}>
+        <p className={styles.input_name}>Обложка трека в формате .jpeg</p>
+        <p className={styles.input_description}>
+          Обложка вашего трека. Файл должен быть в формате .jpeg. Минимальный
+          размер обложки - 600 x 600, максимальный размер файла - 2MB
+        </p>
+        <form
+          onSubmit={(e) => submit_data(e, FileInputNames.Img)}
+          className={`${styles.form} ${styles.form_img}`}
+        >
+          <label
+            htmlFor="img_input"
+            className={`${styles.custom_input} ${styles.custom_input_img} ${
+              dragging[FileInputNames.Img] && styles.custom_input_dragging
+            } ${
+              values_not_empty(img_params) &&
+              styles.custom_input_file_selected_img
+            } ${img_url && styles.custom_input_image_uploaded}`}
+            onDragOver={(e) => handle_drag_over(e, FileInputNames.Img)}
+            onDragLeave={(e) => handle_drag_leave(e, FileInputNames.Img)}
+            onDrop={(e) => handle_file_drop(e, FileInputNames.Img)}
+          >
+            {img_url && (
+              <div className={styles.image_wrapper}>
+                <img
+                  src={img_url}
+                  alt="cover"
+                />
+              </div>
             )}
-          </div>
-        </div>
-      )}
-    </>
+            {values_not_empty(img_params) ? (
+              <>
+                <FaXmark
+                  onClick={(e) => unselect_file(e, FileInputNames.Img)}
+                  className={styles.unselect_file_icon}
+                />
+                <PiFileImageFill className={styles.icon_img} />
+                <p>{img_params.file_name}</p>
+              </>
+            ) : (
+              <>
+                <p>
+                  {dragging[FileInputNames.Img]
+                    ? "Бросайте здесь!"
+                    : "Перетащите или выберите изображение"}
+                </p>
+                <FaCirclePlus className={styles.plus_icon} />
+              </>
+            )}
+          </label>
+          <input
+            ref={img_input_ref}
+            id="img_input"
+            name={FileInputNames.Img}
+            type="file"
+            accept=".jpg"
+            disabled={values_not_empty(img_params)}
+            style={{
+              display: "none",
+            }}
+            onChange={handle_input_chage}
+          />
+          {upload_data.img.file_selecting && (
+            <div className={styles.loader_small}></div>
+          )}
+          {upload_data.img.upload_button_visible && (
+            <button
+              type="submit"
+              className={styles.submit_button}
+            >
+              Загрузить изображение
+            </button>
+          )}
+          {upload_data.img.progress_bar_visible && (
+            <div className={styles.upload_info}>
+              <div>
+                <p
+                  className={styles.upload_status}
+                >{`Загружено ${upload_data.img.upload_progress}%`}</p>
+                <div className={styles.progress_bar_track}>
+                  <div
+                    className={styles.progress_bar_thumb}
+                    style={{
+                      width: `${upload_data.img.upload_progress}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+              {upload_data.img.upload_progress === 100 && (
+                <FaRegCircleCheck className={styles.checkmark} />
+              )}
+            </div>
+          )}
+        </form>
+        {err_messages[FileInputNames.Img] && (
+          <p className={styles.err_message}>
+            {err_messages[FileInputNames.Img]}
+          </p>
+        )}
+      </div>
+    </div>
   );
 };
 
