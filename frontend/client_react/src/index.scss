@@ -24,6 +24,8 @@ body {
     height: 5rem;
 
     background-color: #191919;
+
+    z-index: 9;
   }
 
   // Progress section
@@ -146,6 +148,15 @@ body {
 
     .rhap_additional-controls {
       display: none;
+    }
+
+    .rhap_volume-controls {
+      width: 6rem;
+    }
+
+    .rhap_horizontal .rhap_controls-section {
+      margin-left: 0;
+      justify-content: flex-end;
     }
   }
 }
