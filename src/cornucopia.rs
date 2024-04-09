@@ -292,7 +292,8 @@ u64, tokio_postgres :: Error > > + Send + 'a>>, C > for UpdateSongCoverStmt
     Error > > + Send + 'a>> { Box::pin(self.bind(client, & params.cover_object_key,& params.id,) ) }
 }pub fn update_song_audio() -> UpdateSongAudioStmt
 { UpdateSongAudioStmt(cornucopia_async :: private :: Stmt :: new("UPDATE songs
-    SET audio_object_key = $1
+    SET audio_object_key = $1,
+        updated_at = CURRENT_TIMESTAMP
 WHERE songs.id = $2")) } pub
 struct UpdateSongAudioStmt(cornucopia_async :: private :: Stmt) ; impl
 UpdateSongAudioStmt { pub async fn bind < 'a, C : GenericClient, T1 : cornucopia_async::StringSql,>

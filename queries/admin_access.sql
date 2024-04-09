@@ -45,7 +45,8 @@ WHERE songs.id = :id;
 
 --! update_song_audio
 UPDATE songs
-    SET audio_object_key = :audio_object_key
+    SET audio_object_key = :audio_object_key,
+        updated_at = CURRENT_TIMESTAMP
 WHERE songs.id = :id;
 
 --! remove_song_by_id
