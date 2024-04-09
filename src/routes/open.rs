@@ -32,7 +32,6 @@ pub fn open_router() -> Router<AppState> {
         (status = 500, response = InternalErrorResponse)
     ),
     tag = "open"
-    
 )]
 async fn fetch_songs(
     State(state): State<AppState>,
@@ -43,14 +42,25 @@ async fn fetch_songs(
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
-    // TODO: simplify code
     let futures = open_access::fetch_songs()
         .bind(&db_client)
         .all()
         .await
-        .context("Failed to fetch songs from pg")?.into_iter().map(|mut entry| async {
+        .context("Failed to fetch songs from pg")?
+        .into_iter()
+        .map(|mut entry| async {
             let expiration = std::time::Duration::from_secs(30 * 60);
-            entry.cover_url = state.object_storage.generate_presigned_url(&entry.cover_url.parse().context("Failed to parse object key")?, expiration).await.context("Failed to generate presigned url")?;
+            entry.cover_url = state
+                .object_storage
+                .generate_presigned_url(
+                    &entry
+                        .cover_url
+                        .parse()
+                        .context("Failed to parse object key")?,
+                    expiration,
+                )
+                .await
+                .context("Failed to generate presigned url")?;
             Ok::<FetchSongs, anyhow::Error>(entry.into())
         });
     let songs = try_join_all(futures).await?;
@@ -67,7 +77,6 @@ async fn fetch_songs(
         (status = 500, response = InternalErrorResponse)
     ),
     tag = "open"
-    
 )]
 async fn get_audio_url(
     State(state): State<AppState>,
@@ -104,7 +113,6 @@ async fn get_audio_url(
     Ok(url)
 }
 
-
 /// Fetch genres or moods list
 #[utoipa::path(
     get,
@@ -115,7 +123,6 @@ async fn get_audio_url(
         (status = 500, response = InternalErrorResponse)
     ),
     tag = "open"
-    
 )]
 async fn data(
     State(state): State<AppState>,
