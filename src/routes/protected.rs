@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use anyhow::Context;
 use axum::extract::{Path, Query};
 use axum::Json;
@@ -6,7 +7,6 @@ use axum_login::permission_required;
 use deadpool_postgres::GenericClient;
 use garde::Validate;
 use http::StatusCode;
-use anyhow::anyhow;
 use tokio_postgres::error::SqlState;
 
 use crate::auth::users::AuthSession;
@@ -14,7 +14,10 @@ use crate::cornucopia::queries::admin_access;
 use crate::domain::object_key::ObjectKey;
 use crate::domain::requests::{SubmitSong, UploadFileRequest, WordQuery};
 use crate::object_storage::presigned_post_form::PresignedPostData;
-use crate::startup::api_doc::{BadRequestResponse, ForbiddenResponse, InternalErrorResponse, NotFoundResponse, UnsupportedMediaTypeErrorResponse};
+use crate::startup::api_doc::{
+    BadRequestResponse, ForbiddenResponse, InternalErrorResponse,
+    NotFoundResponse, UnsupportedMediaTypeErrorResponse,
+};
 use crate::startup::AppState;
 use crate::trace_err;
 
@@ -58,7 +61,6 @@ pub fn protected_router() -> Router<AppState> {
             "audio_object_key": "received/Josianne Koepp:1efe0ab0-9a85-4f94-ae62-237aa8b31c8e:song.mp3",
             "moods": ["веселый"],
         }),
-        
     ),
     responses(
         (status = 201, description = "Song submitted successfully"),
@@ -77,19 +79,26 @@ async fn submit_song(
     Json(req): Json<SubmitSong>,
 ) -> Result<StatusCode, ResponseError> {
     req.validate(&())?;
-    let cover_object_key = req.cover_object_key.ok_or(
-        ResponseError::BadRequest(anyhow!("No cover object key provided".to_string()))
-    )?;
-    let audio_object_key = req.audio_object_key.ok_or(
-        ResponseError::BadRequest(anyhow!("No audio object key provided".to_string()))
-    )?;
+    let cover_object_key =
+        req.cover_object_key
+            .ok_or(ResponseError::BadRequest(anyhow!(
+                "No cover object key provided".to_string()
+            )))?;
+    let audio_object_key =
+        req.audio_object_key
+            .ok_or(ResponseError::BadRequest(anyhow!(
+                "No audio object key provided".to_string()
+            )))?;
     let mut db_client = state
         .pg_pool
         .get()
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
-    let trans = db_client.transaction().await.context("Failed to get transaction from pg")?;
+    let trans = db_client
+        .transaction()
+        .await
+        .context("Failed to get transaction from pg")?;
     let id = admin_access::insert_new_song_get_id()
         .bind(
             &trans,
@@ -112,10 +121,15 @@ async fn submit_song(
 
     for mood in req.moods {
         admin_access::add_mood_to_song()
-            .bind(&trans, &id, &mood).await.context("Failed to insert mood to song")?;
+            .bind(&trans, &id, &mood)
+            .await
+            .context("Failed to insert mood to song")?;
     }
 
-    trans.commit().await.context("Failed to commit pg transaction")?;
+    trans
+        .commit()
+        .await
+        .context("Failed to commit pg transaction")?;
     Ok(StatusCode::CREATED)
 }
 
@@ -139,7 +153,6 @@ async fn submit_song(
             "lyric": "Some lyric...",
             "moods": ["веселый"],
         }),
-        
     ),
     responses(
         (status = 200, description = "Song metadata updated successfully"),
@@ -152,7 +165,10 @@ async fn submit_song(
     ),
     tag = "protected.admins"
 )]
-#[tracing::instrument(name = "Update song metadata", skip(_auth_session, state, req))]
+#[tracing::instrument(
+    name = "Update song metadata",
+    skip(_auth_session, state, req)
+)]
 async fn update_song_metadata(
     _auth_session: AuthSession,
     State(state): State<AppState>,
@@ -166,7 +182,10 @@ async fn update_song_metadata(
         .await
         .context("Failed to get connection from postgres pool")
         .map_err(ResponseError::UnexpectedError)?;
-    let trans = db_client.transaction().await.context("Failed to get transaction from pg")?;
+    let trans = db_client
+        .transaction()
+        .await
+        .context("Failed to get transaction from pg")?;
     let update_count = admin_access::update_song_metadata()
         .bind(
             &trans,
@@ -180,24 +199,32 @@ async fn update_song_metadata(
             &req.key.into(),
             &req.duration,
             &req.lyric.as_ref(),
-            &id
+            &id,
         )
         .await
         .context("Failed to update song in pg")?;
     if update_count == 0 {
         return Err(ResponseError::NotFoundError(
-            anyhow!("Update song metadata's update_count is 0"), "No song found with given id")
-        );
+            anyhow!("Update song metadata's update_count is 0"),
+            "No song found with given id",
+        ));
     }
     admin_access::remove_moods_from_song()
         .bind(&trans, &id)
         .await
-        .context("Failed to remove moods from song when was updating song metadata")?;
+        .context(
+            "Failed to remove moods from song when was updating song metadata",
+        )?;
     for mood in req.moods {
         admin_access::add_mood_to_song()
-            .bind(&trans, &id, &mood).await.context("Failed to insert mood to song")?;
+            .bind(&trans, &id, &mood)
+            .await
+            .context("Failed to insert mood to song")?;
     }
-    trans.commit().await.context("Failed to commit pg transaction")?;
+    trans
+        .commit()
+        .await
+        .context("Failed to commit pg transaction")?;
     Ok(StatusCode::OK)
 }
 
@@ -232,7 +259,10 @@ async fn update_song_data(
     Query(q): Query<WordQuery>,
     object_key: String,
 ) -> Result<StatusCode, ResponseError> {
-    let _: ObjectKey = object_key.parse().context("Failed to parse object key").map_err(ResponseError::BadRequest)?;
+    let _: ObjectKey = object_key
+        .parse()
+        .context("Failed to parse object key")
+        .map_err(ResponseError::BadRequest)?;
     let db_client = state
         .pg_pool
         .get()
@@ -242,25 +272,40 @@ async fn update_song_data(
     let old_obj_key = match q.what.as_str() {
         "cover" => {
             let old = admin_access::get_song_cover_object_key_by_id()
-                .bind(&db_client, &id).one().await.context("Failed")?;
-            admin_access::update_song_cover()            
+                .bind(&db_client, &id)
+                .one()
+                .await
+                .context("Failed")?;
+            admin_access::update_song_cover()
                 .bind(&db_client, &object_key, &id)
-            .await.context("Failed to update song cover object key")?;
+                .await
+                .context("Failed to update song cover object key")?;
             old
         }
         "audio" => {
             let old = admin_access::get_song_audio_object_key_by_id()
-                .bind(&db_client, &id).one().await.context("Failed")?;
-            admin_access::update_song_audio()            
+                .bind(&db_client, &id)
+                .one()
+                .await
+                .context("Failed")?;
+            admin_access::update_song_audio()
                 .bind(&db_client, &object_key, &id)
-            .await.context("Failed to update song audio object key")?;
+                .await
+                .context("Failed to update song audio object key")?;
             old
         }
-        _ => return Err(ResponseError::BadRequest(anyhow!("Only 'cover' and 'audio' are allowed")))
+        _ => {
+            return Err(ResponseError::BadRequest(anyhow!(
+                "Only 'cover' and 'audio' are allowed"
+            )))
+        }
     };
     trace_err!(
-        state.object_storage
-            .delete_object_by_key(&old_obj_key.parse().unwrap()).await, ()
+        state
+            .object_storage
+            .delete_object_by_key(&old_obj_key.parse().unwrap())
+            .await,
+        ()
     );
     Ok(StatusCode::OK)
 }
@@ -299,14 +344,23 @@ async fn remove_song(
         .context("Failed to remove song by id")?;
     if let Some(song) = song {
         if let Ok(key) = trace_err!(song.cover_object_key.parse()) {
-            trace_err!(state.object_storage.delete_object_by_key(&key).await, ());
+            trace_err!(
+                state.object_storage.delete_object_by_key(&key).await,
+                ()
+            );
         }
         if let Ok(key) = trace_err!(song.audio_object_key.parse()) {
-            trace_err!(state.object_storage.delete_object_by_key(&key).await, ());
+            trace_err!(
+                state.object_storage.delete_object_by_key(&key).await,
+                ()
+            );
         }
         Ok(StatusCode::OK)
     } else {
-        Err(ResponseError::NotFoundError(anyhow::anyhow!("No song with id: {id}"), "Song not found"))
+        Err(ResponseError::NotFoundError(
+            anyhow::anyhow!("No song with id: {id}"),
+            "Song not found",
+        ))
     }
 }
 
@@ -326,7 +380,6 @@ async fn remove_song(
         ("api_key" = [])
     ),
     tag = "protected.admins"
-    
 )]
 #[tracing::instrument(name = "Request presigned upload form", skip_all)]
 async fn upload_form(
@@ -379,7 +432,6 @@ async fn upload_form(
         ("api_key" = [])
     ),
     tag = "protected.admins"
-    
 )]
 #[tracing::instrument(name = "Add data (genres or moods)", skip_all)]
 async fn add_data(
@@ -397,15 +449,25 @@ async fn add_data(
     match what.as_str() {
         "genres" => {
             for genre in data {
-                admin_access::insert_genre().bind(&db_client, &genre).await.context("Failed to insert genre")?;
-            } 
+                admin_access::insert_genre()
+                    .bind(&db_client, &genre)
+                    .await
+                    .context("Failed to insert genre")?;
+            }
         }
         "moods" => {
-            for mood in data{
-                admin_access::insert_mood().bind(&db_client, &mood).await.context("Failed to insert genre")?;
-            } 
+            for mood in data {
+                admin_access::insert_mood()
+                    .bind(&db_client, &mood)
+                    .await
+                    .context("Failed to insert genre")?;
+            }
         }
-        _ => return Err(ResponseError::BadRequest(anyhow!("Only genres and moods available, given: {what}")))
+        _ => {
+            return Err(ResponseError::BadRequest(anyhow!(
+                "Only genres and moods available, given: {what}"
+            )))
+        }
     }
 
     Ok(StatusCode::CREATED)
@@ -429,7 +491,6 @@ async fn add_data(
         ("api_key" = [])
     ),
     tag = "protected.admins"
-    
 )]
 #[tracing::instrument(name = "Delete genres", skip_all)]
 async fn remove_data(
