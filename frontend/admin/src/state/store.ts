@@ -5,6 +5,7 @@ import files_url_reducer from "./files_url_slice";
 import song_submit_data_reducer from "./song_submit_data_slice";
 import song_list_updated_reducer from "./song_list_updated_slice";
 import permissions_reducer from "./permissions_slice";
+import chosen_file_reducer from "./chosen_files_slice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     song_submit_data: song_submit_data_reducer,
     song_list_updated: song_list_updated_reducer,
     permissions: permissions_reducer,
+    chosen_file: chosen_file_reducer,
   },
 });
 
