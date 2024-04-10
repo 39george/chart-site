@@ -4,20 +4,13 @@ import { IoGrid } from "react-icons/io5";
 import SongItem from "./SongItem";
 import CurrentSong from "./CurrentSong";
 import { GenderOptions, GenresMoods, ISong, PriceValues } from "../types";
-import useAxios from "../Hooks/APIRequests";
-import { API_URL } from "../config";
-import { extract_genres, extract_moods } from "../helpers";
 import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { set_songs } from "../state/songs_slice";
-import { set_genres, set_moods } from "../state/genres_moods_slice";
 import { RootState } from "../state/store";
-import { set_max_price, set_min_price } from "../state/min_max_price_slice";
 import { set_current_song_id } from "../state/current_song_data_slice";
 
 const SongsList: FC = () => {
   const [filtered_songs, set_filtered_songs] = useState<ISong[]>([]);
-  const { fetch_data: fetch_songs } = useAxios();
   const songs = useSelector<RootState, ISong[]>((state) => state.songs.songs);
   const current_song_id = useSelector<RootState, number>(
     (state) => state.current_song_data.id
@@ -46,41 +39,6 @@ const SongsList: FC = () => {
   function toggle_current_song(id: number) {
     dispatch(set_current_song_id(id));
   }
-
-  async function try_to_fetch_songs() {
-    const response = await fetch_songs({
-      method: "GET",
-      url: `${API_URL}/open/songs`,
-    });
-    if (response?.status === 200) {
-      dispatch(set_songs([...response.data]));
-    }
-  }
-
-  useEffect(() => {
-    try_to_fetch_songs();
-  }, []);
-
-  useEffect(() => {
-    dispatch(set_genres(extract_genres(songs)));
-    dispatch(set_moods(extract_moods(songs)));
-    dispatch(
-      set_max_price(
-        Math.max.apply(
-          Math,
-          songs.map((song) => Number.parseFloat(song.price))
-        )
-      )
-    );
-    dispatch(
-      set_min_price(
-        Math.min.apply(
-          Math,
-          songs.map((song) => Number.parseFloat(song.price))
-        )
-      )
-    );
-  }, [songs]);
 
   useEffect(() => {
     set_filtered_songs(
