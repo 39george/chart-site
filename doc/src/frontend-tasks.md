@@ -24,4 +24,5 @@
 | Add prompt when deleting song                                                          |        |
 | Bug with uploading song/img???                                                         |        |
 | Use wasm rust transliterator version                                                   |        |
+| Clean user inputs                                                                      |        |
 | Fix reset song upload state on return from upload form (when song isn't uploaded yet)  |        |
