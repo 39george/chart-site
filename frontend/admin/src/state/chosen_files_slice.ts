@@ -33,10 +33,16 @@ const chosen_files_slice = createSlice({
     ) => {
       state.img = action.payload;
     },
+    reset_chosen_files: () => {
+      return initial_state;
+    },
   },
 });
 
-export const { set_chosen_audio_params, set_chosen_img_params } =
-  chosen_files_slice.actions;
+export const {
+  set_chosen_audio_params,
+  set_chosen_img_params,
+  reset_chosen_files,
+} = chosen_files_slice.actions;
 
 export default chosen_files_slice.reducer;

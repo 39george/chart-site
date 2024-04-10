@@ -71,13 +71,15 @@ const UploadFormComponent: FC<UploadFormComponentProps> = ({ state }) => {
         </div>
         <Outlet />
       </div>
-      {state.fields_not_empty(state.song) && (
+      {state.fields_not_empty(state.song) && state.current_step === "step_4" ? (
         <div
           className={styles.submit_button}
           onClick={state.submit_song}
         >
           Опубликовать
         </div>
+      ) : (
+        ""
       )}
     </div>
   );

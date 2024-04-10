@@ -29,6 +29,7 @@ const UploadFormContainer: FC = () => {
     },
   });
   const [current_step, set_current_step] = useState<StepName>("step_1");
+  console.log(current_step);
   const audio_url = useSelector<RootState, string>(
     (state) => state.files_url.audio
   );
@@ -45,8 +46,6 @@ const UploadFormContainer: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // console.log(song_data.song);
 
   function handle_change_step(step: IStep) {
     if (!step.active) {
@@ -80,6 +79,8 @@ const UploadFormContainer: FC = () => {
       dispatch(set_song_submit_status("error"));
     }
   }
+
+  console.log(song_data.song);
 
   useEffect(() => {
     if (audio_url && img_url) {

@@ -50,8 +50,8 @@
 .input_field {
   display: flex;
   align-items: center;
-
-  user-select: none;
+  user-select: auto;
+  -webkit-user-select: auto;
   cursor: pointer;
 }
 
@@ -84,7 +84,6 @@
   border: 0.5px solid $light_gray;
 
   background-color: $main_dark;
-  user-select: none;
 
   transform-origin: top left;
   animation: pop_up_fade_in 0.15s ease-out forwards;

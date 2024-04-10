@@ -7,6 +7,7 @@ import { RootState } from "../state/store";
 import { set_song_submit_status } from "../state/song_submit_data_slice";
 import { reset_song_data } from "../state/song_data_slice";
 import { set_audio_url, set_img_url } from "../state/files_url_slice";
+import { reset_chosen_files } from "../state/chosen_files_slice";
 
 const InfoModalWindow: FC = () => {
   const state = useSelector<RootState, SubmitStatus>(
@@ -19,6 +20,7 @@ const InfoModalWindow: FC = () => {
     dispatch(reset_song_data());
     dispatch(set_audio_url(""));
     dispatch(set_img_url(""));
+    dispatch(reset_chosen_files());
   }
 
   return (
