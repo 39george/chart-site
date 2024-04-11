@@ -29,7 +29,6 @@ const UploadFormContainer: FC = () => {
     },
   });
   const [current_step, set_current_step] = useState<StepName>("step_1");
-  console.log(current_step);
   const audio_url = useSelector<RootState, string>(
     (state) => state.files_url.audio
   );
@@ -42,7 +41,7 @@ const UploadFormContainer: FC = () => {
   const song_submit_status = useSelector<RootState, SubmitStatus>(
     (state) => state.song_submit_data.submit_status
   );
-  const { fetch_data: submit_song } = useAxios();
+  const { error_data: submit_error_data, fetch_data: submit_song } = useAxios();
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -147,6 +146,7 @@ const UploadFormContainer: FC = () => {
         song: song_data.song,
         submit_song: try_to_submit,
         song_submit_status: song_submit_status,
+        upload_song_error: submit_error_data,
       }}
     />
   );

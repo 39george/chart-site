@@ -13,13 +13,16 @@ interface UploadFormComponentProps {
     song: SubmitSong;
     submit_song: () => Promise<void>;
     song_submit_status: SubmitStatus;
+    upload_song_error: string;
   };
 }
 
 const UploadFormComponent: FC<UploadFormComponentProps> = ({ state }) => {
   return (
     <div className={styles.upload_form_container}>
-      {state.song_submit_status && <InfoModalWindow />}
+      {state.song_submit_status && (
+        <InfoModalWindow error_data={state.upload_song_error} />
+      )}
       <div className={styles.steps}>
         <p className={styles.step_name}>Файлы</p>
         <p className={styles.step_count}>
