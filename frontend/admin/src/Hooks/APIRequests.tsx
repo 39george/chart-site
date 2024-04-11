@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { wait } from "../helpers";
 
 const useAxios = () => {
-  const [error_data, set_error_data] = useState<string | undefined>();
+  const [error_data, set_error_data] = useState<string>("");
 
   const fetch_data = async (
     config: AxiosRequestConfig,
@@ -30,6 +30,15 @@ const useAxios = () => {
           switch (error.response.status) {
             case 400:
               console.error("Bad request:", error.response);
+              set_error_data(
+                `Error status: ${error.response.status}, Error data: ${error.response.data}, Error message: ${error.message}`
+              );
+              break;
+            case 403:
+              console.error("Forbidden:", error.response);
+              set_error_data(
+                `Error status: ${error.response.status}, Error data: ${error.response.data}, Error message: ${error.message}`
+              );
               break;
             case 404:
               console.error(
@@ -37,14 +46,18 @@ const useAxios = () => {
                 error.config?.url,
                 error.response
               );
+              set_error_data(
+                `Error status: ${error.response.status}, Error data: ${error.response.data}, Error message: ${error.message}`
+              );
               break;
             case 500:
               if (attempts < MAX_RETRIES) {
                 await wait(RETRY_DELAY_MS);
                 fetch_data(config, attempts + 1);
               } else {
+                console.error("Server error:", error.response);
                 set_error_data(
-                  "Что-то не так с нашим сервером, мы уже работаем над этим. Пожалуйста, попробуйте обновить страницу"
+                  `Error status: ${error.response.status}, Error data: ${error.response.data}, Error message: ${error.message}`
                 );
               }
               break;
@@ -53,6 +66,9 @@ const useAxios = () => {
                 "API error: ",
                 error.response.status,
                 error.response.data
+              );
+              set_error_data(
+                `Error status: ${error.status}, Error: ${error.response}`
               );
           }
         } else if (error.request) {
