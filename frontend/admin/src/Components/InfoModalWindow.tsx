@@ -9,7 +9,11 @@ import { reset_song_data } from "../state/song_data_slice";
 import { set_audio_url, set_img_url } from "../state/files_url_slice";
 import { reset_chosen_files } from "../state/chosen_files_slice";
 
-const InfoModalWindow: FC = () => {
+interface InfoModalWindowPorps {
+  error_data?: string;
+}
+
+const InfoModalWindow: FC<InfoModalWindowPorps> = ({ error_data }) => {
   const state = useSelector<RootState, SubmitStatus>(
     (state) => state.song_submit_data.submit_status
   );
@@ -35,7 +39,7 @@ const InfoModalWindow: FC = () => {
           </p>
           <p className={styles.info}>
             {state === "success" && "Вы можете вернуться на главную страницу"}
-            {state === "error" && "Текст ошибки"}
+            {state === "error" && error_data}
           </p>
           <Link
             to="/"
