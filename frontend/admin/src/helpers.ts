@@ -1,3 +1,5 @@
+import { FORBIDDEN_CHARS } from "./config";
+
 // Format price
 const number_format = new Intl.NumberFormat("ru");
 
@@ -121,7 +123,11 @@ export function transliterate(text: string): string {
         if (c.length === 1) {
           let ch = c.charAt(0);
           if (ch.charCodeAt(0) <= 127) {
-            result += ch;
+            if (FORBIDDEN_CHARS.test(ch)) {
+              result += "_";
+            } else {
+              result += ch;
+            }
           } else {
             result += "_";
           }
