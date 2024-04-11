@@ -82,6 +82,9 @@ const UploadStep1: FC = () => {
     audio: "",
     img: "",
   });
+  const [temp_audio_key, set_temp_audio_key] = useState("");
+  const [temp_img_key, set_temp_img_key] = useState("");
+
   const presigned_post_forms = useRef<PresignedForms>({
     audio: {
       url: "",
@@ -114,10 +117,9 @@ const UploadStep1: FC = () => {
       },
     },
   });
+
   const audio_input_ref = useRef<HTMLInputElement>(null);
   const img_input_ref = useRef<HTMLInputElement>(null);
-  const [temp_audio_key, set_temp_audio_key] = useState("");
-  const [temp_img_key, set_temp_img_key] = useState("");
 
   const audio_params = useSelector<RootState, FileParams>(
     (state) => state.chosen_file.audio
@@ -131,7 +133,6 @@ const UploadStep1: FC = () => {
   const img_url = useSelector<RootState, string>(
     (state) => state.files_url.img
   );
-
   const song_data = useSelector<RootState, ISongData>(
     (state) => state.song_data
   );
@@ -178,6 +179,29 @@ const UploadStep1: FC = () => {
       // Handling single file
       const file = files[0];
 
+      // Check if file.type corrseponds to the desired type
+      switch (name) {
+        case FileInputNames.Audio:
+          if (file.type !== "audio/mpeg") {
+            set_err_messages((prev) => ({
+              ...prev,
+              audio: "Неверный формат аудио. Пожалуйста, выберите файл .mp3",
+            }));
+            return;
+          }
+          break;
+        case FileInputNames.Img:
+          if (file.type !== "image/jpeg") {
+            set_err_messages((prev) => ({
+              ...prev,
+              img: "Неверный формат изображения. Пожалуйста, выберите файл .mp3",
+            }));
+            return;
+          }
+          break;
+      }
+
+      // Checking file size
       if (check_file_size(name, file)) {
         // Setting upload data
         set_upload_data((prev) => ({
@@ -494,24 +518,12 @@ const UploadStep1: FC = () => {
     if (response?.status === 200) {
       switch (name) {
         case FileInputNames.Audio:
-          // dispatch(
-          //   set_song_data({
-          //     ...song_data.song,
-          //     audio_object_key: presigned_post_forms.current.audio.fields.key,
-          //   })
-          // );
           set_temp_audio_key(presigned_post_forms.current.audio.fields.key);
           dispatch(
             set_audio_url(URL.createObjectURL(form_data.get("file") as Blob))
           );
           break;
         case FileInputNames.Img:
-          // dispatch(
-          //   set_song_data({
-          //     ...song_data.song,
-          //     cover_object_key: presigned_post_forms.current.img.fields.key,
-          //   })
-          // );
           set_temp_img_key(presigned_post_forms.current.img.fields.key);
           dispatch(
             set_img_url(URL.createObjectURL(form_data.get("file") as Blob))
@@ -524,6 +536,7 @@ const UploadStep1: FC = () => {
   // TODO Setting error messages based on api response
   // useEffect(() => {}, [upload_form_error, presigned_post_form_error]);
 
+  // Assign keys sumultaneously to evade bugs with "" as img or audi obj key
   useEffect(() => {
     if (temp_audio_key && temp_img_key) {
       dispatch(

@@ -2,6 +2,7 @@ import { useDispatch } from "react-redux";
 import { ISongData, set_song_data } from "../state/song_data_slice";
 import styles from "./UploadStep2.module.scss";
 import { FC, useEffect, useState } from "react";
+import { FORBIDDEN_CHARS } from "../config";
 
 interface UploadStep2Props {
   song_data: ISongData;
@@ -12,6 +13,10 @@ const UploadStep2: FC<UploadStep2Props> = ({ song_data }) => {
     name: 0,
     lyric: 0,
   });
+  const [err_messages, set_err_messages] = useState({
+    name: "",
+    lyric: "",
+  });
   const dispatch = useDispatch();
 
   function handle_input_change(
@@ -20,6 +25,19 @@ const UploadStep2: FC<UploadStep2Props> = ({ song_data }) => {
     e.preventDefault();
 
     const { name, value } = e.target;
+
+    if (FORBIDDEN_CHARS.test(value)) {
+      set_err_messages((prev) => ({
+        ...prev,
+        [name]: `Пожалуйста, не используйте символы /()"<>\{};: в полях ввода`,
+      }));
+      return;
+    } else {
+      set_err_messages((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
 
     if (name === "name" && value.length > 30) {
       return;
@@ -66,6 +84,9 @@ const UploadStep2: FC<UploadStep2Props> = ({ song_data }) => {
           onChange={handle_input_change}
           autoComplete="off"
         />
+        {err_messages.name && (
+          <div className={styles.err_message}>{err_messages.name}</div>
+        )}
       </div>
       <div className={styles.input_container}>
         <div className={styles.label_and_counter}>
@@ -88,6 +109,9 @@ const UploadStep2: FC<UploadStep2Props> = ({ song_data }) => {
           onChange={handle_input_change}
           autoComplete="off"
         />
+        {err_messages.lyric && (
+          <div className={styles.err_message}>{err_messages.lyric}</div>
+        )}
       </div>
     </div>
   );
