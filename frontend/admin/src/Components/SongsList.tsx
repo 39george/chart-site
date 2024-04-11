@@ -10,11 +10,18 @@ import { set_song_list_updated } from "../state/song_list_updated_slice";
 
 const SongsList: FC = () => {
   const [songs_list, set_songs_list] = useState<ISong[]>([]);
+  const [options_popup_id_visible, set_options_popup_id_visible] = useState(0);
   const { fetch_data: fetch_songs } = useAxios();
   const song_list_updated = useSelector<RootState, boolean>(
     (state) => state.song_list_updated.song_list_updated
   );
   const dispatch = useDispatch();
+
+  function handle_otpions_click(id: number) {
+    id === options_popup_id_visible
+      ? set_options_popup_id_visible(0)
+      : set_options_popup_id_visible(id);
+  }
 
   async function try_to_fetch_songs() {
     const response = await fetch_songs({
@@ -55,6 +62,8 @@ const SongsList: FC = () => {
                 sex: song.sex,
               }}
               idx={idx}
+              options_popup_id_visible={options_popup_id_visible}
+              handle_options_click={handle_otpions_click}
             />
           );
         })}

@@ -3,7 +3,7 @@ import { ISong } from "../types";
 import { TbDots } from "react-icons/tb";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { format_price } from "../helpers";
-import { FC, useState } from "react";
+import { FC, useRef, useState } from "react";
 import useAxios from "../Hooks/APIRequests";
 import { API_URL } from "../config";
 import { useDispatch } from "react-redux";
@@ -12,11 +12,13 @@ import { set_song_list_updated } from "../state/song_list_updated_slice";
 interface SongItemProps {
   song: ISong;
   idx: number;
+  options_popup_id_visible: number;
+  handle_options_click: (id: number) => void;
 }
 
 const SongItem: FC<SongItemProps> = (props) => {
   const [price_popup_visible, set_price_popup_visible] = useState(false);
-  const [options_popup_visible, set_options_popup_visible] = useState(false);
+  const popup_ref = useRef<HTMLDivElement>(null);
   const { fetch_data: delete_song } = useAxios();
   const dispatch = useDispatch();
 
@@ -82,11 +84,12 @@ const SongItem: FC<SongItemProps> = (props) => {
         </div>
       </div>
       <div
+        ref={popup_ref}
         className={styles.options}
-        onClick={() => set_options_popup_visible(!options_popup_visible)}
+        onClick={() => props.handle_options_click(props.song.id)}
       >
         <TbDots className={styles.dots_icon} />
-        {options_popup_visible && (
+        {props.song.id === props.options_popup_id_visible && (
           <div
             className={styles.options_popup}
             onClick={(e) => e.stopPropagation()}
