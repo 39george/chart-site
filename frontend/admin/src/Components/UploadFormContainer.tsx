@@ -79,7 +79,7 @@ const UploadFormContainer: FC = () => {
     }
   }
 
-  console.log(song_data.song);
+  // console.log(song_data.song);
 
   useEffect(() => {
     if (audio_url && img_url) {
