@@ -22,6 +22,7 @@
 | ADMIN                                                                                  |        |
 | Handle case when admin tries to delete genre/mood referenced in songs table            |        |
 | Implement editing songs                                                                |        |
+| Add forbidden char check on genres/moods creation                                      |        |
 | Update 'edit options' button appearance logic (one button at a time)                   | Done   |
 | Add prompt when deleting song                                                          |        |
 | Check input file type and impl corresponding logic                                     |        |
