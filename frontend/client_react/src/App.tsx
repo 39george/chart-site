@@ -7,7 +7,7 @@ import useAxios from "./Hooks/APIRequests";
 import { API_URL } from "./config";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { set_songs } from "./state/songs_slice";
+import { set_are_songs_fetching, set_songs } from "./state/songs_slice";
 import { set_genres, set_moods } from "./state/genres_moods_slice";
 import { extract_genres, extract_moods } from "./helpers";
 import { set_max_price, set_min_price } from "./state/min_max_price_slice";
@@ -47,6 +47,9 @@ function App() {
           )
         )
       );
+      // dispatch(set_are_songs_fetching(false));
+    } else {
+      dispatch(set_are_songs_fetching(false));
     }
   }
 
