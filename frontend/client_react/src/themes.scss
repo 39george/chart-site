@@ -1,0 +1,23 @@
+@use "./colors.scss" as *;
+
+html[data-theme="light"] {
+  --primary_bg: #{$primary_bg_light};
+  --primary_text: #{$primary_text_light};
+  --accent: #{$accent_light};
+  --widget_bg_main: #{$widget_bg_main_light};
+  --secondary_bg: #{$secondary_bg_light};
+  --secondary_text: #{$secondary_text_light};
+  --popup_bg: #{$widget_bg_main_light};
+  --popup_outline: #{$secondary_bg_light};
+}
+
+html[data-theme="dark"] {
+  --primary_bg: #{$primary_bg_dark};
+  --primary_text: #{$primary_text_dark};
+  --accent: #{$accent_dark};
+  --widget_bg_main: #{$widget_bg_main_dark};
+  --secondary_bg: #{$secondary_bg_dark};
+  --secondary_text: #{$secondary_text_dark};
+  --popup_bg: #{$primary_bg_dark};
+  --popup_outline: #{$secondary_text_dark};
+}

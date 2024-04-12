@@ -1,4 +1,3 @@
-@import "../variables.scss";
 @import "../genreal_styles.scss";
 
 .main_page {
@@ -41,7 +40,7 @@
 
 // ───── Auido Player ─────────────────────────────────────────────────────── //
 .playback_icon {
-  color: $main_bright;
+  color: var(--primary_text);
   width: 1.25rem;
   height: 1.25rem;
 }

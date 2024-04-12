@@ -1,8 +1,6 @@
-@import "../variables.scss";
-
 @mixin active_link {
   text-decoration: underline;
-  text-decoration-color: $accent;
+  text-decoration-color: var(--accent);
   text-decoration-thickness: 0.125rem;
   text-underline-offset: 0.25rem;
 }
@@ -19,7 +17,7 @@
 
   padding: 2.375rem 1rem;
 
-  background-color: rgba($color: $main_dark, $alpha: 0.8);
+  background-color: rgba($color: var(--primary_bg), $alpha: 0.8);
   backdrop-filter: blur(0.25rem);
   -webkit-backdrop-filter: blur(0.25rem);
 
@@ -43,7 +41,7 @@
   text-decoration: none;
   letter-spacing: 0.05em;
 
-  color: $main_bright;
+  color: var(--primary_text);
 
   &:not(:last-child) {
     margin-right: 2em;
@@ -56,6 +54,45 @@
 
 .active_link {
   @include active_link;
+}
+
+.theme_switch_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+
+  width: 2.25rem;
+
+  padding: 0.5rem;
+
+  border-radius: 2rem;
+  background-color: transparent;
+
+  transition: 0.15s ease-out;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--secondary_bg);
+    width: fit-content;
+
+    .hover_text {
+      display: block;
+    }
+  }
+}
+
+.theme_icon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.hover_text {
+  margin-right: 0.25em;
+  margin-left: 1em;
+  font-size: 0.875rem;
+  display: none;
 }
 
 @media (max-width: 700px) {

@@ -2,7 +2,13 @@ import styles from "./Filters.module.scss";
 import { IoChevronDown } from "react-icons/io5";
 import ActiveFitlers from "./ActiveFilters";
 import { genders } from "../data";
-import { FilterType, GenderOptions, GenresMoods, PriceValues } from "../types";
+import {
+  ColorThemes,
+  FilterType,
+  GenderOptions,
+  GenresMoods,
+  PriceValues,
+} from "../types";
 import { format_price } from "../helpers";
 import { FC, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +35,11 @@ interface InputRefs {
   price_ref: React.RefObject<HTMLDivElement>;
 }
 
+const popup_rgba = {
+  light: "rgba(0, 0, 0, 0.1)",
+  dark: "rgba(255, 255, 255, 0.1)",
+};
+
 // ───── Component ────────────────────────────────────────────────────────── //
 
 const Filters: FC = () => {
@@ -44,6 +55,10 @@ const Filters: FC = () => {
   };
   const number_format = new Intl.NumberFormat("ru");
   const dispatch = useDispatch();
+
+  const color_theme = useSelector<RootState, ColorThemes>(
+    (state) => state.color_theme.theme
+  );
   const MIN_PRICE = useSelector<RootState, number>(
     (state) => state.min_max_price.min
   );
@@ -226,7 +241,14 @@ const Filters: FC = () => {
             <IoChevronDown className={styles.chevron} />
           </div>
           {focused_filter.focused === "gender" && (
-            <div className={styles.pop_up}>
+            <div
+              className={styles.pop_up}
+              style={{
+                boxShadow: `0 0 0.5rem ${
+                  color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                }`,
+              }}
+            >
               <ul className={styles.pop_up_content}>
                 <li className={styles.pop_up_title}>Пол</li>
                 {genders.map((gender, idx) => {
@@ -273,7 +295,14 @@ const Filters: FC = () => {
             <IoChevronDown className={styles.chevron} />
           </div>
           {focused_filter.focused === "genre" && (
-            <div className={`${styles.pop_up} ${styles.pop_up_genre}`}>
+            <div
+              className={`${styles.pop_up} ${styles.pop_up_genre}`}
+              style={{
+                boxShadow: `0 0 0.5rem ${
+                  color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                }`,
+              }}
+            >
               <ul className={styles.pop_up_content}>
                 <li className={styles.pop_up_title}>Жанр</li>
                 {genres_moods.genres.map((genre, idx) => {
@@ -324,7 +353,14 @@ const Filters: FC = () => {
             <IoChevronDown className={styles.chevron} />
           </div>
           {focused_filter.focused === "mood" && (
-            <div className={`${styles.pop_up} ${styles.pop_up_mood}`}>
+            <div
+              className={`${styles.pop_up} ${styles.pop_up_mood}`}
+              style={{
+                boxShadow: `0 0 0.5rem ${
+                  color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                }`,
+              }}
+            >
               <ul className={styles.pop_up_content}>
                 <li className={styles.pop_up_title}>Настроение</li>
                 {genres_moods.moods.map((mood, idx) => {
@@ -375,7 +411,14 @@ const Filters: FC = () => {
             <IoChevronDown className={styles.chevron} />
           </div>
           {focused_filter.focused === "price" && (
-            <div className={`${styles.pop_up} ${styles.pop_up_price}`}>
+            <div
+              className={`${styles.pop_up} ${styles.pop_up_price}`}
+              style={{
+                boxShadow: `0 0 0.5rem ${
+                  color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                }`,
+              }}
+            >
               <div className={styles.pop_up_content}>
                 <p className={styles.pop_up_title}>Цена</p>
                 <div className={styles.price_inputs}>

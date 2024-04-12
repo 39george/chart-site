@@ -7,6 +7,7 @@ import price_value_reducer from "./price_value_slice";
 import songs_reducer from "./songs_slice";
 import song_url_reducer from "./song_url_slice";
 import current_song_data_reducer from "./current_song_data_slice";
+import color_theme_reducer from "./color_theme_slice";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     songs: songs_reducer,
     song_url: song_url_reducer,
     current_song_data: current_song_data_reducer,
+    color_theme: color_theme_reducer,
   },
 });
 

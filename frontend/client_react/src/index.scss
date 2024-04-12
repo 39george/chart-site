@@ -1,5 +1,5 @@
+@use "./themes.scss" as *;
 @import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap");
-@import "./variables.scss";
 
 * {
   margin: 0;
@@ -9,8 +9,10 @@
 
 body {
   font-family: "Inter Tight", sans-serif;
-  background-color: $main_dark;
-  color: $main_bright;
+  background-color: var(--primary_bg);
+  color: var(--primary_text);
+
+  transition: background-color 0.15s ease-out, color 0.15s ease-out;
 
   // background-image: url("./assets/chart_bg_decor_dark.png");
   // background-size: contain;
@@ -26,7 +28,7 @@ body {
 
     height: 5rem;
 
-    background-color: #191919;
+    background-color: var(--secondary_bg);
 
     z-index: 9;
   }
@@ -39,20 +41,20 @@ body {
 
   // Progress bar
   .rhap_progress-bar-show-download {
-    background-color: rgba($color: $main_bright, $alpha: 0.1);
+    background-color: rgba($color: var(--primary_text), $alpha: 0.1);
   }
 
   .rhap_progress-filled {
-    background-color: $accent;
+    background-color: var(--accent);
   }
 
   .rhap_progress-indicator {
-    background-color: $accent;
+    background-color: var(--accent);
     box-shadow: none;
   }
 
   .rhap_download-progress {
-    background-color: $light_gray;
+    background-color: var(--secondary_text);
   }
 
   // Main controls
@@ -99,7 +101,7 @@ body {
   // Time
   .rhap_time {
     font-size: 0.75rem;
-    color: $main_bright;
+    color: var(--primary_text);
   }
 
   // Volume
@@ -108,16 +110,16 @@ body {
   }
 
   .rhap_volume-indicator {
-    background-color: $main_bright;
+    background-color: var(--primary_text);
     box-shadow: none;
   }
 
   .rhap_volume-filled {
-    background-color: $main_bright;
+    background-color: var(--primary_text);
   }
 
   .rhap_volume-bar {
-    background-color: $light_gray;
+    background-color: var(--secondary_text);
   }
 
   @media (max-width: 768px) {

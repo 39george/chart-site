@@ -5,15 +5,19 @@ import MainPage from "./Pages/MainPage";
 import ContactsPage from "./Pages/ContactsPage";
 import useAxios from "./Hooks/APIRequests";
 import { API_URL } from "./config";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { set_songs } from "./state/songs_slice";
 import { set_genres, set_moods } from "./state/genres_moods_slice";
 import { extract_genres, extract_moods } from "./helpers";
 import { set_max_price, set_min_price } from "./state/min_max_price_slice";
-import { ISong } from "./types";
+import { ColorThemes, ISong } from "./types";
+import { RootState } from "./state/store";
 
 function App() {
+  const color_theme = useSelector<RootState, ColorThemes>(
+    (state) => state.color_theme.theme
+  );
   const { fetch_data: fetch_songs } = useAxios();
   const dispatch = useDispatch();
 
@@ -49,6 +53,14 @@ function App() {
   useEffect(() => {
     try_to_fetch_songs();
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-theme",
+      color_theme === "light" ? "light" : "dark"
+    );
+  }, [color_theme]);
+
   return (
     <BrowserRouter>
       <Routes>

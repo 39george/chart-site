@@ -1,7 +1,7 @@
 import styles from "./CurrentSong.module.scss";
 import { BsPlayCircle, BsPauseCircle } from "react-icons/bs";
 import { IoChevronDown } from "react-icons/io5";
-import { ISong } from "../types";
+import { ColorThemes, ISong } from "../types";
 import { FC, useState } from "react";
 import { RootState } from "../state/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,8 +12,16 @@ interface CurrentSongProps {
   song: ISong | undefined;
 }
 
+const popup_rgba = {
+  light: "rgba(0, 0, 0, 0.3)",
+  dark: "rgba(255, 255, 255, 0.2)",
+};
+
 const CurrentSong: FC<CurrentSongProps> = (props) => {
   const [expanded, set_expanded] = useState(false);
+  const color_theme = useSelector<RootState, ColorThemes>(
+    (state) => state.color_theme.theme
+  );
   const current_song_id = useSelector<RootState, number>(
     (state) => state.current_song_data.id
   );
@@ -38,7 +46,14 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
         <div className={styles.current_song_section}>
           <div>
             <div className={styles.image_section}>
-              <div className={styles.image_wrapper}>
+              <div
+                className={styles.image_wrapper}
+                style={{
+                  boxShadow: `0 0 1rem ${
+                    color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                  }`,
+                }}
+              >
                 <img
                   src={props.song.cover_url}
                   alt="cover"

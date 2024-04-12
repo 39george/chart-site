@@ -1,5 +1,3 @@
-@import "./variables.scss";
-
 @mixin image_wrapper($size, $border_radius) {
   width: $size;
   height: $size;
@@ -21,7 +19,7 @@
   width: $size;
   height: $size;
 
-  color: $main_bright;
+  color: #fff;
 
   border-radius: 50%;
 

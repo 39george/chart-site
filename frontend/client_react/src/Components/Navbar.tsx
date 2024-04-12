@@ -1,7 +1,13 @@
 import styles from "./Navbar.module.scss";
-import logo from "../assets/logo.png";
+import logo_light from "../assets/logo_light.png";
+import logo_dark from "../assets/logo_dark.png";
+import { HiSun, HiMoon } from "react-icons/hi";
 import { FC, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { RootState } from "../state/store";
+import { useDispatch, useSelector } from "react-redux";
+import { ColorThemes } from "../types";
+import { set_theme } from "../state/color_theme_slice";
 
 type ActivePageName = "home" | "contacts" | "";
 
@@ -14,9 +20,19 @@ const Navbar: FC = () => {
       ? "contacts"
       : ""
   );
+  const color_theme = useSelector<RootState, ColorThemes>(
+    (state) => state.color_theme.theme
+  );
+  const dispatch = useDispatch();
 
   function handle_page_click(pageName: ActivePageName) {
     set_active_page(pageName);
+  }
+
+  function handle_change_theme() {
+    color_theme === "light"
+      ? dispatch(set_theme("dark"))
+      : dispatch(set_theme("light"));
   }
 
   return (
@@ -24,7 +40,7 @@ const Navbar: FC = () => {
       <nav className={styles.navbar}>
         <div className={styles.image_wrapper}>
           <img
-            src={logo}
+            src={color_theme === "light" ? logo_light : logo_dark}
             alt="logo"
             draggable={false}
             className={styles.logo}
@@ -48,6 +64,19 @@ const Navbar: FC = () => {
         >
           Контакты
         </Link>
+        <div
+          className={styles.theme_switch_container}
+          onClick={handle_change_theme}
+        >
+          {color_theme === "light" ? (
+            <HiSun className={styles.theme_icon} />
+          ) : (
+            <HiMoon className={styles.theme_icon} />
+          )}
+          <p className={styles.hover_text}>
+            {color_theme === "light" ? "темная тема" : "светлая тема"}
+          </p>
+        </div>
       </nav>
     </>
   );

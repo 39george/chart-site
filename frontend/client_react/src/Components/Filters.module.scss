@@ -1,5 +1,3 @@
-@import "../variables.scss";
-
 @keyframes pop_up_fade_in {
   from {
     opacity: 0;
@@ -49,10 +47,10 @@
   &:hover {
     .filter_name {
       p {
-        color: $main_bright;
+        color: var(--primary_text);
       }
       .chevron {
-        stroke: $main_bright;
+        stroke: var(--primary_text);
       }
     }
   }
@@ -61,10 +59,10 @@
 .focused_filter {
   .filter_name {
     p {
-      color: $main_bright;
+      color: var(--primary_text);
     }
     .chevron {
-      stroke: $main_bright;
+      stroke: var(--primary_text);
       transform: rotate(-180deg);
     }
   }
@@ -74,7 +72,7 @@
   cursor: pointer;
 
   p {
-    color: $light_gray;
+    color: var(--secondary_text);
     transition: 0.15s ease-out;
   }
 
@@ -84,7 +82,7 @@
 
     margin-left: 0.25rem;
 
-    stroke: $light_gray;
+    stroke: var(--secondary_text);
 
     transition: stroke 0.15s ease-out, transform 0.15s ease-out;
   }
@@ -99,10 +97,8 @@
 
   padding: 1rem;
   border-radius: 0.25rem;
-  border: 0.5px solid $light_gray;
-  box-shadow: 0 0 0.5rem rgba($color: #ffffff, $alpha: 0.2);
-
-  background-color: $main_dark;
+  border: 0.5px solid var(--popup_outline);
+  background-color: var(--popup_bg);
 
   transform-origin: top left;
 
@@ -143,10 +139,10 @@ input[type="checkbox"] {
   display: none;
 
   &:checked + label {
-    color: $main_bright;
+    color: var(--primary_text);
 
     .custom_checkbox {
-      border: 1px solid $accent;
+      border: 1px solid var(--accent);
 
       &::after {
         display: block;
@@ -160,7 +156,7 @@ input[type="checkbox"] {
 
   padding-left: 1.25rem;
 
-  color: $light_gray;
+  color: var(--secondary_text);
   cursor: pointer;
   user-select: none;
 
@@ -172,7 +168,7 @@ input[type="checkbox"] {
     width: 0.75rem;
     height: 0.75rem;
     border-radius: 50%;
-    border: 1px solid $light_gray;
+    border: 1px solid var(--secondary_text);
 
     &::after {
       display: none;
@@ -184,7 +180,7 @@ input[type="checkbox"] {
       width: 0.375rem;
       height: 0.375rem;
       border-radius: 50%;
-      background-color: $accent;
+      background-color: var(--accent);
     }
   }
 
@@ -197,9 +193,9 @@ input[type="checkbox"] {
   }
 
   &:hover {
-    color: $main_bright;
+    color: var(--primary_text);
     .custom_checkbox {
-      border: 1px solid $main_bright;
+      border: 1px solid var(--primary_text);
     }
   }
 }
@@ -216,25 +212,25 @@ input[type="checkbox"] {
   font-weight: 500;
 
   border: none;
-  border-bottom: 1px solid $light_gray;
+  border-bottom: 1px solid var(--secondary_text);
 
-  color: $main_bright;
-  background-color: $main_dark;
+  color: var(--primary_text);
+  background-color: var(--primary_bg);
 
   transition: border-bottom 0.15s ease-out;
 
   &::placeholder {
-    color: $light_gray;
+    color: var(--secondary_text);
   }
 
   &:focus {
     outline: none;
-    border-bottom: 1px solid $main_bright;
+    border-bottom: 1px solid var(--primary_text);
   }
 }
 
 .price_not_empty {
-  border-bottom: 1px solid $main_bright;
+  border-bottom: 1px solid var(--primary_text);
 }
 
 @media (max-width: 550px) {
