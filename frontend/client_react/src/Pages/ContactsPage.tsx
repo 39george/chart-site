@@ -8,11 +8,11 @@ const ContactsPage: FC = () => {
         <p className={styles.contacts}>
           <span>Телеграмм для связи</span>
           <a
-            href="https://t.me/nai_alyona"
+            href="https://t.me/alyonaaas"
             target="_blank"
             className={styles.telegramm_link}
           >
-            @Alyonaaas
+            @alyonaaas
           </a>
         </p>
       </div>
