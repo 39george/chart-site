@@ -1,5 +1,7 @@
 .contacts_page {
+  position: relative;
   padding: 4.5rem clamp(0px, (100vw - 80rem) / 2, 9999px) 2rem;
+  z-index: 10;
 }
 
 .content {

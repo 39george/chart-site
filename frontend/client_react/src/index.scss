@@ -13,9 +13,6 @@ body {
   color: var(--primary_text);
 
   transition: background-color 0.15s ease-out, color 0.15s ease-out;
-
-  // background-image: url("./assets/chart_bg_decor_dark.png");
-  // background-size: contain;
 }
 
 // ───── Audio Player ─────────────────────────────────────────────────────── //
@@ -29,6 +26,7 @@ body {
     height: 5rem;
 
     background-color: var(--secondary_bg);
+    box-shadow: none;
 
     z-index: 9;
   }
@@ -41,7 +39,7 @@ body {
 
   // Progress bar
   .rhap_progress-bar-show-download {
-    background-color: rgba($color: var(--primary_text), $alpha: 0.1);
+    background-color: rgba($color: #000, $alpha: 0.1);
   }
 
   .rhap_progress-filled {

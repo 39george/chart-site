@@ -1,7 +1,9 @@
 @import "../genreal_styles.scss";
 
 .main_page {
+  position: relative;
   padding: 4.5rem clamp(0px, (100vw - 80rem) / 2, 9999px) 2rem;
+  z-index: 10;
 }
 
 .content {
@@ -51,6 +53,12 @@
   }
 }
 
+@media (max-width: 700px) {
+  .main_page {
+    padding-top: 0;
+  }
+}
+
 @media (max-width: 545px) {
   .player_meta_info {
     left: 1rem;
@@ -62,11 +70,5 @@
     font-size: 0.75rem;
     margin-top: 0.5em;
     margin-left: 0;
-  }
-}
-
-@media (max-width: 450px) {
-  .content {
-    padding-top: 3rem;
   }
 }

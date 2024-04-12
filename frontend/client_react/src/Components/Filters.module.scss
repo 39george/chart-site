@@ -212,10 +212,11 @@ input[type="checkbox"] {
   font-weight: 500;
 
   border: none;
+  border-radius: 0;
   border-bottom: 1px solid var(--secondary_text);
 
   color: var(--primary_text);
-  background-color: var(--primary_bg);
+  background-color: var(--popup_bg);
 
   transition: border-bottom 0.15s ease-out;
 

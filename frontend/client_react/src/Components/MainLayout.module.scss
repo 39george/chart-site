@@ -1,0 +1,22 @@
+.decor_container {
+  position: fixed;
+  top: 0;
+  left: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  z-index: 4;
+  transform: rotate(-22deg) scale(1.7);
+
+  .bg_decor {
+    background-image: url("../assets/chart_bg_decor.png");
+    background-size: contain;
+    filter: invert(1);
+    width: 100%;
+    height: 100%;
+    opacity: 0.025;
+  }
+}

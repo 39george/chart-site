@@ -9,6 +9,7 @@ html[data-theme="light"] {
   --secondary_text: #{$secondary_text_light};
   --popup_bg: #{$widget_bg_main_light};
   --popup_outline: #{$secondary_bg_light};
+  --active_filter_bg: #{$widget_bg_main_light};
 }
 
 html[data-theme="dark"] {
@@ -20,4 +21,5 @@ html[data-theme="dark"] {
   --secondary_text: #{$secondary_text_dark};
   --popup_bg: #{$primary_bg_dark};
   --popup_outline: #{$secondary_text_dark};
+  --active_filter_bg: #{$secondary_bg_dark};
 }
