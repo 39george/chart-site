@@ -12,7 +12,8 @@ body {
   background-color: var(--primary_bg);
   color: var(--primary_text);
 
-  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out,
+    border 0.15s ease-out;
 }
 
 // ───── Audio Player ─────────────────────────────────────────────────────── //
@@ -28,7 +29,7 @@ body {
     background-color: var(--secondary_bg);
     box-shadow: none;
 
-    z-index: 9;
+    z-index: 12;
   }
 
   // Progress section
@@ -52,7 +53,7 @@ body {
   }
 
   .rhap_download-progress {
-    background-color: var(--secondary_text);
+    background-color: rgba($color: #fff, $alpha: 0.7);
   }
 
   // Main controls
