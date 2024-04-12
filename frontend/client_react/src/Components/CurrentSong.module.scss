@@ -2,19 +2,16 @@
 
 .current_song_section {
   position: relative;
-  width: 100%;
-  max-width: 27rem;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 
-  margin: 3.375rem 1rem 0 2rem;
-  margin-top: 0;
+  margin: 2rem 0rem;
 }
 
 .image_section {
-  position: relative;
-
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-around;
 }
 
 .image_wrapper {
@@ -42,13 +39,16 @@
 .meta_info {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
 
-  margin-top: 4.5rem;
+  width: 65%;
 
   font-weight: 500;
 
-  overflow: hidden;
+  & > div {
+    &:not(:last-child) {
+      margin-right: 1.5rem;
+    }
+  }
 }
 
 .general {
@@ -81,10 +81,11 @@
 .text_section {
   max-width: 11.25rem;
   min-width: 10rem;
-  margin-left: 1rem;
 }
 
 .text {
+  @include custom_scrollbar;
+
   height: 10.375rem;
 
   margin-top: 1.75rem;
@@ -94,71 +95,25 @@
   font-weight: 400;
 
   letter-spacing: 0.05em;
-
-  mask-image: linear-gradient(180deg, var(--primary_bg) 0, transparent);
-  -webkit-mask-image: linear-gradient(180deg, var(--primary_bg) 0, transparent);
-
-  overflow-y: hidden;
+  overflow-y: scroll;
 }
 
-.text_expanded {
-  height: 100%;
-  mask-image: none;
-  -webkit-mask-image: none;
+.buy_widget_pos1 {
+  display: none;
 }
 
-.expand_button {
-  display: flex;
-  align-items: center;
-
-  width: fit-content;
-
-  margin-top: 2em;
-
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.chevron {
-  width: 0.75rem;
-  height: 0.75rem;
-  margin-left: 0.25rem;
-  transition: transform 0.15s ease-out;
-}
-
-.button_expanded {
-  .chevron {
-    transform: rotate(-180deg);
-  }
-}
-
-@media (max-width: 1090px) {
+// Media queries
+@media (max-width: 1170px) {
   .current_song_section {
-    display: flex;
-    justify-content: space-around;
-
-    width: initial;
-    max-width: initial;
-
-    margin: 3.375rem 0 0;
+    justify-content: space-between;
   }
 
   .meta_info {
-    margin-top: 0;
-    width: 50%;
-  }
-
-  .general {
-    margin-right: 2rem;
+    width: 74%;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
   .current_song_section {
     display: block;
   }
@@ -173,39 +128,38 @@
     max-width: fit-content;
     margin-right: 1rem;
   }
+
+  .buy_widget_pos1 {
+    display: block;
+    margin-top: 2.75rem;
+  }
+
+  .buy_widget_pos2 {
+    display: none;
+  }
 }
 
-@media (max-width: 480px) {
-  .image_wrapper {
-    width: clamp(
-      10rem,
-      calc(10rem + (204 - 160) * ((100vw - 320px) / (480 - 320))),
-      12.75rem
-    );
-    height: clamp(
-      10rem,
-      calc(10rem + (204 - 160) * ((100vw - 320px) / (480 - 320))),
-      12.75rem
-    );
+@media (max-width: 620px) {
+  .image_section,
+  .meta_info {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 560px) {
+  .current_song_section {
+    margin: 2rem 0;
   }
 
-  .background_decor {
-    width: clamp(
-      18rem,
-      calc(18rem + (432 - 288) * ((100vw - 320px) / (480 - 320))),
-      27rem
-    );
-    height: clamp(
-      18rem,
-      calc(18rem + (432 - 288) * ((100vw - 320px) / (480 - 320))),
-      27rem
-    );
-  }
-
+  .image_section,
   .meta_info {
     flex-direction: column;
     width: 80%;
     margin: 3rem auto;
+  }
+
+  .image_wrapper {
+    margin: 0 auto;
   }
 
   .general {
@@ -216,5 +170,37 @@
 
   .text_section {
     margin-left: 0;
+  }
+
+  .buy_widget_pos1 {
+    width: fit-content;
+    margin: 2.75rem auto 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .current_song_section {
+    margin: 0;
+  }
+
+  .image_section {
+    margin: 2rem auto 0;
+  }
+
+  .buy_widget_pos1 {
+    width: 100%;
+  }
+
+  .buy_widget_pos1,
+  .name {
+    margin-top: 1.75rem;
+  }
+
+  .meta_info {
+    margin: 3rem auto 1rem;
+  }
+
+  .general {
+    margin-bottom: 2rem;
   }
 }

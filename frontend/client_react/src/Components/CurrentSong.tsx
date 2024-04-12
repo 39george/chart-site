@@ -1,24 +1,23 @@
 import styles from "./CurrentSong.module.scss";
 import { BsPlayCircle, BsPauseCircle } from "react-icons/bs";
-import { IoChevronDown } from "react-icons/io5";
 import { ColorThemes, ISong } from "../types";
-import { FC, useState } from "react";
+import { FC } from "react";
 import { RootState } from "../state/store";
 import { useDispatch, useSelector } from "react-redux";
 import { set_current_song_playing } from "../state/current_song_data_slice";
 import { format_price } from "../helpers";
+import BuyWidget from "./BuyWidget";
 
 interface CurrentSongProps {
   song: ISong | undefined;
 }
 
-const popup_rgba = {
+const img_shadow_rgba = {
   light: "rgba(0, 0, 0, 0.3)",
   dark: "rgba(255, 255, 255, 0.2)",
 };
 
 const CurrentSong: FC<CurrentSongProps> = (props) => {
-  const [expanded, set_expanded] = useState(false);
   const color_theme = useSelector<RootState, ColorThemes>(
     (state) => state.color_theme.theme
   );
@@ -44,13 +43,15 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
         ""
       ) : (
         <div className={styles.current_song_section}>
-          <div>
-            <div className={styles.image_section}>
+          <div className={styles.image_section}>
+            <div>
               <div
                 className={styles.image_wrapper}
                 style={{
                   boxShadow: `0 0 1rem ${
-                    color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                    color_theme === "light"
+                      ? img_shadow_rgba.light
+                      : img_shadow_rgba.dark
                   }`,
                 }}
               >
@@ -75,9 +76,11 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
                   </>
                 )}
               </div>
-              <div className={styles.background_decor}></div>
+              <p className={styles.name}>{props.song.name}</p>
             </div>
-            <p className={styles.name}>{props.song.name}</p>
+            <div className={styles.buy_widget_pos1}>
+              <BuyWidget price={props.song.price} />
+            </div>
           </div>
           <div className={styles.meta_info}>
             <div className={styles.general}>
@@ -102,16 +105,14 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
                 <div className={styles.stat_unit}>
                   <p className={styles.stat_type}>Цена</p>
                   <p className={styles.stat_value}>
-                    {format_price(props.song.price)}
+                    {format_price(props.song.price)}₽
                   </p>
                 </div>
               </div>
             </div>
             <div className={styles.text_section}>
               <p className={styles.info_header}>Текст песни</p>
-              <div
-                className={`${styles.text} ${expanded && styles.text_expanded}`}
-              >
+              <div className={`${styles.text}`}>
                 {lyric_format(props.song.lyric).map((s, idx) => {
                   if (s === "") {
                     return <br key={idx} />;
@@ -119,15 +120,9 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
                   return <p key={idx}>{s}</p>;
                 })}
               </div>
-              <div
-                className={`${styles.expand_button} ${
-                  expanded && styles.button_expanded
-                }`}
-                onClick={() => set_expanded(!expanded)}
-              >
-                {!expanded ? <p>показать</p> : <p>свернуть</p>}
-                <IoChevronDown className={styles.chevron} />
-              </div>
+            </div>
+            <div className={styles.buy_widget_pos2}>
+              <BuyWidget price={props.song.price} />
             </div>
           </div>
         </div>

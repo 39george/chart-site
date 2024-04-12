@@ -18,6 +18,9 @@ interface SongItemProps {
 
 const SongItem: FC<SongItemProps> = (props) => {
   const [popup_visible, set_popup_visible] = useState(false);
+  const [is_small_screen, set_is_small_screen] = useState(
+    window.innerWidth <= 378
+  );
   const popup_ref = useRef<HTMLDivElement>(null);
   const [popup_width, set_popup_width] = useState<number | undefined>(0);
   const { fetch_data: fetch_song_url } = useAxios();
@@ -60,6 +63,18 @@ const SongItem: FC<SongItemProps> = (props) => {
   useEffect(() => {
     set_popup_width(popup_ref.current?.clientWidth);
   }, [popup_ref, popup_visible]);
+
+  useEffect(() => {
+    const handle_resize = () => {
+      set_is_small_screen(window.innerWidth <= 378);
+    };
+
+    window.addEventListener("resize", handle_resize);
+
+    return () => {
+      window.removeEventListener("resize", handle_resize);
+    };
+  }, []);
 
   return (
     <div
@@ -113,7 +128,7 @@ const SongItem: FC<SongItemProps> = (props) => {
         <div
           ref={popup_ref}
           className={`${styles.price_pop_up} ${
-            popup_visible && styles.price_pop_up_visible
+            popup_visible && is_small_screen && styles.price_pop_up_visible
           }`}
           style={{
             left: `calc((${Math.floor(

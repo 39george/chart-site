@@ -4,14 +4,20 @@ import { IoGrid } from "react-icons/io5";
 import SongItem from "./SongItem";
 import CurrentSong from "./CurrentSong";
 import { GenderOptions, GenresMoods, ISong, PriceValues } from "../types";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { set_current_song_id } from "../state/current_song_data_slice";
+import { set_are_songs_fetching } from "../state/songs_slice";
 
 const SongsList: FC = () => {
   const [filtered_songs, set_filtered_songs] = useState<ISong[]>([]);
+  const current_ref = useRef<HTMLDivElement>(null);
+
   const songs = useSelector<RootState, ISong[]>((state) => state.songs.songs);
+  const are_songs_fetching = useSelector<RootState, boolean>(
+    (state) => state.songs.are_fetching
+  );
   const current_song_id = useSelector<RootState, number>(
     (state) => state.current_song_data.id
   );
@@ -39,6 +45,19 @@ const SongsList: FC = () => {
   function toggle_current_song(id: number) {
     dispatch(set_current_song_id(id));
   }
+
+  useEffect(() => {
+    if (current_ref.current) {
+      current_ref.current.scrollIntoView({
+        behavior: "instant",
+        block: "start",
+      });
+
+      window.scrollBy({
+        top: -200,
+      });
+    }
+  }, [current_ref.current]);
 
   useEffect(() => {
     set_filtered_songs(
@@ -75,16 +94,30 @@ const SongsList: FC = () => {
     );
   }, [songs, checked_gender, checked_genres_moods, price_value]);
 
+  useEffect(() => {
+    let timeout: number;
+
+    if (songs.length !== 0) {
+      timeout = setTimeout(() => {
+        dispatch(set_are_songs_fetching(false));
+      }, 400);
+    }
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [songs]);
+
   return (
     <div className={styles.songs_section}>
-      {filtered_songs.length === 0 ? (
+      {are_songs_fetching ? (
+        <div className={styles.loader_small}></div>
+      ) : songs.length === 0 ? (
+        <div>Список песен пока пуст... Скоро мы что-нибудь выложим!</div>
+      ) : filtered_songs.length === 0 ? (
         <div>Нет песен с такими параметрами</div>
       ) : (
-        <div
-          className={`${styles.songs_list} ${
-            current_song_id !== -1 && styles.songs_list_short
-          }`}
-        >
+        <div className={`${styles.songs_list}`}>
           <div className={styles.view_switch}>
             <div className={`${styles.switch_option} ${styles.active_option}`}>
               <FaBars className={styles.switch_icon} />
@@ -95,33 +128,39 @@ const SongsList: FC = () => {
           </div>
           {filtered_songs.map((song, idx) => {
             return (
-              <SongItem
-                key={idx}
-                song={{
-                  cover_url: song.cover_url,
-                  created_at: song.created_at,
-                  updated_at: song.updated_at,
-                  duration: song.duration,
-                  id: song.id,
-                  lyric: song.lyric,
-                  moods: song.moods,
-                  name: song.name,
-                  price: song.price,
-                  primary_genre: song.primary_genre,
-                  raiting: song.raiting,
-                  sex: song.sex,
-                }}
-                order_number={idx + 1}
-                toggle_current_song={toggle_current_song}
-              />
+              <div key={idx}>
+                <SongItem
+                  key={idx}
+                  song={{
+                    cover_url: song.cover_url,
+                    created_at: song.created_at,
+                    updated_at: song.updated_at,
+                    duration: song.duration,
+                    id: song.id,
+                    lyric: song.lyric,
+                    moods: song.moods,
+                    name: song.name,
+                    price: song.price,
+                    primary_genre: song.primary_genre,
+                    raiting: song.raiting,
+                    sex: song.sex,
+                  }}
+                  order_number={idx + 1}
+                  toggle_current_song={toggle_current_song}
+                />
+                {song.id === current_song_id && (
+                  <div ref={current_ref}>
+                    <CurrentSong
+                      song={filtered_songs.find(
+                        (song) => song.id === current_song_id
+                      )}
+                    />
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
-      )}
-      {filtered_songs.find((song) => song.id === current_song_id) && (
-        <CurrentSong
-          song={filtered_songs.find((song) => song.id === current_song_id)}
-        />
       )}
     </div>
   );
