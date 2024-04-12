@@ -11,15 +11,15 @@
 | --------------------------------------------------------------------------------------   | ------ |
 | CLIENT                                                                                   |        |
 | --------------------------------------------------------------------------------------   | ------ |
-| Make Чарт in the tab header uppercased                                                   |        |
-| Move the logo so it'll match the padding of the main content                             |        |
-| Process case when there're no songs (prcie should be 0 - 0; text insead of song list)    |        |
-| Change contacts link                                                                     |        |
-| Iterate lyric representation (scroll, position??)                                        |        |
-| Check current path underline bug in safari (underline doesn't go away)                   |        |
+| Make Чарт in the tab header uppercased                                                   | Done   |
+| Move the logo so it'll match the padding of the main content                             | Done   |
+| Process case when there're no songs (prcie should be 0 - 0; text insead of song list)    | Done   |
+| Change contacts link                                                                     | Done   |
+| Iterate lyric representation (scroll, position??)                                        | Done   |
+| Check current path underline bug in safari (underline doesn't go away)                   | Done   |
 | Impl audio caching                                                                       |        |
 | Fix strange audio player play/pause logic                                                |        |
-| Move audio player to Main Layout                                                         |        |
+| Move audio player to Main Layout                                                         | Done   |
 | --------------------------------------------------------------------------------------   | ------ |
 | ADMIN                                                                                    |        |
 | Handle case when admin tries to delete genre/mood referenced in songs table              |        |
