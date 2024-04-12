@@ -1,8 +1,12 @@
 @mixin active_link {
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 0.125rem;
-  text-underline-offset: 0.25rem;
+  display: none;
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.25rem;
+  width: 100%;
+  height: 0.125rem;
+  background-color: var(--accent);
 }
 
 .navbar {
@@ -15,7 +19,7 @@
 
   width: 100%;
 
-  padding: 2.375rem 1rem;
+  padding: 2.375rem;
 
   background-color: rgba($color: var(--primary_bg), $alpha: 0.8);
   backdrop-filter: blur(0.25rem);
@@ -37,6 +41,8 @@
 }
 
 .link {
+  position: relative;
+
   font-size: 0.875rem;
   text-decoration: none;
   letter-spacing: 0.05em;
@@ -47,13 +53,18 @@
     margin-right: 2em;
   }
 
-  &:hover {
-    @include active_link;
+  &::after {
+    @include active_link();
+  }
+
+  &:hover::after {
+    display: block;
   }
 }
 
-.active_link {
-  @include active_link;
+.active_link::after {
+  @include active_link();
+  display: block;
 }
 
 .theme_switch_container {
@@ -102,5 +113,15 @@
 
   .image_wrapper {
     margin-right: 1.75rem;
+  }
+}
+
+@media (max-width: 460px) {
+  .theme_switch_container {
+    &:hover {
+      .hover_text {
+        display: none;
+      }
+    }
   }
 }
