@@ -26,3 +26,13 @@
     }
   }
 }
+
+@media (max-width: 700px) {
+  .contacts_page {
+    padding-top: 0;
+  }
+
+  .content {
+    padding: 6.5rem 1rem;
+  }
+}
