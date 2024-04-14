@@ -44,6 +44,7 @@ const UploadStep3: FC<UploadStep3Props> = ({
           moods: [e.target.id],
         })
       );
+      set_popup_visibe("");
       return;
     }
 
@@ -54,6 +55,7 @@ const UploadStep3: FC<UploadStep3Props> = ({
           [name]: e.target.id,
         })
       );
+      set_popup_visibe("");
       return;
     }
 
