@@ -18,6 +18,7 @@
 | Iterate lyric representation (scroll, position??)                                        | Done   |
 | Check current path underline bug in safari (underline doesn't go away)                   | Done   |
 | Impl audio caching                                                                       |        |
+| Add loop button on small screens on audio player                                         |        |
 | Fix strange audio player play/pause logic                                                |        |
 | Move audio player to Main Layout                                                         | Done   |
 | --------------------------------------------------------------------------------------   | ------ |
@@ -30,6 +31,7 @@
 | Add prompt when deleting song                                                            |        |
 | Check input file type and impl corresponding logic                                       | Done   |
 | Use wasm rust transliterator version                                                     |        |
+| Close genres/moods window on genre/mood click                                            |        |
 | Clean user inputs                                                                        |        |
 | Text preview should be like in the client                                                |        |
 | Fix strange onDropOver behaviour                                                         |        |
