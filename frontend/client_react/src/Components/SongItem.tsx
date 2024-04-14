@@ -14,10 +14,11 @@ interface SongItemProps {
   song: ISong;
   order_number: number;
   toggle_current_song: (id: number) => void;
+  price_popup_visible_id: number;
+  toggle_price_popup_visible: (id: number) => void;
 }
 
 const SongItem: FC<SongItemProps> = (props) => {
-  const [popup_visible, set_popup_visible] = useState(false);
   const [is_small_screen, set_is_small_screen] = useState(
     window.innerWidth <= 378
   );
@@ -37,7 +38,7 @@ const SongItem: FC<SongItemProps> = (props) => {
       return;
     }
     e.stopPropagation();
-    set_popup_visible(!popup_visible);
+    props.toggle_price_popup_visible(props.song.id);
   }
 
   function handle_song_click(id: number) {
@@ -62,7 +63,7 @@ const SongItem: FC<SongItemProps> = (props) => {
 
   useEffect(() => {
     set_popup_width(popup_ref.current?.clientWidth);
-  }, [popup_ref, popup_visible]);
+  }, [popup_ref, props.price_popup_visible_id]);
 
   useEffect(() => {
     const handle_resize = () => {
@@ -128,7 +129,9 @@ const SongItem: FC<SongItemProps> = (props) => {
         <div
           ref={popup_ref}
           className={`${styles.price_pop_up} ${
-            popup_visible && is_small_screen && styles.price_pop_up_visible
+            props.price_popup_visible_id === props.song.id &&
+            is_small_screen &&
+            styles.price_pop_up_visible
           }`}
           style={{
             left: `calc((${Math.floor(

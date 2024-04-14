@@ -12,6 +12,7 @@ import { set_are_songs_fetching } from "../state/songs_slice";
 
 const SongsList: FC = () => {
   const [filtered_songs, set_filtered_songs] = useState<ISong[]>([]);
+  const [price_popup_visible_id, set_price_popup_visible_id] = useState(0);
   const current_ref = useRef<HTMLDivElement>(null);
 
   const songs = useSelector<RootState, ISong[]>((state) => state.songs.songs);
@@ -44,6 +45,10 @@ const SongsList: FC = () => {
 
   function toggle_current_song(id: number) {
     dispatch(set_current_song_id(id));
+  }
+
+  function toggle_price_popup(id: number) {
+    set_price_popup_visible_id(id);
   }
 
   useEffect(() => {
@@ -147,6 +152,8 @@ const SongsList: FC = () => {
                   }}
                   order_number={idx + 1}
                   toggle_current_song={toggle_current_song}
+                  price_popup_visible_id={price_popup_visible_id}
+                  toggle_price_popup_visible={toggle_price_popup}
                 />
                 {song.id === current_song_id && (
                   <div ref={current_ref}>
