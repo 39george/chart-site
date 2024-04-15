@@ -52,7 +52,7 @@ pub struct SubmitSong {
         min_length = 2,
         max_length = 30,
         pattern = r#"[^/()"<>\\{};:]*"#,
-        example = "Mixing"
+        example = "Some song"
     )]
     pub name: String,
     #[garde(skip)]
