@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::anyhow;
 use anyhow::Context;
 use axum::extract::{Path, Query};
@@ -27,6 +29,7 @@ pub fn protected_router() -> Router<AppState> {
     Router::new()
         .route("/upload_form", routing::get(upload_form))
         .route("/song", routing::post(submit_song))
+        .route("/sort_songs", routing::patch(sort_songs))
         .route("/song/:id", routing::delete(remove_song))
         .route("/song_meta/:id", routing::put(update_song_metadata))
         .route("/song_data/:id", routing::put(update_song_data))
@@ -45,7 +48,7 @@ pub fn protected_router() -> Router<AppState> {
     path = "/api/protected/song",
     request_body(
         content = SubmitSong,
-        content_type = "application/Json",
+        content_type = "application/json",
         example = json!({
             "name": "song_name",
             "price": "3000.0",
@@ -131,6 +134,55 @@ async fn submit_song(
         .await
         .context("Failed to commit pg transaction")?;
     Ok(StatusCode::CREATED)
+}
+
+/// Sort songs. Json body: song_id: song_rating
+#[utoipa::path(
+    patch,
+    path = "/api/protected/sort_songs",
+    request_body(
+        content = SubmitSong,
+        content_type = "application/json",
+        example = json!({
+            "1": 25,
+            "2": 10,
+            "3": 2,
+        }),
+    ),
+    responses(
+        (status = 200, description = "Song submitted successfully"),
+        (status = 403, response = ForbiddenResponse),
+        (status = 500, response = InternalErrorResponse)
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+)]
+#[tracing::instrument(name = "Submit new song", skip_all)]
+async fn sort_songs(
+    _auth_session: AuthSession,
+    State(state): State<AppState>,
+    Json(req): Json<HashMap<i32, i32>>,
+) -> Result<StatusCode, ResponseError> {
+    let mut db_client = state
+        .pg_pool
+        .get()
+        .await
+        .context("Failed to get connection from postgres pool")
+        .map_err(ResponseError::UnexpectedError)?;
+    let trans = db_client
+        .transaction()
+        .await
+        .context("Failed to get transaction from pg")?;
+    for (song_id, rating) in req {
+        admin_access::set_song_rating()
+            .bind(&trans, &rating, &song_id)
+            .await
+            .context("Failed to update song rating")?;
+    }
+
+    Ok(StatusCode::OK)
 }
 
 /// Update song meta information

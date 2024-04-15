@@ -77,3 +77,7 @@ VALUES (
 --! remove_moods_from_song
 DELETE FROM songs_moods
 WHERE songs_id = :song_id;
+
+--! set_song_rating
+UPDATE songs SET rating = :new_rating
+WHERE songs.id = :song_id;

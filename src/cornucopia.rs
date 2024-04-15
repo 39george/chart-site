@@ -53,7 +53,7 @@
 } }}#[allow(clippy :: all, clippy :: pedantic)] #[allow(unused_variables)]
 #[allow(unused_imports)] #[allow(dead_code)] pub mod queries
 { pub mod admin_access
-{ use futures::{{StreamExt, TryStreamExt}};use futures; use cornucopia_async::GenericClient;#[derive( Debug)] pub struct InsertNewSongGetIdParams < T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,T6 : cornucopia_async::StringSql,T7 : cornucopia_async::StringSql,> { pub name : T1,pub price : rust_decimal::Decimal,pub rating : Option<i32>,pub primary_genre : T2,pub secondary_genre : Option<T3>,pub sex : T4,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : T5,pub cover_obj_key : T6,pub audio_obj_key : T7,}#[derive( Debug)] pub struct UpdateSongMetadataParams < T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,> { pub name : T1,pub price : rust_decimal::Decimal,pub rating : Option<i32>,pub primary_genre : T2,pub secondary_genre : Option<T3>,pub sex : T4,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : T5,pub id : i32,}#[derive( Debug)] pub struct UpdateSongCoverParams < T1 : cornucopia_async::StringSql,> { pub cover_object_key : T1,pub id : i32,}#[derive( Debug)] pub struct UpdateSongAudioParams < T1 : cornucopia_async::StringSql,> { pub audio_object_key : T1,pub id : i32,}#[derive( Debug)] pub struct AddMoodToSongParams < T1 : cornucopia_async::StringSql,> { pub song_id : i32,pub mood : T1,}pub struct I32Query < 'a, C : GenericClient, T, const N : usize >
+{ use futures::{{StreamExt, TryStreamExt}};use futures; use cornucopia_async::GenericClient;#[derive( Debug)] pub struct InsertNewSongGetIdParams < T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,T6 : cornucopia_async::StringSql,T7 : cornucopia_async::StringSql,> { pub name : T1,pub price : rust_decimal::Decimal,pub rating : Option<i32>,pub primary_genre : T2,pub secondary_genre : Option<T3>,pub sex : T4,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : T5,pub cover_obj_key : T6,pub audio_obj_key : T7,}#[derive( Debug)] pub struct UpdateSongMetadataParams < T1 : cornucopia_async::StringSql,T2 : cornucopia_async::StringSql,T3 : cornucopia_async::StringSql,T4 : cornucopia_async::StringSql,T5 : cornucopia_async::StringSql,> { pub name : T1,pub price : rust_decimal::Decimal,pub rating : Option<i32>,pub primary_genre : T2,pub secondary_genre : Option<T3>,pub sex : T4,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : T5,pub id : i32,}#[derive( Debug)] pub struct UpdateSongCoverParams < T1 : cornucopia_async::StringSql,> { pub cover_object_key : T1,pub id : i32,}#[derive( Debug)] pub struct UpdateSongAudioParams < T1 : cornucopia_async::StringSql,> { pub audio_object_key : T1,pub id : i32,}#[derive( Debug)] pub struct AddMoodToSongParams < T1 : cornucopia_async::StringSql,> { pub song_id : i32,pub mood : T1,}#[derive(Clone,Copy, Debug)] pub struct SetSongRatingParams < > { pub new_rating : i32,pub song_id : i32,}pub struct I32Query < 'a, C : GenericClient, T, const N : usize >
 {
     client : & 'a  C, params :
     [& 'a (dyn postgres_types :: ToSql + Sync) ; N], stmt : & 'a mut cornucopia_async
@@ -393,7 +393,25 @@ song_id : & 'a i32,) -> Result < u64, tokio_postgres :: Error >
 {
     let stmt = self.0.prepare(client) .await ? ;
     client.execute(stmt, & [song_id,]) .await
-} }}pub mod open_access
+} }pub fn set_song_rating() -> SetSongRatingStmt
+{ SetSongRatingStmt(cornucopia_async :: private :: Stmt :: new("UPDATE songs SET rating = $1
+WHERE songs.id = $2")) } pub
+struct SetSongRatingStmt(cornucopia_async :: private :: Stmt) ; impl
+SetSongRatingStmt { pub async fn bind < 'a, C : GenericClient, >
+(& 'a mut self, client : & 'a  C,
+new_rating : & 'a i32,song_id : & 'a i32,) -> Result < u64, tokio_postgres :: Error >
+{
+    let stmt = self.0.prepare(client) .await ? ;
+    client.execute(stmt, & [new_rating,song_id,]) .await
+} }impl < 'a, C : GenericClient + Send + Sync, >
+cornucopia_async :: Params < 'a, SetSongRatingParams < >, std::pin::Pin<Box<dyn futures::Future<Output = Result <
+u64, tokio_postgres :: Error > > + Send + 'a>>, C > for SetSongRatingStmt
+{
+    fn
+    params(& 'a mut self, client : & 'a  C, params : & 'a
+    SetSongRatingParams < >) -> std::pin::Pin<Box<dyn futures::Future<Output = Result < u64, tokio_postgres ::
+    Error > > + Send + 'a>> { Box::pin(self.bind(client, & params.new_rating,& params.song_id,) ) }
+}}pub mod open_access
 { use futures::{{StreamExt, TryStreamExt}};use futures; use cornucopia_async::GenericClient;#[derive(serde::Serialize, Debug, Clone, PartialEq, )] pub struct FetchSongs
 { pub id : i32,pub created_at : time::OffsetDateTime,pub updated_at : time::OffsetDateTime,pub rating : Option<i32>,pub price : rust_decimal::Decimal,pub name : String,pub primary_genre : String,pub secondary_genre : Option<String>,pub cover_url : String,pub sex : String,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : String,pub moods : Vec<String>,}pub struct FetchSongsBorrowed < 'a >
 { pub id : i32,pub created_at : time::OffsetDateTime,pub updated_at : time::OffsetDateTime,pub rating : Option<i32>,pub price : rust_decimal::Decimal,pub name : &'a str,pub primary_genre : &'a str,pub secondary_genre : Option<&'a str>,pub cover_url : &'a str,pub sex : &'a str,pub tempo : i16,pub key : super::super::types::public::Musickey,pub duration : i16,pub lyric : &'a str,pub moods : cornucopia_async::ArrayIterator<'a, &'a str>,} impl < 'a > From < FetchSongsBorrowed <
