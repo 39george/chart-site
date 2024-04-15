@@ -80,7 +80,8 @@ async fn submit_song_success() {
         .build()
         .unwrap();
     assert_eq!(
-        app.create_admin_submit_song(&http_client, "Lalasong").await,
+        app.create_admin_submit_song(&http_client, "Фывафывафывафыва")
+            .await,
         201
     );
 
@@ -91,7 +92,7 @@ async fn submit_song_success() {
         .unwrap();
     let songs: Vec<FetchSongs> = response.json().await.unwrap();
     assert_eq!(songs.len(), 1);
-    assert_eq!(&songs[0].name, "Lalasong");
+    assert_eq!(&songs[0].name, "Фывафывафывафыва");
 }
 
 #[tokio::test]
