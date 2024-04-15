@@ -1,3 +1,4 @@
+use chart_site::cornucopia::queries::admin_access;
 use chart_site::domain::open::FetchSongs;
 use chart_site::{
     config::Settings,
@@ -237,4 +238,58 @@ async fn update_song_audio_success() {
         .await
         .unwrap();
     assert_eq!(audio_obj_key, obj_key);
+}
+
+#[tokio::test]
+async fn sort_songs_success() {
+    // Create app
+    let config = Settings::load_configuration().unwrap();
+    let app = TestApp::spawn_app(config).await;
+    let http_client = reqwest::Client::builder()
+        .cookie_store(true)
+        .build()
+        .unwrap();
+
+    // Fetch songs closure
+    let fetch_songs = || async {
+        http_client
+            .get(format!("{}/api/open/songs", &app.address))
+            .send()
+            .await
+            .unwrap()
+            .json::<Vec<FetchSongs>>()
+            .await
+            .unwrap()
+    };
+    let mut ratings = Vec::new();
+    for i in 0..10 {
+        let songname = format!("song-{i}");
+        // Create song
+        assert_eq!(
+            app.create_admin_submit_song(&http_client, &songname).await,
+            201
+        );
+        ratings.push((songname, i));
+    }
+    let songs = fetch_songs().await;
+    for song in songs {
+        let rating = ratings
+            .iter()
+            .find(|(name, _)| name.eq(&song.name))
+            .unwrap()
+            .1;
+        admin_access::set_song_rating()
+            .bind(&app.pg_client, &rating, &song.id)
+            .await
+            .unwrap();
+    }
+    let songs = fetch_songs().await;
+    for song in songs {
+        let rating = ratings
+            .iter()
+            .find(|(name, _)| name.eq(&song.name))
+            .unwrap()
+            .1;
+        assert_eq!(song.rating, Some(rating));
+    }
 }
