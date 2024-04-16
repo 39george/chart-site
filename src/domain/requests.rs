@@ -27,7 +27,7 @@ pub struct WordQuery {
 #[garde(transparent)]
 pub struct Lyric(
     #[garde(
-        length(min = MIN_LYRIC_LEN, max = MAX_LYRIC_LEN),
+        length(chars, min = MIN_LYRIC_LEN, max = MAX_LYRIC_LEN),
     )]
     /// Should contain no control characters
     #[schema(example = "Some lyrics", min_length = 1, max_length = 5000)]
@@ -44,7 +44,7 @@ impl AsRef<str> for Lyric {
 #[garde(allow_unvalidated)]
 pub struct SubmitSong {
     #[garde(
-        length(min = PRDCT_NAME_MIN_LEN, max = PRDCT_NAME_MAX_LEN),
+        length(chars, min = PRDCT_NAME_MIN_LEN, max = PRDCT_NAME_MAX_LEN),
         custom(forbidden_characters),
         custom(contains_no_control_characters)
     )]
@@ -64,14 +64,14 @@ pub struct SubmitSong {
     #[garde(skip)]
     pub rating: Option<i32>,
     #[garde(
-        length(min=GENRE_MIN_LEN, max=GENRE_MAX_LEN),
+        length(chars, min=GENRE_MIN_LEN, max=GENRE_MAX_LEN),
         custom(forbidden_characters),
         custom(contains_no_control_characters)
     )]
     #[schema(example = "pop", pattern = r#"[^/()"<>\\{};:]*"#)]
     pub primary_genre: String,
     #[garde(
-        length(min=GENRE_MIN_LEN, max=GENRE_MAX_LEN),
+        length(chars, min=GENRE_MIN_LEN, max=GENRE_MAX_LEN),
         inner(
             custom(forbidden_characters),
             custom(contains_no_control_characters)
@@ -94,7 +94,7 @@ pub struct SubmitSong {
     pub cover_object_key: Option<ObjectKey>,
     pub audio_object_key: Option<ObjectKey>,
     #[garde(inner(
-        length(min=MOOD_MIN_LEN, max=MOOD_MAX_LEN),
+        length(chars, min=MOOD_MIN_LEN, max=MOOD_MAX_LEN),
         custom(forbidden_characters),
         custom(contains_no_control_characters)
     ))]
@@ -107,7 +107,7 @@ pub struct UploadFileRequest {
     #[garde(skip)]
     pub media_type: mediatype::MediaTypeBuf,
     #[garde(
-        length(min = MIN_FILENAME_LEN, max = MAX_FILENAME_LEN),
+        length(chars, min = MIN_FILENAME_LEN, max = MAX_FILENAME_LEN),
         custom(forbidden_characters),
         custom(contains_no_control_characters)
     )]
