@@ -18,7 +18,7 @@
 | Iterate lyric representation (scroll, position??)                                        | Done   |
 | Check current path underline bug in safari (underline doesn't go away)                   | Done   |
 | Impl audio caching                                                                       |        |
-| Add loop button on small screens on audio player                                         |        |
+| Add loop button on small screens on audio player                                         | Done   |
 | Fix strange audio player play/pause logic                                                |        |
 | Move audio player to Main Layout                                                         | Done   |
 | --------------------------------------------------------------------------------------   | ------ |
