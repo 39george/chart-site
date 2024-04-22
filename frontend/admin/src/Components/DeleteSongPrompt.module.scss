@@ -1,0 +1,40 @@
+@import "../variables.scss";
+@import "../genreal_styles.scss";
+
+.prompt_bg {
+  @include modal_window_bg();
+}
+
+.content {
+  @include modal_window_content();
+
+  max-width: 30rem;
+  padding: 1.5rem 2rem;
+}
+
+.header {
+  width: fit-content;
+  margin: 0 auto;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.info {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+}
+
+.loader_small {
+  @include loader_small;
+  margin-left: 0;
+}
+
+.delete_button {
+  margin-left: initial;
+}
+
+@media (max-width: 450px) {
+  .content {
+    padding: 1.5rem 1rem;
+  }
+}
