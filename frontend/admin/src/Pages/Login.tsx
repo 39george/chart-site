@@ -11,8 +11,9 @@ const Login: FC = () => {
     password: "",
   });
   const [err_msg, set_err_msg] = useState("");
+  const [logging, set_logging] = useState(false);
   const dispatch = useDispatch();
-  const { fetch_data: login } = useAxios();
+  const { error_data: login_error, fetch_data: login } = useAxios();
 
   function handle_input_change(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -25,6 +26,8 @@ const Login: FC = () => {
 
   async function handle_submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    set_err_msg("");
+    set_logging(true);
     const data = JSON.stringify(form_data);
 
     const response = await login({
@@ -38,8 +41,13 @@ const Login: FC = () => {
 
     if (response?.status === 200) {
       dispatch(set_permissions(true));
+      set_logging(false);
+    } else if (response?.status === 500) {
+      set_err_msg(login_error);
+      set_logging(false);
     } else {
       set_err_msg("Неверный логин или пароль");
+      set_logging(false);
     }
   }
 
@@ -91,8 +99,13 @@ const Login: FC = () => {
           <button
             type="submit"
             className={styles.submit_button}
+            disabled={logging}
           >
-            Авторизоваться
+            {logging ? (
+              <div className={styles.loader_small}></div>
+            ) : (
+              "Авторизоваться"
+            )}
           </button>
         </form>
         {err_msg && <div className={styles.err_msg}>{err_msg}</div>}

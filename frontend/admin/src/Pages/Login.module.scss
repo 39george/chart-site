@@ -54,6 +54,12 @@
   }
 }
 
+.loader_small {
+  @include loader_small;
+
+  margin: 0;
+}
+
 .err_msg {
   width: fit-content;
   margin: 1rem auto 0;
