@@ -4,7 +4,7 @@ import { FaXmark } from "react-icons/fa6";
 import { TiPlus } from "react-icons/ti";
 import { FiTrash2 } from "react-icons/fi";
 import useAxios from "../Hooks/APIRequests";
-import { API_URL } from "../config";
+import { API_URL, FORBIDDEN_CHARS } from "../config";
 import {
   set_genres_changed,
   set_moods_changed,
@@ -28,6 +28,7 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
     item: "",
   });
   const [input_empty, set_input_empty] = useState(false);
+  const [forbidden_chars_err, set_forbidden_chars_err] = useState("");
   const { fetch_data: delete_items } = useAxios();
   const { fetch_data: add_items } = useAxios();
   const dispatch = useDispatch();
@@ -51,6 +52,15 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
       set_input_empty(true);
     } else {
       set_input_empty(false);
+    }
+
+    if (FORBIDDEN_CHARS.test(value)) {
+      set_forbidden_chars_err(
+        `Пожалуйста, не используйте символы /()"<>\{};: в полях ввода`
+      );
+      return;
+    } else {
+      set_forbidden_chars_err("");
     }
 
     set_new_item({
@@ -113,6 +123,7 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
         dispatch(set_moods_changed(true));
       }
 
+      set_new_item({ item: "" });
       set_add_modal_visible(false);
     }
   }
@@ -141,6 +152,7 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
               type="text"
               id="new"
               name={kind}
+              value={new_item.item}
               autoFocus
               autoComplete="off"
               className={styles.input_field}
@@ -148,6 +160,9 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
             />
             {input_empty && (
               <p className={styles.input_empty}>Поле не должно быть пустым</p>
+            )}
+            {forbidden_chars_err && (
+              <div className={styles.err_message}>{forbidden_chars_err}</div>
             )}
           </div>
         ) : (

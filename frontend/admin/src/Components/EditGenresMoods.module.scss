@@ -201,6 +201,10 @@ input[type="checkbox"] {
   color: $warning;
 }
 
+.err_message {
+  margin-left: auto;
+}
+
 @media (max-height: 950px) {
   .list {
     max-height: 30rem;
