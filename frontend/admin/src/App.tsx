@@ -40,8 +40,9 @@ function App() {
   const dispatch = useDispatch();
   const [genres_list, set_genres_list] = useState<string[]>([]);
   const [moods_list, set_moods_list] = useState<string[]>([]);
-  const { fetch_data: fetch_genres } = useAxios();
-  const { fetch_data: fetch_moods } = useAxios();
+  const { error_data: fetch_genres_error, fetch_data: fetch_genres } =
+    useAxios();
+  const { error_data: fetch_moods_error, fetch_data: fetch_moods } = useAxios();
   const { fetch_data: fetch_healthcheck } = useAxios();
 
   async function get_healthcheck() {
@@ -142,6 +143,8 @@ function App() {
               <MainPage
                 genres_list={genres_list}
                 moods_list={moods_list}
+                fetch_genres_error={fetch_genres_error}
+                fetch_moods_error={fetch_moods_error}
               />
             }
           />

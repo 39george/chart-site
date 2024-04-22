@@ -15,12 +15,16 @@ interface EditGenresMoodsProps {
   kind: "genres" | "moods";
   items_list: string[];
   close_window: () => void;
+  fetch_genres_error: string;
+  fetch_moods_error: string;
 }
 
 const EditGenresMoods: FC<EditGenresMoodsProps> = ({
   kind,
   items_list,
   close_window,
+  fetch_genres_error,
+  fetch_moods_error,
 }) => {
   const [checked_items, set_checked_items] = useState<string[]>([]);
   const [add_modal_visible, set_add_modal_visible] = useState(false);
@@ -137,117 +141,138 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
         >
           <FaXmark className={styles.close_icon} />
         </div>
-        <p className={styles.header}>
-          Редактирование {kind === "genres" ? "жанров" : "настроений"}
-        </p>
-        {add_modal_visible ? (
-          <div className={styles.add_modal}>
-            <label
-              htmlFor="new"
-              className={styles.label}
+        {fetch_genres_error || fetch_moods_error ? (
+          <div>
+            <p className={styles.header}>Ошибка</p>
+            <p
+              style={{
+                marginTop: "2rem",
+                marginBottom: "1.25rem",
+                fontSize: ".875rem",
+              }}
             >
-              Название {kind === "genres" ? "жанра" : "настроения"}
-            </label>
-            <input
-              type="text"
-              id="new"
-              name={kind}
-              value={new_item.item}
-              autoFocus
-              autoComplete="off"
-              className={styles.input_field}
-              onChange={handle_text_input_change}
-            />
-            {input_empty && (
-              <p className={styles.input_empty}>Поле не должно быть пустым</p>
-            )}
-            {forbidden_chars_err && (
-              <div className={styles.err_message}>{forbidden_chars_err}</div>
-            )}
+              {kind === "genres" ? fetch_genres_error : fetch_moods_error}
+            </p>
           </div>
         ) : (
-          <div className={styles.list_and_options}>
-            <ul className={styles.list}>
-              {items_list.map((item, idx) => {
-                return (
-                  <li
-                    key={idx}
-                    className={styles.input_options}
-                  >
-                    <input
-                      type="checkbox"
-                      id={item}
-                      name={kind === "genres" ? "primary_genre" : "moods"}
-                      checked={checked_items.includes(item)}
-                      onChange={handle_checkbox_input_change}
-                    />
-                    <span className={styles.custom_checkbox}></span>
-                    <label
-                      htmlFor={item}
-                      className={styles.input_option}
-                    >
-                      &nbsp;&nbsp;{item}
-                    </label>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className={styles.check_options}>
-              <p
-                className={styles.check_all}
-                onClick={() => set_checked_items([...items_list])}
-              >
-                Выбрать все
-              </p>
-              {checked_items.length !== 0 && (
-                <p
-                  className={styles.uncheck_all}
-                  onClick={() => set_checked_items([])}
+          <div>
+            <p className={styles.header}>
+              Редактирование {kind === "genres" ? "жанров" : "настроений"}
+            </p>
+            {add_modal_visible ? (
+              <div className={styles.add_modal}>
+                <label
+                  htmlFor="new"
+                  className={styles.label}
                 >
-                  Сбросить
-                </p>
+                  Название {kind === "genres" ? "жанра" : "настроения"}
+                </label>
+                <input
+                  type="text"
+                  id="new"
+                  name={kind}
+                  value={new_item.item}
+                  autoFocus
+                  autoComplete="off"
+                  className={styles.input_field}
+                  onChange={handle_text_input_change}
+                />
+                {input_empty && (
+                  <p className={styles.input_empty}>
+                    Поле не должно быть пустым
+                  </p>
+                )}
+                {forbidden_chars_err && (
+                  <div className={styles.err_message}>
+                    {forbidden_chars_err}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className={styles.list_and_options}>
+                <ul className={styles.list}>
+                  {items_list.map((item, idx) => {
+                    return (
+                      <li
+                        key={idx}
+                        className={styles.input_options}
+                      >
+                        <input
+                          type="checkbox"
+                          id={item}
+                          name={kind === "genres" ? "primary_genre" : "moods"}
+                          checked={checked_items.includes(item)}
+                          onChange={handle_checkbox_input_change}
+                        />
+                        <span className={styles.custom_checkbox}></span>
+                        <label
+                          htmlFor={item}
+                          className={styles.input_option}
+                        >
+                          &nbsp;&nbsp;{item}
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div className={styles.check_options}>
+                  <p
+                    className={styles.check_all}
+                    onClick={() => set_checked_items([...items_list])}
+                  >
+                    Выбрать все
+                  </p>
+                  {checked_items.length !== 0 && (
+                    <p
+                      className={styles.uncheck_all}
+                      onClick={() => set_checked_items([])}
+                    >
+                      Сбросить
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            <div className={styles.action_buttons}>
+              {!add_modal_visible && checked_items.length === 0 && (
+                <div
+                  className={`${styles.action_button} ${styles.add_button}`}
+                  onClick={handle_show_modal}
+                >
+                  <p>Добавить {kind === "genres" ? "жанры" : "настроения"}</p>
+                  <TiPlus className={styles.action_icon} />
+                </div>
+              )}
+              {add_modal_visible && (
+                <>
+                  <div
+                    className={`${styles.action_button} ${styles.confirm_button}`}
+                    onClick={try_to_add_item}
+                  >
+                    <p>Добавить</p>
+                    <TiPlus className={styles.action_icon} />
+                  </div>
+                  <div
+                    className={`${styles.action_button} ${styles.cancel_button}`}
+                    onClick={handle_cancel_click}
+                  >
+                    <p>Отмена</p>
+                    <FaXmark className={styles.action_icon} />
+                  </div>
+                </>
+              )}
+              {checked_items.length !== 0 && (
+                <div
+                  className={`${styles.action_button} ${styles.delete_button}`}
+                  onClick={try_to_delete}
+                >
+                  <p>Удалить {kind === "genres" ? "жанры" : "настроения"}</p>
+                  <FiTrash2 className={styles.action_icon} />
+                </div>
               )}
             </div>
           </div>
         )}
-        <div className={styles.action_buttons}>
-          {!add_modal_visible && checked_items.length === 0 && (
-            <div
-              className={`${styles.action_button} ${styles.add_button}`}
-              onClick={handle_show_modal}
-            >
-              <p>Добавить {kind === "genres" ? "жанры" : "настроения"}</p>
-              <TiPlus className={styles.action_icon} />
-            </div>
-          )}
-          {add_modal_visible && (
-            <>
-              <div
-                className={`${styles.action_button} ${styles.confirm_button}`}
-                onClick={try_to_add_item}
-              >
-                <p>Добавить</p>
-                <TiPlus className={styles.action_icon} />
-              </div>
-              <div
-                className={`${styles.action_button} ${styles.cancel_button}`}
-                onClick={handle_cancel_click}
-              >
-                <p>Отмена</p>
-                <FaXmark className={styles.action_icon} />
-              </div>
-            </>
-          )}
-          {checked_items.length !== 0 && (
-            <div
-              className={`${styles.action_button} ${styles.delete_button}`}
-              onClick={try_to_delete}
-            >
-              <p>Удалить {kind === "genres" ? "жанры" : "настроения"}</p>
-              <FiTrash2 className={styles.action_icon} />
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

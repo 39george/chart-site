@@ -9,9 +9,16 @@ import EditGenresMoods from "../Components/EditGenresMoods";
 interface MainPagePorps {
   genres_list: string[];
   moods_list: string[];
+  fetch_genres_error: string;
+  fetch_moods_error: string;
 }
 
-const MainPage: FC<MainPagePorps> = ({ genres_list, moods_list }) => {
+const MainPage: FC<MainPagePorps> = ({
+  genres_list,
+  moods_list,
+  fetch_genres_error,
+  fetch_moods_error,
+}) => {
   const [edit_window_visible, set_edit_window_visible] = useState<
     "genres" | "moods" | ""
   >("");
@@ -29,6 +36,8 @@ const MainPage: FC<MainPagePorps> = ({ genres_list, moods_list }) => {
               edit_window_visible === "genres" ? genres_list : moods_list
             }
             close_window={handle_close_edit_window}
+            fetch_genres_error={fetch_genres_error}
+            fetch_moods_error={fetch_moods_error}
           />
         )}
         <div className={styles.header}>
