@@ -26,18 +26,20 @@ const useAxios = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          //TODO Process all the error cases
           switch (error.response.status) {
             case 400:
               console.error("Bad request:", error.response);
+              break;
+            case 401:
+              console.error("Unathorized: ", error.response);
               set_error_data(
-                `Error status: ${error.response.status}, Error data: ${error.response.data}, Error message: ${error.message}`
+                "Запрос запрещен. Пожалуйста, авторизуйтесь и попробуйте еще раз"
               );
               break;
             case 403:
               console.error("Forbidden:", error.response);
               set_error_data(
-                `Error status: ${error.response.status}, Error data: ${error.response.data}, Error message: ${error.message}`
+                "Запрос запрещен. У вас нет прав для выполнения данного запроса"
               );
               break;
             case 404:
@@ -46,8 +48,17 @@ const useAxios = () => {
                 error.config?.url,
                 error.response
               );
+              break;
+            case 415:
+              console.error("Unsupported media type: ", error.response);
+              break;
+            case 422:
+              console.error(
+                "Trying to delete data used somewhere: ",
+                error.response
+              );
               set_error_data(
-                `Error status: ${error.response.status}, Error data: ${error.response.data}, Error message: ${error.message}`
+                "Вы пытаетесь удалить данные, которые используются в загруженных песнях. Пожалуйста, сначала поменяйте данные в песне или удалите её."
               );
               break;
             case 500:
@@ -57,7 +68,7 @@ const useAxios = () => {
               } else {
                 console.error("Server error:", error.response);
                 set_error_data(
-                  `Error status: ${error.response.status}, Error data: ${error.response.data}, Error message: ${error.message}`
+                  "На нашем сервере произошла ошибка. Мы делаем всё возможное, чтобы её исправить. Пожалуйста, повторите ваш запрос позднее"
                 );
               }
               break;
@@ -76,9 +87,9 @@ const useAxios = () => {
             await wait(RETRY_DELAY_MS);
             fetch_data(config, attempts + 1);
           } else {
-            console.error(
-              "Сервер не отвечает, пожалуйста, обновите страницу и попробуйте еще раз",
-              error.message
+            console.error("Server is not responding: ", error.message);
+            set_error_data(
+              "Сервер не отвечает, пожалуйста, обновите страницу и попробуйте еще раз"
             );
           }
         } else {
