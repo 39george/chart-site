@@ -28,14 +28,14 @@
 | Remove rating system from the user, implement dragging that will change the song's order |        |
 | Add forbidden char check on genres/moods creation and media uploading                    | Done   |
 | Update 'edit options' button appearance logic (one button at a time)                     | Done   |
-| Add prompt when deleting song                                                            |        |
+| Add prompt when deleting song                                                            | Done   |
 | Check input file type and impl corresponding logic                                       | Done   |
 | Use wasm rust transliterator version                                                     |        |
-| Close genres/moods window on genre/mood click                                            |        |
+| Close genres/moods window on genre/mood click                                            | Done   |
 | Clean user inputs                                                                        |        |
 | Text preview should be like in the client                                                |        |
 | Fix strange onDropOver behaviour                                                         |        |
 | Handle multiple files drop                                                               |        |
 | Process errors                                                                           |        |
-| Refactor styles to make buttons (maybe other) reusable                                   |        |
+| Refactor styles to make buttons (maybe other) reusable                                   | Done   |
 | Add propmpt on return from upload form (when song isn't uploaded yet)                    |        |
