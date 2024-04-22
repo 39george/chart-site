@@ -7,6 +7,12 @@
   margin-top: 3.5rem;
 }
 
+.loader_small {
+  @include loader_small;
+  margin-top: 3.5rem;
+  margin-left: 0;
+}
+
 .songs_list {
   width: 100%;
 }
