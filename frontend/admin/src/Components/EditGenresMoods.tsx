@@ -213,7 +213,7 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
         <div className={styles.action_buttons}>
           {!add_modal_visible && checked_items.length === 0 && (
             <div
-              className={`${styles.button} ${styles.add_button}`}
+              className={`${styles.action_button} ${styles.add_button}`}
               onClick={handle_show_modal}
             >
               <p>Добавить {kind === "genres" ? "жанры" : "настроения"}</p>
@@ -223,14 +223,14 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
           {add_modal_visible && (
             <>
               <div
-                className={`${styles.button} ${styles.confirm_button}`}
+                className={`${styles.action_button} ${styles.confirm_button}`}
                 onClick={try_to_add_item}
               >
                 <p>Добавить</p>
                 <TiPlus className={styles.action_icon} />
               </div>
               <div
-                className={`${styles.button} ${styles.cancel_button}`}
+                className={`${styles.action_button} ${styles.cancel_button}`}
                 onClick={handle_cancel_click}
               >
                 <p>Отмена</p>
@@ -240,7 +240,7 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
           )}
           {checked_items.length !== 0 && (
             <div
-              className={`${styles.button} ${styles.delete_button}`}
+              className={`${styles.action_button} ${styles.delete_button}`}
               onClick={try_to_delete}
             >
               <p>Удалить {kind === "genres" ? "жанры" : "настроения"}</p>
