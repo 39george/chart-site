@@ -111,6 +111,64 @@
   background-color: $main_dark;
 }
 
+// ───── Action buttons ───────────────────────────────────────────────────── //
+
+.action_buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.action_button {
+  display: flex;
+  align-items: center;
+
+  padding: 0.75rem;
+
+  font-size: 0.75rem;
+
+  border-radius: 2rem;
+  border: 1px solid $light_gray;
+  color: $light_gray;
+
+  transition: 0.15s ease-out;
+  cursor: pointer;
+
+  &:not(:last-child) {
+    margin-right: 1rem;
+  }
+}
+
+.add_button:hover {
+  border: 1px solid $accent_cyan;
+  color: $accent_cyan;
+}
+
+.delete_button {
+  margin-left: auto;
+  &:hover {
+    border: 1px solid $warning;
+    color: $warning;
+  }
+}
+
+.confirm_button:hover {
+  border: 1px solid $accent_cyan;
+  color: $accent_cyan;
+}
+
+.cancel_button:hover {
+  border: 1px solid $main_bright;
+  color: $main_bright;
+}
+
+.action_icon {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
 // ───── Loaders ──────────────────────────────────────────────────────────── //
 
 @keyframes spin {
