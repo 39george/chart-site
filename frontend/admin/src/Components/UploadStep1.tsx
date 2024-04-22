@@ -117,7 +117,6 @@ const UploadStep1: FC = () => {
       },
     },
   });
-
   const audio_input_ref = useRef<HTMLInputElement>(null);
   const img_input_ref = useRef<HTMLInputElement>(null);
 
