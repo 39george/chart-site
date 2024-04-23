@@ -11,6 +11,7 @@ interface MainPagePorps {
   moods_list: string[];
   fetch_genres_error: string;
   fetch_moods_error: string;
+  genres_moods_fetching: boolean;
 }
 
 const MainPage: FC<MainPagePorps> = ({
@@ -18,6 +19,7 @@ const MainPage: FC<MainPagePorps> = ({
   moods_list,
   fetch_genres_error,
   fetch_moods_error,
+  genres_moods_fetching,
 }) => {
   const [edit_window_visible, set_edit_window_visible] = useState<
     "genres" | "moods" | ""
@@ -38,6 +40,7 @@ const MainPage: FC<MainPagePorps> = ({
             close_window={handle_close_edit_window}
             fetch_genres_error={fetch_genres_error}
             fetch_moods_error={fetch_moods_error}
+            genres_moods_fetching={genres_moods_fetching}
           />
         )}
         <div className={styles.header}>
