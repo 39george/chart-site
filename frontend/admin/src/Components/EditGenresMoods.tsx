@@ -204,11 +204,11 @@ const EditGenresMoods: FC<EditGenresMoodsProps> = ({
                           checked={checked_items.includes(item)}
                           onChange={handle_checkbox_input_change}
                         />
-                        <span className={styles.custom_checkbox}></span>
                         <label
                           htmlFor={item}
                           className={styles.input_option}
                         >
+                          <span className={styles.custom_checkbox}></span>
                           &nbsp;&nbsp;{item}
                         </label>
                       </li>
