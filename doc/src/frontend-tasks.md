@@ -20,10 +20,11 @@
 | Impl audio caching                                                                       |        |
 | Add loop button on small screens on audio player                                         | Done   |
 | Fix strange audio player play/pause logic                                                |        |
+| Play next song when current is over                                                      |        |
 | Move audio player to Main Layout                                                         | Done   |
 | --------------------------------------------------------------------------------------   | ------ |
 | ADMIN                                                                                    |        |
-| Handle case when admin tries to delete genre/mood referenced in songs table              |        |
+| Handle case when admin tries to delete genre/mood referenced in songs table              | Done   |
 | Implement editing songs                                                                  |        |
 | Remove rating system from the user, implement dragging that will change the song's order |        |
 | Add forbidden char check on genres/moods creation and media uploading                    | Done   |
@@ -39,3 +40,4 @@
 | Process errors                                                                           |        |
 | Refactor styles to make buttons (maybe other) reusable                                   | Done   |
 | Add propmpt on return from upload form (when song isn't uploaded yet)                    |        |
+| Fix custom checkbox click in song upload                                                 |        |
