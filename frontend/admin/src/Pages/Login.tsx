@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import styles from "./Login.module.scss";
-import { FC, FormEvent, useState } from "react";
+import { FC, FormEvent, useEffect, useState } from "react";
 import useAxios from "../Hooks/APIRequests";
 import { API_URL } from "../config";
 import { set_permissions } from "../state/permissions_slice";
@@ -13,7 +13,13 @@ const Login: FC = () => {
   const [err_msg, set_err_msg] = useState("");
   const [logging, set_logging] = useState(false);
   const dispatch = useDispatch();
-  const { error_data: login_error, fetch_data: login } = useAxios();
+  const {
+    error_data: login_error,
+    set_error_data: set_login_error,
+    response_status: login_error_response_status,
+    set_response_status: set_login_error_response_status,
+    fetch_data: login,
+  } = useAxios();
 
   function handle_input_change(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -42,14 +48,32 @@ const Login: FC = () => {
     if (response?.status === 200) {
       dispatch(set_permissions(true));
       set_logging(false);
-    } else if (response?.status === 500) {
-      set_err_msg(login_error);
-      set_logging(false);
-    } else {
-      set_err_msg("Неверный логин или пароль");
-      set_logging(false);
     }
   }
+
+  // Handle login errors
+  useEffect(() => {
+    if (
+      login_error_response_status === 401 ||
+      login_error_response_status === 400
+    ) {
+      set_err_msg("Неверный логин или пароль");
+    }
+    if (login_error_response_status === 500) {
+      set_err_msg(login_error);
+    }
+    set_logging(false);
+    set_login_error_response_status(0);
+    set_login_error("");
+  }, [login_error_response_status]);
+
+  useEffect(() => {
+    if (!login_error_response_status && login_error) {
+      set_err_msg(login_error);
+      set_logging(false);
+      set_login_error("");
+    }
+  }, [login_error, login_error_response_status]);
 
   return (
     <div className={styles.login_window}>
