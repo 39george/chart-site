@@ -13,10 +13,7 @@
 }
 
 .header {
-  width: fit-content;
-  margin: 0 auto;
-  font-size: 1.125rem;
-  font-weight: 600;
+  @include modal_window_header;
 }
 
 .info {
