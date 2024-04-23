@@ -111,6 +111,14 @@
   background-color: $main_dark;
 }
 
+@mixin modal_window_header() {
+  width: fit-content;
+  margin: 0 auto;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
 // ───── Action buttons ───────────────────────────────────────────────────── //
 
 .action_buttons {
@@ -118,7 +126,7 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  margin-top: 2rem;
+  margin-top: 3rem;
 }
 
 .action_button {
@@ -133,7 +141,7 @@
   border: 1px solid $light_gray;
   color: $light_gray;
 
-  transition: 0.15s ease-out;
+  transition: border 0.15s ease-out, color 0.15s ease-out;
   cursor: pointer;
 
   &:not(:last-child) {
