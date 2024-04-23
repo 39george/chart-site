@@ -25,10 +25,7 @@
 }
 
 .header {
-  width: fit-content;
-  margin: 0 auto;
-  font-size: 1.125rem;
-  font-weight: 600;
+  @include modal_window_header;
 }
 
 .add_modal {
@@ -156,6 +153,11 @@ input[type="checkbox"] {
 
 .err_message {
   margin-left: auto;
+}
+
+.loader_small {
+  @include loader_small;
+  margin: 0 auto;
 }
 
 @media (max-height: 950px) {
