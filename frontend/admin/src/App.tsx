@@ -206,7 +206,7 @@ function App() {
                 страница не найдена
               </div>
               <Link
-                to="/admin"
+                to="/"
                 style={{
                   marginTop: "2rem",
                   color: "white",
