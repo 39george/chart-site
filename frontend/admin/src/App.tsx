@@ -40,6 +40,7 @@ function App() {
   const dispatch = useDispatch();
   const [genres_list, set_genres_list] = useState<string[]>([]);
   const [moods_list, set_moods_list] = useState<string[]>([]);
+  const [genres_moods_fetching, set_genres_moods_fetching] = useState(false);
   const { error_data: fetch_genres_error, fetch_data: fetch_genres } =
     useAxios();
   const { error_data: fetch_moods_error, fetch_data: fetch_moods } = useAxios();
@@ -60,6 +61,8 @@ function App() {
   }
 
   async function get_genres_moods() {
+    set_genres_moods_fetching(true);
+
     try {
       const [genres, moods] = await Promise.all([
         get_genres_list(),
@@ -70,6 +73,8 @@ function App() {
     } catch (err) {
       console.error(err);
     }
+
+    set_genres_moods_fetching(false);
   }
 
   async function get_genres_list() {
@@ -103,15 +108,19 @@ function App() {
   // Call Genres or Moods lists if they were changed
   useEffect(() => {
     async function refetch_genres() {
+      set_genres_moods_fetching(true);
       const response = await get_genres_list();
       dispatch(set_genres_changed(false));
       set_genres_list(response);
+      set_genres_moods_fetching(false);
     }
 
     async function refetch_moods() {
+      set_genres_moods_fetching(true);
       const response = await get_moods_list();
       dispatch(set_moods_changed(false));
       set_moods_list(response);
+      set_genres_moods_fetching(false);
     }
 
     if (genres_changed) {
@@ -145,6 +154,7 @@ function App() {
                 moods_list={moods_list}
                 fetch_genres_error={fetch_genres_error}
                 fetch_moods_error={fetch_moods_error}
+                genres_moods_fetching={genres_moods_fetching}
               />
             }
           />
