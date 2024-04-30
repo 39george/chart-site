@@ -13,6 +13,6 @@
 | Change `created_at` and `updated_at` data format                                             | Done                    |
 | When song's name is >= 16 cyrillic sumbols throws an error `name: length is greater than 30` | Done                    |
 | Implement song sorting, create method to get list of songs from frontend                     | Done                    |
-| Check redundance status code 401 of login endpoint                                           |                         |
-| Upload new backend to production                                                             |                         |
+| Check redundance status code 401 of login endpoint                                           | Done                    |
+| Upload new backend to production                                                             | Done                    |
 | Implement cookie dark/white theme storing                                                    |                         |
