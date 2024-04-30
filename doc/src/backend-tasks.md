@@ -16,3 +16,4 @@
 | Check redundance status code 401 of login endpoint                                           | Done                    |
 | Upload new backend to production                                                             | Done                    |
 | Implement cookie dark/white theme storing                                                    |                         |
+| Implement cookie authentication renewal                                                      |                         |
