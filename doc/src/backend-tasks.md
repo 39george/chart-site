@@ -15,5 +15,5 @@
 | Implement song sorting, create method to get list of songs from frontend                     | Done                    |
 | Check redundance status code 401 of login endpoint                                           | Done                    |
 | Upload new backend to production                                                             | Done                    |
-| Implement cookie dark/white theme storing                                                    |                         |
+| Implement cookie dark/white theme storing                                                    | Done                    |
 | Implement cookie authentication renewal                                                      |                         |
