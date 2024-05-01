@@ -11,7 +11,7 @@ use crate::startup::api_doc::InternalErrorResponse;
 
 use super::ResponseError;
 
-#[derive(Deserialize, Serialize, ToResponse, ToSchema)]
+#[derive(Debug, PartialEq, Deserialize, Serialize, ToResponse, ToSchema)]
 #[response(
     description = "Current theme value",
     content_type = "application/json",
