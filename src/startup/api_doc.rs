@@ -13,7 +13,6 @@ use utoipa::{
     Modify, OpenApi, ToResponse, ToSchema,
 };
 
-use crate::domain::requests::UploadFileRequest;
 use crate::domain::{music_parameters::Sex, requests::Lyric};
 use crate::domain::{open::FetchSongs, requests::SubmitSong};
 use crate::{
@@ -21,6 +20,7 @@ use crate::{
     object_storage::presigned_post_form::PresignedPostData,
     routes::development::InputWithFiles,
 };
+use crate::{domain::requests::UploadFileRequest, routes::session::ThemeValue};
 
 // ───── ErrorResponses ───────────────────────────────────────────────────── //
 
@@ -150,6 +150,8 @@ impl Modify for ServerAddon {
         crate::auth::login::post::login,
         crate::auth::login::get::logout,
         crate::routes::development::upload_file,
+        crate::routes::session::get_theme,
+        crate::routes::session::set_theme,
     ),
     components(
         schemas(
@@ -177,11 +179,13 @@ impl Modify for ServerAddon {
             NotFoundResponse,
             ConflictErrorResponse,
             UnsupportedMediaTypeErrorResponse,
+
             // Other responses
             crate::object_storage::presigned_post_form::PresignedPostData,
             FetchSongs,
             Permission,
             PresignedPostData,
+            ThemeValue,
         )
     ),
     modifiers(&ServerAddon),

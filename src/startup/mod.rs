@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::extract::ConnectInfo;
+use axum::handler::Handler;
 use axum::middleware::AddExtension;
 use axum::serve::Serve;
 use axum::{routing, Router};
@@ -15,12 +16,14 @@ use secrecy::ExposeSecret;
 use time::UtcOffset;
 use tokio::net::TcpListener;
 use tower_http::trace::TraceLayer;
+use tower_sessions::Session;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::auth;
 use crate::config::{DatabaseSettings, RedisSettings, Settings};
 use crate::object_storage::ObjectStorage;
+use crate::routes::session;
 use crate::routes::{
     development, open::open_router, protected::protected_router,
 };
@@ -162,7 +165,8 @@ impl Application {
         // service which will provide the auth session as a request extension.
         let backend = crate::auth::users::Backend::new(app_state.clone());
         let auth_service =
-            AuthManagerLayerBuilder::new(backend, session_layer).build();
+            AuthManagerLayerBuilder::new(backend, session_layer.clone())
+                .build();
 
         #[rustfmt::skip]
         let mut app = Router::new()
@@ -172,6 +176,7 @@ impl Application {
             .merge(auth::login::login_router(app_state.clone()))
             .layer(crate::middleware::map_response::BadRequestIntoJsonLayer) // 2
             .layer(auth_service) // 1
+            .nest("/api/session", session::router(session_layer))
             .route("/api/healthcheck", routing::get(|| async { StatusCode::OK }));
 
         app = setup_test_tracing(app);

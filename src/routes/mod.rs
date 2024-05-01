@@ -18,6 +18,7 @@ use crate::types::data_size::DataSizes;
 pub mod development;
 pub mod open;
 pub mod protected;
+pub mod session;
 
 // ───── Types ────────────────────────────────────────────────────────────── //
 
