@@ -22,6 +22,7 @@
 | Fix strange audio player play/pause logic                                                |        |
 | Play next song when current is over                                                      |        |
 | Move audio player to Main Layout                                                         | Done   |
+| Implement theme retrievement from backend on startup                                     |        |
 | --------------------------------------------------------------------------------------   | ------ |
 | ADMIN                                                                                    |        |
 | Handle case when admin tries to delete genre/mood referenced in songs table              | Done   |
