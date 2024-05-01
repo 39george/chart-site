@@ -147,6 +147,7 @@ impl Modify for ServerAddon {
         crate::routes::protected::add_data,
         crate::routes::protected::remove_data,
         crate::routes::protected::sort_songs,
+        crate::routes::protected::renew_session,
         crate::auth::login::post::login,
         crate::auth::login::get::logout,
         crate::routes::development::upload_file,

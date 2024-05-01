@@ -36,10 +36,38 @@ pub fn protected_router() -> Router<AppState> {
         .route("/:what", routing::post(add_data))
         .route("/:what", routing::delete(remove_data))
         .route("/health_check", routing::get(|| async { StatusCode::OK }))
+        .route("/renew_session", routing::put(renew_session))
         .layer(permission_required!(
             crate::auth::users::Backend,
             "administrator"
         ))
+}
+
+/// Renew session
+#[utoipa::path(
+    put,
+    path = "/api/protected/renew_session",
+    responses(
+        (status = 200, description = "Session renewed successfully"),
+        (status = 403, response = ForbiddenResponse),
+        (status = 500, response = InternalErrorResponse)
+    ),
+    security(
+        ("api_key" = [])
+    ),
+    tag = "protected.admins"
+)]
+async fn renew_session(
+    mut auth_session: AuthSession,
+) -> Result<StatusCode, ResponseError> {
+    let user = auth_session
+        .user
+        .as_ref()
+        .context("Failed to get user from session")?
+        .clone();
+    auth_session.logout().await.context("Failed to logout")?;
+    auth_session.login(&user).await.context("Failed to login")?;
+    Ok(StatusCode::OK)
 }
 
 /// Submit new song
