@@ -13,12 +13,14 @@ import { extract_genres, extract_moods } from "./helpers";
 import { set_max_price, set_min_price } from "./state/min_max_price_slice";
 import { ColorThemes, ISong } from "./types";
 import { RootState } from "./state/store";
+import { set_theme } from "./state/color_theme_slice";
 
 function App() {
   const color_theme = useSelector<RootState, ColorThemes>(
     (state) => state.color_theme.theme
   );
   const { fetch_data: fetch_songs } = useAxios();
+  const { fetch_data: fetch_theme } = useAxios();
   const dispatch = useDispatch();
 
   async function try_to_fetch_songs() {
@@ -58,9 +60,26 @@ function App() {
   }, []);
 
   useEffect(() => {
+    async function try_to_fetch_theme() {
+      const response = await fetch_theme({
+        method: "GET",
+        url: `${API_URL}/session/theme`,
+      });
+
+      if (response) {
+        setTimeout(() => {
+          dispatch(set_theme(response.data));
+        }, 300);
+      }
+    }
+
+    try_to_fetch_theme();
+  }, []);
+
+  useEffect(() => {
     document.documentElement.setAttribute(
       "data-theme",
-      color_theme === "light" ? "light" : "dark"
+      color_theme === "White" ? "light" : "dark"
     );
   }, [color_theme]);
 

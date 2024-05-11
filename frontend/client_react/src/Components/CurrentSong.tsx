@@ -49,7 +49,7 @@ const CurrentSong: FC<CurrentSongProps> = (props) => {
                 className={styles.image_wrapper}
                 style={{
                   boxShadow: `0 0 1rem ${
-                    color_theme === "light"
+                    color_theme === "White"
                       ? img_shadow_rgba.light
                       : img_shadow_rgba.dark
                   }`,

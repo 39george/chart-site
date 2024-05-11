@@ -8,6 +8,8 @@ import { RootState } from "../state/store";
 import { useDispatch, useSelector } from "react-redux";
 import { ColorThemes } from "../types";
 import { set_theme } from "../state/color_theme_slice";
+import useAxios from "../Hooks/APIRequests";
+import { API_URL } from "../config";
 
 type ActivePageName = "home" | "contacts" | "";
 
@@ -23,6 +25,7 @@ const Navbar: FC = () => {
   const color_theme = useSelector<RootState, ColorThemes>(
     (state) => state.color_theme.theme
   );
+  const { fetch_data: post_theme } = useAxios();
   const dispatch = useDispatch();
 
   function handle_page_click(pageName: ActivePageName) {
@@ -30,9 +33,23 @@ const Navbar: FC = () => {
   }
 
   function handle_change_theme() {
-    color_theme === "light"
-      ? dispatch(set_theme("dark"))
-      : dispatch(set_theme("light"));
+    color_theme === "White"
+      ? dispatch(set_theme("Dark"))
+      : dispatch(set_theme("White"));
+
+    try_to_post_theme();
+  }
+
+  async function try_to_post_theme() {
+    const data = JSON.stringify(color_theme === "White" ? "Dark" : "White");
+    await post_theme({
+      method: "PUT",
+      url: `${API_URL}/session/theme`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    });
   }
 
   return (
@@ -40,7 +57,7 @@ const Navbar: FC = () => {
       <nav className={styles.navbar}>
         <div className={styles.image_wrapper}>
           <img
-            src={color_theme === "light" ? logo_light : logo_dark}
+            src={color_theme === "White" ? logo_light : logo_dark}
             alt="logo"
             draggable={false}
             className={styles.logo}
@@ -68,13 +85,13 @@ const Navbar: FC = () => {
           className={styles.theme_switch_container}
           onClick={handle_change_theme}
         >
-          {color_theme === "light" ? (
+          {color_theme === "White" ? (
             <HiSun className={styles.theme_icon} />
           ) : (
             <HiMoon className={styles.theme_icon} />
           )}
           <p className={styles.hover_text}>
-            {color_theme === "light" ? "темная тема" : "светлая тема"}
+            {color_theme === "White" ? "темная тема" : "светлая тема"}
           </p>
         </div>
       </nav>

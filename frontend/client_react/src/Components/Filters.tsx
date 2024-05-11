@@ -245,7 +245,7 @@ const Filters: FC = () => {
               className={styles.pop_up}
               style={{
                 boxShadow: `0 0 0.5rem ${
-                  color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                  color_theme === "White" ? popup_rgba.light : popup_rgba.dark
                 }`,
               }}
             >
@@ -299,7 +299,7 @@ const Filters: FC = () => {
               className={`${styles.pop_up} ${styles.pop_up_genre}`}
               style={{
                 boxShadow: `0 0 0.5rem ${
-                  color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                  color_theme === "White" ? popup_rgba.light : popup_rgba.dark
                 }`,
               }}
             >
@@ -357,7 +357,7 @@ const Filters: FC = () => {
               className={`${styles.pop_up} ${styles.pop_up_mood}`}
               style={{
                 boxShadow: `0 0 0.5rem ${
-                  color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                  color_theme === "White" ? popup_rgba.light : popup_rgba.dark
                 }`,
               }}
             >
@@ -415,7 +415,7 @@ const Filters: FC = () => {
               className={`${styles.pop_up} ${styles.pop_up_price}`}
               style={{
                 boxShadow: `0 0 0.5rem ${
-                  color_theme === "light" ? popup_rgba.light : popup_rgba.dark
+                  color_theme === "White" ? popup_rgba.light : popup_rgba.dark
                 }`,
               }}
             >

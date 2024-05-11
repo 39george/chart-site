@@ -39,4 +39,4 @@ export interface GenresMoods {
   moods: string[];
 }
 
-export type ColorThemes = "light" | "dark";
+export type ColorThemes = "White" | "Dark" | "";

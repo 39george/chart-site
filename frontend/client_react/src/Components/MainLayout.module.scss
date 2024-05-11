@@ -46,6 +46,13 @@
   letter-spacing: 0.05em;
 }
 
+.preload {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+}
+
 // ───── Auido Player ─────────────────────────────────────────────────────── //
 .playback_icon {
   color: var(--primary_text);

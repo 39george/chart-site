@@ -63,6 +63,10 @@ const MainLayout: FC = () => {
     }
   }, [song_playing]);
 
+  if (!color_theme) {
+    return <div className={styles.preload}></div>;
+  }
+
   return (
     <>
       <Navbar />
@@ -159,7 +163,7 @@ const MainLayout: FC = () => {
       <div className={styles.decor_container}>
         <div
           className={styles.bg_decor}
-          style={{ filter: `invert(${color_theme === "light" ? 0 : 1})` }}
+          style={{ filter: `invert(${color_theme === "White" ? 0 : 1})` }}
         ></div>
       </div>
     </>

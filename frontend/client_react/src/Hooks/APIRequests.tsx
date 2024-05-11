@@ -19,6 +19,9 @@ const useAxios = () => {
         case "POST":
           response = await axios.post(config.url || "", config.data, config);
           return response;
+        case "PUT":
+          response = await axios.put(config.url || "", config.data, config);
+          return response;
         case "DELETE":
           response = await axios.delete(config.url || "", config);
           return response;
@@ -52,7 +55,7 @@ const useAxios = () => {
               console.error(
                 "API error: ",
                 error.response.status,
-                error.response.data
+                error.response
               );
           }
         } else if (error.request) {

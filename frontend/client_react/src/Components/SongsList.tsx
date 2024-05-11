@@ -51,18 +51,18 @@ const SongsList: FC = () => {
     set_price_popup_visible_id(id);
   }
 
-  useEffect(() => {
-    if (current_ref.current) {
-      current_ref.current.scrollIntoView({
-        behavior: "instant",
-        block: "start",
-      });
+  // useEffect(() => {
+  //   if (current_ref.current) {
+  //     current_ref.current.scrollIntoView({
+  //       behavior: "instant",
+  //       block: "start",
+  //     });
 
-      window.scrollBy({
-        top: -200,
-      });
-    }
-  }, [current_ref.current]);
+  //     window.scrollBy({
+  //       top: -200,
+  //     });
+  //   }
+  // }, [current_ref.current]);
 
   useEffect(() => {
     set_filtered_songs(
