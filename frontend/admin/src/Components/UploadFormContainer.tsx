@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import UploadFormComponent from "./UploadFormComponent";
-import { IStep, ISteps, StepName, SubmitSong, SubmitStatus } from "../types";
+import { IStep, ISteps, StepName, SubmitStatus } from "../types";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
@@ -8,6 +8,7 @@ import { ISongData } from "../state/song_data_slice";
 import useAxios from "../Hooks/APIRequests";
 import { API_URL } from "../config";
 import { set_song_submit_status } from "../state/song_submit_data_slice";
+import { fields_not_empty } from "../helpers";
 
 const UploadFormContainer: FC = () => {
   const [steps, set_steps] = useState<ISteps>({
@@ -52,10 +53,6 @@ const UploadFormContainer: FC = () => {
     }
     set_current_step(step.path);
     navigate(step.path);
-  }
-
-  function fields_not_empty(song: SubmitSong): boolean {
-    return Object.values(song).every((value) => value !== "");
   }
 
   async function try_to_submit() {
@@ -142,7 +139,6 @@ const UploadFormContainer: FC = () => {
         steps: steps,
         current_step: current_step,
         change_step: handle_change_step,
-        fields_not_empty: fields_not_empty,
         song: song_data.song,
         submit_song: try_to_submit,
         song_submit_status: song_submit_status,

@@ -3,13 +3,13 @@ import { FC } from "react";
 import { Outlet } from "react-router-dom";
 import { IStep, ISteps, StepName, SubmitSong, SubmitStatus } from "../types";
 import InfoModalWindow from "./InfoModalWindow";
+import { fields_not_empty } from "../helpers";
 
 interface UploadFormComponentProps {
   state: {
     steps: ISteps;
     current_step: StepName;
     change_step: (step: IStep) => void;
-    fields_not_empty: (song: SubmitSong) => boolean;
     song: SubmitSong;
     submit_song: () => Promise<void>;
     song_submit_status: SubmitStatus;
@@ -74,7 +74,7 @@ const UploadFormComponent: FC<UploadFormComponentProps> = ({ state }) => {
         </div>
         <Outlet />
       </div>
-      {state.fields_not_empty(state.song) && state.current_step === "step_4" ? (
+      {fields_not_empty(state.song) && state.current_step === "step_4" ? (
         <div
           className={styles.submit_button}
           onClick={state.submit_song}

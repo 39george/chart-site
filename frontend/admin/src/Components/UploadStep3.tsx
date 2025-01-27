@@ -308,7 +308,7 @@ const UploadStep3: FC<UploadStep3Props> = ({
           <p style={{ marginLeft: ".75rem" }}>₽</p>
         </div>
       </div>
-      <div className={`${styles.input_container} ${styles.container_rating}`}>
+      {/* <div className={`${styles.input_container} ${styles.container_rating}`}>
         <label
           htmlFor="rating"
           className={styles.label}
@@ -325,7 +325,7 @@ const UploadStep3: FC<UploadStep3Props> = ({
           onChange={handle_input_change}
           className={styles.input_field}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

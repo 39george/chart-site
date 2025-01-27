@@ -162,6 +162,11 @@
   }
 }
 
+.proceed_button:hover {
+  border: 1px solid $warning;
+  color: $warning;
+}
+
 .confirm_button:hover {
   border: 1px solid $accent_cyan;
   color: $accent_cyan;

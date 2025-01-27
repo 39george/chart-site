@@ -1,6 +1,5 @@
 import styles from "./UploadStep4.module.scss";
-import { FC, useState } from "react";
-import { HiOutlineChevronDown } from "react-icons/hi";
+import { FC } from "react";
 import { format_price } from "../helpers";
 import { ISongData } from "../state/song_data_slice";
 import { RootState } from "../state/store";
@@ -14,7 +13,6 @@ function lyric_format(lyric: string): string[] {
 }
 
 const UploadStep4: FC<UploadStep4Props> = ({ song_data }) => {
-  const [expanded, set_expanded] = useState(false);
   const img_url = useSelector<RootState, string>(
     (state) => state.files_url.img
   );
@@ -56,18 +54,16 @@ const UploadStep4: FC<UploadStep4Props> = ({ song_data }) => {
                 <p className={styles.stat_value}>{song_data.song.moods[0]}</p>
               </div>
             </div>
-            {song_data.song.rating && (
+            {/* {song_data.song.rating && (
               <div className={styles.stat_unit}>
                 <p className={styles.stat_type}>Рейтинг:&nbsp;&nbsp;</p>
                 <p className={styles.stat_value}>{song_data.song.rating}</p>
               </div>
-            )}
+            )} */}
           </div>
           <div className={styles.text_section}>
             <p className={styles.text_header}>Текст песни</p>
-            <div
-              className={`${styles.text} ${expanded && styles.text_expanded}`}
-            >
+            <div className={`${styles.text}`}>
               {lyric_format(song_data.song.lyric).map((line, idx) => {
                 if (line === "") {
                   return <br key={idx} />;
@@ -75,15 +71,6 @@ const UploadStep4: FC<UploadStep4Props> = ({ song_data }) => {
                   return <p key={idx}>{line}</p>;
                 }
               })}
-            </div>
-            <div
-              className={`${styles.expand_button} ${
-                expanded && styles.button_expanded
-              }`}
-              onClick={() => set_expanded(!expanded)}
-            >
-              <p>{!expanded ? "развернуть" : "свернуть"}</p>
-              <HiOutlineChevronDown className={styles.chevron} />
             </div>
           </div>
         </div>

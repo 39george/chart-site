@@ -31,6 +31,7 @@ const DeleteSongPrompt: FC<DeleteSongPromptProps> = ({
     if (response?.status === 200) {
       dispatch(set_song_list_updated(true));
       set_loader_visible(false);
+      close_window();
     } else {
       set_loader_visible(false);
     }
@@ -44,8 +45,8 @@ const DeleteSongPrompt: FC<DeleteSongPromptProps> = ({
           <div className={styles.loader_small}></div>
         ) : (
           <p className={styles.info}>
-            Вы точно хотите удалить песню "{song_name}"? Это действие нельзя
-            отменить
+            Вы точно хотите удалить песню "{song_name}"? <br />
+            Это действие нельзя отменить
           </p>
         )}
         <div className={styles.action_buttons}>

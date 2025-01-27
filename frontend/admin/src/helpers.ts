@@ -1,4 +1,5 @@
 import { FORBIDDEN_CHARS } from "./config";
+import { FileParams, SubmitSong } from "./types";
 
 // Format price
 const number_format = new Intl.NumberFormat("ru");
@@ -167,3 +168,13 @@ export function bytes_to_mb(file: File): number {
 export const wait = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+// Check if fields aren't empty
+export function fields_not_empty(song: SubmitSong): boolean {
+  return Object.values(song).every((value) => value !== "");
+}
+
+// Check if values aren't empty
+export function values_not_empty(obj: FileParams): boolean {
+  return Object.values(obj).every((val) => val !== "");
+}

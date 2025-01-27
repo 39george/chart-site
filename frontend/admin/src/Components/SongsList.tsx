@@ -44,6 +44,8 @@ const SongsList: FC = () => {
     }
   }, [song_list_updated]);
 
+  // console.log(songs_list.map((song) => console.log(song.cover_url)));
+
   return (
     <>
       {songs_loading ? (

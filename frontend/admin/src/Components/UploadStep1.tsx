@@ -4,7 +4,12 @@ import { FaCirclePlus, FaRegCircleCheck, FaXmark } from "react-icons/fa6";
 import { PiFileAudioFill, PiFileImageFill } from "react-icons/pi";
 import { API_URL } from "../config";
 import { FileParams, PresignedPostForm } from "../types";
-import { bytes_to_mb, fileToBlob, transliterate } from "../helpers";
+import {
+  bytes_to_mb,
+  fileToBlob,
+  transliterate,
+  values_not_empty,
+} from "../helpers";
 import useAxios from "../Hooks/APIRequests";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
@@ -193,7 +198,7 @@ const UploadStep1: FC = () => {
           if (file.type !== "image/jpeg") {
             set_err_messages((prev) => ({
               ...prev,
-              img: "Неверный формат изображения. Пожалуйста, выберите файл .mp3",
+              img: "Неверный формат изображения. Пожалуйста, выберите файл .jpg/jpeg",
             }));
             return;
           }
@@ -383,11 +388,6 @@ const UploadStep1: FC = () => {
       return false;
     }
     return true;
-  }
-
-  // Helper func to check if values not empty
-  function values_not_empty(obj: FileParams): boolean {
-    return Object.values(obj).every((val) => val !== "");
   }
 
   // Handle unselect file

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { set_song_submit_status } from "../state/song_submit_data_slice";
 import { reset_song_data } from "../state/song_data_slice";
-import { set_audio_url, set_img_url } from "../state/files_url_slice";
+import { reset_urls } from "../state/files_url_slice";
 import { reset_chosen_files } from "../state/chosen_files_slice";
 
 interface InfoModalWindowPorps {
@@ -22,8 +22,7 @@ const InfoModalWindow: FC<InfoModalWindowPorps> = ({ error_data }) => {
   function handle_click() {
     dispatch(set_song_submit_status(""));
     dispatch(reset_song_data());
-    dispatch(set_audio_url(""));
-    dispatch(set_img_url(""));
+    dispatch(reset_urls());
     dispatch(reset_chosen_files());
   }
 

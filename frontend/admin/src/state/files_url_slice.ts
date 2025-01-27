@@ -20,9 +20,13 @@ const files_url_slice = createSlice({
     set_img_url: (state: InitialState, action: PayloadAction<string>) => {
       state.img = action.payload;
     },
+    reset_urls: () => {
+      return initial_state;
+    },
   },
 });
 
-export const { set_audio_url, set_img_url } = files_url_slice.actions;
+export const { set_audio_url, set_img_url, reset_urls } =
+  files_url_slice.actions;
 
 export default files_url_slice.reducer;

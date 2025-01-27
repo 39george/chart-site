@@ -2,7 +2,7 @@ import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import "./App.scss";
 import MainLayout from "./Components/MainLayout";
 import MainPage from "./Pages/MainPage";
-import UploadNewPage from "./Pages/UploadNewPage";
+import UploadOrEditPage from "./Pages/UploadOrEditPage";
 import UploadStep1 from "./Components/UploadStep1";
 import UploadStep2 from "./Components/UploadStep2";
 import UploadStep3 from "./Components/UploadStep3";
@@ -160,7 +160,7 @@ function App() {
           />
           <Route
             path="upload_new_song"
-            element={<UploadNewPage />}
+            element={<UploadOrEditPage kind="upload" />}
           >
             <Route
               path="step_1"
@@ -194,6 +194,42 @@ function App() {
               }
             />
           </Route>
+          {/* <Route
+            path="edit_song"
+            element={<UploadOrEditPage kind="edit" />}
+          >
+            <Route
+              path="step_1"
+              element={<UploadStep1 />}
+            />
+            <Route
+              path="step_2"
+              element={<UploadStep2 song_data={song_data} />}
+            />
+            <Route
+              path="step_3"
+              element={
+                <UploadStep3
+                  song_data={song_data}
+                  genres_list={genres_list}
+                  moods_list={moods_list}
+                />
+              }
+            />
+            <Route
+              path="step_4"
+              element={<UploadStep4 song_data={song_data} />}
+            />
+            <Route
+              index
+              element={
+                <Navigate
+                  to="step_1"
+                  replace
+                />
+              }
+            />
+          </Route> */}
         </Route>
         <Route
           path="*"

@@ -22,6 +22,22 @@ export interface ISong {
   tempo?: number;
 }
 
+export interface ISongEdit {
+  duration: number;
+  lyric: string;
+  name: string;
+  price: string;
+  primary_genre: string;
+  moods: string[];
+  raiting: number | null;
+  sex: GenderOptions;
+  created_at: number[];
+  updated_at: string;
+  key?: string;
+  secondary_genre?: null;
+  tempo?: number;
+}
+
 // ───── UploadForm types ─────────────────────────────────────────────────── //
 
 export type StepName = "step_1" | "step_2" | "step_3" | "step_4";
