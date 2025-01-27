@@ -4,7 +4,7 @@ import { IoGrid } from "react-icons/io5";
 import SongItem from "./SongItem";
 import CurrentSong from "./CurrentSong";
 import { GenderOptions, GenresMoods, ISong, PriceValues } from "../types";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { set_current_song_id } from "../state/current_song_data_slice";
@@ -13,7 +13,7 @@ import { set_are_songs_fetching } from "../state/songs_slice";
 const SongsList: FC = () => {
   const [filtered_songs, set_filtered_songs] = useState<ISong[]>([]);
   const [price_popup_visible_id, set_price_popup_visible_id] = useState(0);
-  const current_ref = useRef<HTMLDivElement>(null);
+  const [currentVisibleId, setCurrentVisibleId] = useState<number | null>(null);
 
   const songs = useSelector<RootState, ISong[]>((state) => state.songs.songs);
   const are_songs_fetching = useSelector<RootState, boolean>(
@@ -51,18 +51,9 @@ const SongsList: FC = () => {
     set_price_popup_visible_id(id);
   }
 
-  // useEffect(() => {
-  //   if (current_ref.current) {
-  //     current_ref.current.scrollIntoView({
-  //       behavior: "instant",
-  //       block: "start",
-  //     });
-
-  //     window.scrollBy({
-  //       top: -200,
-  //     });
-  //   }
-  // }, [current_ref.current]);
+  function handleCurentVisibleIdChange(id: number | null) {
+    setCurrentVisibleId(id);
+  }
 
   useEffect(() => {
     set_filtered_songs(
@@ -154,15 +145,16 @@ const SongsList: FC = () => {
                   toggle_current_song={toggle_current_song}
                   price_popup_visible_id={price_popup_visible_id}
                   toggle_price_popup_visible={toggle_price_popup}
+                  showCurrent={handleCurentVisibleIdChange}
+                  currentVisibleId={currentVisibleId}
                 />
-                {song.id === current_song_id && (
-                  <div ref={current_ref}>
-                    <CurrentSong
-                      song={filtered_songs.find(
-                        (song) => song.id === current_song_id
-                      )}
-                    />
-                  </div>
+                {song.id === currentVisibleId && (
+                  <CurrentSong
+                    song={filtered_songs.find(
+                      (song) => song.id === current_song_id
+                    )}
+                    hideInfo={handleCurentVisibleIdChange}
+                  />
                 )}
               </div>
             );

@@ -16,6 +16,8 @@ interface SongItemProps {
   toggle_current_song: (id: number) => void;
   price_popup_visible_id: number;
   toggle_price_popup_visible: (id: number) => void;
+  currentVisibleId: number | null;
+  showCurrent: (id: number) => void;
 }
 
 const SongItem: FC<SongItemProps> = (props) => {
@@ -23,6 +25,7 @@ const SongItem: FC<SongItemProps> = (props) => {
     window.innerWidth <= 378
   );
   const popup_ref = useRef<HTMLDivElement>(null);
+  const songRef = useRef<HTMLDivElement>(null);
   const [popup_width, set_popup_width] = useState<number | undefined>(0);
   const { fetch_data: fetch_song_url } = useAxios();
   const current_song_id = useSelector<RootState, number>(
@@ -33,22 +36,25 @@ const SongItem: FC<SongItemProps> = (props) => {
   );
   const dispatch = useDispatch();
 
+  async function handle_song_click(id: number) {
+    if (current_song_id !== props.song.id) {
+      await get_url(id);
+      dispatch(set_current_song_playing(true));
+      props.toggle_current_song(id);
+    } else {
+      if (props.currentVisibleId) {
+        dispatch(set_current_song_playing(!current_song_playing));
+      }
+    }
+    props.showCurrent(props.song.id);
+  }
+
   function handle_price_click(e: React.MouseEvent) {
     if (window.innerWidth > 378) {
       return;
     }
     e.stopPropagation();
     props.toggle_price_popup_visible(props.song.id);
-  }
-
-  function handle_song_click(id: number) {
-    if (current_song_id !== props.song.id) {
-      get_url(id);
-      dispatch(set_current_song_playing(true));
-      props.toggle_current_song(id);
-    } else {
-      dispatch(set_current_song_playing(!current_song_playing));
-    }
   }
 
   async function get_url(id: number) {
@@ -77,12 +83,17 @@ const SongItem: FC<SongItemProps> = (props) => {
     };
   }, []);
 
+  function handlePlayPauseClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    dispatch(set_current_song_playing(!current_song_playing));
+  }
   return (
     <div
       className={`${styles.song_item} ${
         current_song_id === props.song.id && styles.current_song
       }`}
       onClick={() => handle_song_click(props.song.id)}
+      ref={songRef}
     >
       <p className={styles.order_number}>{props.order_number}</p>
       <div className={styles.image_wrapper}>
@@ -92,13 +103,13 @@ const SongItem: FC<SongItemProps> = (props) => {
           draggable={false}
         />
         {current_song_id === props.song.id && (
-          <>
+          <div onClick={handlePlayPauseClick}>
             {!current_song_playing ? (
               <BsPlayCircle className={styles.playpause_icon} />
             ) : (
               <BsPauseCircle className={styles.playpause_icon} />
             )}
-          </>
+          </div>
         )}
       </div>
       <div className={styles.name_and_meta}>

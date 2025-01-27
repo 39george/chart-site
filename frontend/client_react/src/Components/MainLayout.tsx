@@ -20,6 +20,7 @@ import { RiLoopLeftFill } from "react-icons/ri";
 import H5AudioPlayer from "react-h5-audio-player";
 import { ISong } from "../types";
 import { set_current_song_playing } from "../state/current_song_data_slice";
+import CookiePopup from "./CookiePopup";
 
 const MainLayout: FC = () => {
   const songs = useSelector<RootState, ISong[]>((state) => state.songs.songs);
@@ -71,6 +72,7 @@ const MainLayout: FC = () => {
     <>
       <Navbar />
       <Outlet />
+      <CookiePopup />
       {current_song_id !== -1 && (
         <div className={styles.player_meta_info}>
           <div className={styles.image_wrapper}>

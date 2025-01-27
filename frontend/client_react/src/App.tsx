@@ -19,6 +19,10 @@ function App() {
   const color_theme = useSelector<RootState, ColorThemes>(
     (state) => state.color_theme.theme
   );
+  const cookieRejected = useSelector<RootState, boolean>(
+    (state) => state.cookieRejected.isRejected
+  );
+
   const { fetch_data: fetch_songs } = useAxios();
   const { fetch_data: fetch_theme } = useAxios();
   const dispatch = useDispatch();
@@ -82,6 +86,24 @@ function App() {
       color_theme === "White" ? "light" : "dark"
     );
   }, [color_theme]);
+
+  if (cookieRejected) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          height: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          padding: "0 1rem",
+        }}
+      >
+        Вы отказались от использования файлов cookie. Вы подтвердили отказ от
+        продолжения работы с сайтом.
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
