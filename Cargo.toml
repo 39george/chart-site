@@ -57,7 +57,7 @@ garde = { version = "0.18.0", features = ["derive", "email"] }
 rand = { version = "0.8.5", features = ["std_rng"] }
 thiserror = "1.0.59"
 anyhow = "1.0.81"
-time = { version = "0.3.34", features = ["local-offset", "macros", "parsing"] }
+time = { version = "0.3.37", features = ["local-offset", "macros", "parsing"] }
 lazy_static = "1.4.0"
 # identicon-rs = "5.0.0"
 # image = "0.24.8" # identicon support ^0.24
