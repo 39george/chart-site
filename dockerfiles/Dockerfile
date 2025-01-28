@@ -3,9 +3,11 @@
 
 ARG RUST_VERSION=1.84
 ARG APP_NAME=chart-site
-FROM rust:${RUST_VERSION}-slim-bookworm AS build
+FROM rust:${RUST_VERSION}-bookworm AS build
 ARG APP_NAME
 WORKDIR /app
+
+RUN apt update && apt install -y libssl-dev pkg-config
 
 RUN --mount=type=bind,source=src,target=src \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
