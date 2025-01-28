@@ -17,10 +17,10 @@ import { set_theme } from "./state/color_theme_slice";
 
 function App() {
   const color_theme = useSelector<RootState, ColorThemes>(
-    (state) => state.color_theme.theme
+    (state) => state.color_theme.theme,
   );
   const cookieRejected = useSelector<RootState, boolean>(
-    (state) => state.cookieRejected.isRejected
+    (state) => state.cookieRejected.isRejected,
   );
 
   const { fetch_data: fetch_songs } = useAxios();
@@ -32,6 +32,7 @@ function App() {
       method: "GET",
       url: `${API_URL}/open/songs`,
     });
+
     if (response?.status === 200) {
       let response_data: ISong[] = response.data;
       dispatch(set_songs([...response_data]));
@@ -41,19 +42,19 @@ function App() {
         set_max_price(
           Math.max.apply(
             Math,
-            response_data.map((song) => Number.parseFloat(song.price))
-          )
-        )
+            response_data.map((song) => Number.parseFloat(song.price)),
+          ),
+        ),
       );
       dispatch(
         set_min_price(
           Math.min.apply(
             Math,
-            response_data.map((song) => Number.parseFloat(song.price))
-          )
-        )
+            response_data.map((song) => Number.parseFloat(song.price)),
+          ),
+        ),
       );
-      // dispatch(set_are_songs_fetching(false));
+      dispatch(set_are_songs_fetching(false));
     } else {
       dispatch(set_are_songs_fetching(false));
     }
@@ -83,7 +84,7 @@ function App() {
   useEffect(() => {
     document.documentElement.setAttribute(
       "data-theme",
-      color_theme === "White" ? "light" : "dark"
+      color_theme === "White" ? "light" : "dark",
     );
   }, [color_theme]);
 

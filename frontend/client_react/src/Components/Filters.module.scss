@@ -25,7 +25,6 @@
   width: 100%;
 
   font-size: 0.75rem;
-  letter-spacing: 0.1em;
 
   user-select: none;
 }
@@ -49,6 +48,7 @@
       p {
         color: var(--primary_text);
       }
+
       .chevron {
         stroke: var(--primary_text);
       }
@@ -61,6 +61,7 @@
     p {
       color: var(--primary_text);
     }
+
     .chevron {
       stroke: var(--primary_text);
       transform: rotate(-180deg);
@@ -194,6 +195,7 @@ input[type="checkbox"] {
 
   &:hover {
     color: var(--primary_text);
+
     .custom_checkbox {
       border: 1px solid var(--primary_text);
     }
