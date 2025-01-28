@@ -1,6 +1,7 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+use anyhow::Context;
 use axum::extract::connect_info::IntoMakeServiceWithConnectInfo;
 use axum::extract::ConnectInfo;
 use axum::handler::Handler;
@@ -8,7 +9,6 @@ use axum::middleware::AddExtension;
 use axum::serve::Serve;
 use axum::{routing, Router};
 use axum_login::AuthManagerLayerBuilder;
-use deadpool_postgres::{Manager, ManagerConfig, Pool};
 use fred::clients::RedisPool;
 use fred::types::{ReconnectPolicy, RedisConfig};
 use http::StatusCode;
@@ -21,7 +21,8 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::auth;
-use crate::config::{DatabaseSettings, RedisSettings, Settings};
+use crate::config::{DatabaseSettings, Environment, RedisSettings, Settings};
+use crate::helpers::generic_pg::PgPool;
 use crate::object_storage::ObjectStorage;
 use crate::routes::session;
 use crate::routes::{
@@ -53,7 +54,7 @@ pub struct Application {
 /// at the launch stage.
 #[derive(Clone, Debug)]
 pub struct AppState {
-    pub pg_pool: Pool,
+    pub pg_pool: PgPool,
     pub redis_pool: RedisPool,
     pub object_storage: ObjectStorage,
     pub argon2_obj: argon2::Argon2<'static>,
@@ -68,11 +69,18 @@ impl Application {
     pub async fn build(
         configuration: Settings,
     ) -> Result<Application, anyhow::Error> {
-        let pg_pool = get_postgres_connection_pool(&configuration.database);
+        let use_tls = configuration.env.eq(&Environment::Prod);
+        let pg_pool = PgPool::new(
+            configuration.database.connection_string().expose_secret(),
+            use_tls,
+        )
+        .await
+        .context("Failed to build pg connection pool")?;
+
         let redis_pool =
-            get_redis_connection_pool(&configuration.redis).await?;
+            get_redis_connection_pool(&configuration.redis, use_tls).await?;
         let redis_pool_tower_sessions =
-            get_redis_connection_pool(&configuration.redis).await?;
+            get_redis_connection_pool(&configuration.redis, use_tls).await?;
 
         let redis_client = redis_pool.next().clone_new();
         fred::interfaces::ClientLike::connect(&redis_client);
@@ -106,6 +114,7 @@ impl Application {
 
     /// This function only returns when the application is stopped.
     pub async fn run_until_stopped(self) -> Result<(), std::io::Error> {
+        tracing::info!("Started");
         self.server
             .with_graceful_shutdown(shutdown_signal())
             .await?;
@@ -115,7 +124,7 @@ impl Application {
     /// Configure `Server`.
     fn build_server(
         listener: TcpListener,
-        pg_pool: Pool,
+        pg_pool: PgPool,
         redis_pool: RedisPool,
         redis_pool_tower_sessions: RedisPool,
         object_storage: ObjectStorage,
@@ -247,11 +256,15 @@ async fn shutdown_signal() {
 
 pub async fn get_redis_connection_pool(
     configuration: &RedisSettings,
+    use_tls: bool,
 ) -> Result<RedisPool, anyhow::Error> {
-    let redis_config = RedisConfig::from_url_centralized(
+    let mut redis_config = RedisConfig::from_url_centralized(
         configuration.connection_string().expose_secret(),
     )
     .unwrap();
+    if use_tls {
+        redis_config.tls = Some(create_tls_config().into());
+    }
     let redis_pool = fred::types::Builder::default_centralized()
         .set_config(redis_config)
         .set_policy(ReconnectPolicy::default())
@@ -262,22 +275,14 @@ pub async fn get_redis_connection_pool(
     Ok(redis_pool)
 }
 
-pub fn get_postgres_connection_pool(configuration: &DatabaseSettings) -> Pool {
-    let pg_config = get_pg_conf(configuration);
-    let connector = tokio_postgres::NoTls;
-    let manager_config = ManagerConfig {
-        recycling_method: deadpool_postgres::RecyclingMethod::Fast,
-    };
-    let manager = Manager::from_config(pg_config, connector, manager_config);
-    let pool = Pool::builder(manager).max_size(16).build().unwrap();
-    pool
-}
+fn create_tls_config() -> native_tls::TlsConnector {
+    use fred::native_tls::TlsConnector as NativeTlsConnector;
 
-fn get_pg_conf(configuration: &DatabaseSettings) -> tokio_postgres::Config {
-    let mut config = tokio_postgres::Config::new();
-    config.user(&configuration.username);
-    config.dbname(&configuration.database_name);
-    config.host(&configuration.host);
-    config.password(&configuration.password.expose_secret());
-    config
+    // or use `TlsConnector::default_native_tls()`
+    NativeTlsConnector::builder()
+        .use_sni(true)
+        .danger_accept_invalid_certs(false)
+        .build()
+        .expect("Failed to create TLS config")
+        .into()
 }

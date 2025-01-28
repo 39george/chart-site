@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use std::time::Duration;
 
 use anyhow::anyhow;
@@ -36,14 +37,15 @@ pub fn open_router() -> Router<AppState> {
 async fn fetch_songs(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<FetchSongs>>, ResponseError> {
-    let db_client = state
+    let p_c = state
         .pg_pool
         .get()
         .await
-        .context("Failed to get connection from postgres pool")
+        .context("Failed to get a connection from pg pool")
         .map_err(ResponseError::UnexpectedError)?;
+    let db_client = p_c.deref();
     let futures = open_access::fetch_songs()
-        .bind(&db_client)
+        .bind(db_client)
         .all()
         .await
         .context("Failed to fetch songs from pg")?
@@ -82,14 +84,15 @@ async fn get_audio_url(
     State(state): State<AppState>,
     Path(song_id): Path<i32>,
 ) -> Result<String, ResponseError> {
-    let db_client = state
+    let p_c = state
         .pg_pool
         .get()
         .await
-        .context("Failed to get connection from postgres pool")
+        .context("Failed to get a connection from pg pool")
         .map_err(ResponseError::UnexpectedError)?;
+    let db_client = p_c.deref();
     let obj_key = open_access::get_song_audio_obj_key_by_id()
-        .bind(&db_client, &song_id)
+        .bind(db_client, &song_id)
         .one()
         .await
         .map_err(|e| {
@@ -128,20 +131,21 @@ async fn data(
     State(state): State<AppState>,
     Path(what): Path<String>,
 ) -> Result<Json<Vec<String>>, ResponseError> {
-    let db_client = state
+    let p_c = state
         .pg_pool
         .get()
         .await
-        .context("Failed to get connection from postgres pool")
+        .context("Failed to get a connection from pg pool")
         .map_err(ResponseError::UnexpectedError)?;
+    let db_client = p_c.deref();
     let response = match what.as_str() {
         "genres" => open_access::list_genres()
-            .bind(&db_client)
+            .bind(db_client)
             .all()
             .await
             .context("Failed to fetch genres from pg")?,
         "moods" => open_access::list_moods()
-            .bind(&db_client)
+            .bind(db_client)
             .all()
             .await
             .context("Failed to fetch genres from pg")?,

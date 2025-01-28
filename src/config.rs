@@ -7,6 +7,12 @@ use config::FileFormat;
 use secrecy::{ExposeSecret, Secret};
 use serde::Deserialize;
 
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub enum Environment {
+    Dev,
+    Prod,
+}
+
 #[derive(Deserialize, Debug)]
 pub struct Settings {
     pub database: DatabaseSettings,
@@ -15,6 +21,8 @@ pub struct Settings {
     pub app_addr: Ipv4Addr,
     pub app_base_url: String,
     pub object_storage: ObjectStorageSettings,
+    #[serde(default = "get_environment")]
+    pub env: Environment,
 }
 
 impl Settings {
@@ -77,7 +85,7 @@ impl RedisSettings {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct ObjectStorageSettings {
-    pub endpoint_url: String,
+    pub api_endpoint: String,
     pub region: String,
     pub bucket_name: String,
     #[serde(default = "object_storage_key_id")]
@@ -138,4 +146,11 @@ fn object_storage_access_key() -> Secret<String> {
         )
         .expect("Can't read object-storage-access-key file!"),
     )
+}
+
+fn get_environment() -> Environment {
+    match std::env::var("ENVIRONMENT") {
+        Ok(env) if env.eq("production") => Environment::Prod,
+        _ => Environment::Dev,
+    }
 }

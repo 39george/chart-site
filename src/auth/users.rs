@@ -1,10 +1,10 @@
 use std::collections::HashSet;
+use std::ops::Deref;
 
 use anyhow::Context;
 use argon2::{PasswordHash, PasswordVerifier};
 use async_trait::async_trait;
 use axum_login::{AuthUser, AuthnBackend, AuthzBackend, UserId};
-use deadpool_postgres::Pool;
 use secrecy::{ExposeSecret, Secret};
 use serde::{Deserialize, Serialize};
 use utoipa::ToResponse;
@@ -14,6 +14,7 @@ use utoipa::ToResponse;
 use super::AuthError;
 use crate::auth::login::Credentials;
 use crate::cornucopia::queries::user_auth_queries;
+use crate::helpers::generic_pg::PgPool;
 use crate::startup::AppState;
 use crate::telemetry::spawn_blocking_with_tracing;
 
@@ -154,19 +155,20 @@ pub type AuthSession = axum_login::AuthSession<Backend>;
 
 #[tracing::instrument(name = "Get user data from db", skip_all)]
 async fn get_user_data(
-    pool: &Pool,
+    pool: &PgPool,
     username: Option<&str>,
     id: Option<&i32>,
 ) -> Result<User, AuthError> {
-    let connection = pool
+    let p_c = pool
         .get()
         .await
-        .context("Failed to get connection from db pool")?;
+        .context("Failed to get a connection from pg pool")?;
+    let connection = p_c.deref();
 
     let data = match (username, id) {
         (Some(username), None) => {
             user_auth_queries::get_auth_user_data_by_username()
-                .bind(&connection, &username)
+                .bind(connection, &username)
                 .opt()
                 .await
                 .context("Failed to query user from db by email")
@@ -174,7 +176,7 @@ async fn get_user_data(
                 .map(|r| (r.id, r.username, Secret::new(r.password_hash)))
         }
         (None, Some(id)) => user_auth_queries::get_auth_user_data_by_id()
-            .bind(&connection, id)
+            .bind(connection, id)
             .opt()
             .await
             .context("Failed to query user from db by id")
@@ -242,14 +244,15 @@ impl AuthzBackend for Backend {
         &self,
         user: &Self::User,
     ) -> Result<HashSet<Self::Permission>, Self::Error> {
-        let pg_client = self
+        let p_c = self
             .app_state
             .pg_pool
             .get()
             .await
-            .context("Failed to get connection from db pool")?;
+            .context("Failed to get a connection from pg pool")?;
+        let pg_client = p_c.deref();
         let permissions = user_auth_queries::get_user_permissions()
-            .bind(&pg_client, &user.id)
+            .bind(pg_client, &user.id)
             .all()
             .await
             .context("Failed to get user permissions from pg")?

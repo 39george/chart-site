@@ -8,19 +8,19 @@ use argon2::Argon2;
 use argon2::PasswordHasher;
 
 use argon2::password_hash::SaltString;
+use chart_site::helpers::generic_pg;
 use chart_site::object_storage::presigned_post_form::PresignedPostData;
 use chart_site::startup::get_redis_connection_pool;
-use deadpool_postgres::Client;
 use fake::Fake;
 use fred::clients::RedisClient;
 use reqwest::multipart::Form;
 use reqwest::multipart::Part;
+use secrecy::ExposeSecret;
 use secrecy::Secret;
 use tracing::Level;
 
 use chart_site::config::DatabaseSettings;
 use chart_site::config::Settings;
-use chart_site::startup::get_postgres_connection_pool;
 use chart_site::startup::Application;
 
 #[derive(Debug)]
@@ -37,7 +37,7 @@ pub struct TestApp {
     pg_config_with_root_cred: DatabaseSettings,
     argon: Argon2<'static>,
     pub address: String,
-    pub pg_client: Client,
+    pub pg_client: tokio_postgres::Client,
     pub redis_client: RedisClient,
     pub port: u16,
 }
@@ -83,7 +83,7 @@ impl TestApp {
         config.redis.db_number = 3;
         config.object_storage.bucket_name =
             String::from("chart-site-test-data");
-        let redis_client = get_redis_connection_pool(&config.redis)
+        let redis_client = get_redis_connection_pool(&config.redis, false)
             .await
             .unwrap()
             .next()
@@ -193,8 +193,12 @@ impl Drop for TestApp {
             let rt = tokio::runtime::Runtime::new().unwrap();
             // Execute the future, blocking the current thread until completion
             rt.block_on(async {
-                let pg_pool = get_postgres_connection_pool(&db_config);
-                let client = pg_pool.get().await.unwrap();
+                let client = generic_pg::get_postgres_connection(
+                    db_config.connection_string().expose_secret(),
+                    false,
+                )
+                .await
+                .unwrap();
                 let create_role =
                     format!("DROP SCHEMA {0} CASCADE;", db_username);
                 let create_schema = format!("DROP ROLE {0};", db_username);
@@ -210,7 +214,7 @@ impl Drop for TestApp {
 
 fn init_tracing() {
     use tracing_subscriber::fmt::format::FmtSpan;
-    if let Ok(_) = std::env::var("TEST_TRACING") {
+    if std::env::var("TEST_TRACING").is_ok() {
         let subscriber = tracing_subscriber::fmt()
             .with_timer(tracing_subscriber::fmt::time::ChronoLocal::default())
             .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
@@ -231,21 +235,28 @@ fn init_tracing() {
 
 async fn prepare_postgres_with_rand_user(
     mut pg_config: DatabaseSettings,
-) -> (DatabaseSettings, Client, String) {
-    let pool = get_postgres_connection_pool(&pg_config);
+) -> (DatabaseSettings, tokio_postgres::Client, String) {
+    let client = generic_pg::get_postgres_connection(
+        pg_config.connection_string().expose_secret(),
+        false,
+    )
+    .await
+    .unwrap();
     let pg_username = generate_username();
     let create_role =
         format!("CREATE ROLE {0} WITH LOGIN PASSWORD '{0}';", &pg_username);
     let create_schema =
         format!("CREATE SCHEMA {0} AUTHORIZATION {0};", &pg_username);
-    let client = pool.get().await.unwrap();
     client.simple_query(&create_role).await.unwrap();
     client.simple_query(&create_schema).await.unwrap();
-    drop(pool);
     pg_config.username = pg_username.clone();
     pg_config.password = Secret::new(pg_username.clone());
-    let pg_pool = get_postgres_connection_pool(&pg_config);
-    let client = pg_pool.get().await.unwrap();
+    let client = generic_pg::get_postgres_connection(
+        pg_config.connection_string().expose_secret(),
+        false,
+    )
+    .await
+    .unwrap();
     (pg_config, client, pg_username)
 }
 

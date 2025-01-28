@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::ops::Deref;
 
 use anyhow::anyhow;
 use anyhow::Context;
@@ -6,7 +7,6 @@ use axum::extract::{Path, Query};
 use axum::Json;
 use axum::{extract::State, routing, Router};
 use axum_login::permission_required;
-use deadpool_postgres::GenericClient;
 use garde::Validate;
 use http::StatusCode;
 use tokio_postgres::error::SqlState;
@@ -343,33 +343,34 @@ async fn update_song_data(
         .parse()
         .context("Failed to parse object key")
         .map_err(ResponseError::BadRequest)?;
-    let db_client = state
+    let p_c = state
         .pg_pool
         .get()
         .await
-        .context("Failed to get connection from postgres pool")
+        .context("Failed to get a connection from pg pool")
         .map_err(ResponseError::UnexpectedError)?;
+    let db_client = p_c.deref();
     let old_obj_key = match q.what.as_str() {
         "cover" => {
             let old = admin_access::get_song_cover_object_key_by_id()
-                .bind(&db_client, &id)
+                .bind(db_client, &id)
                 .one()
                 .await
                 .context("Failed")?;
             admin_access::update_song_cover()
-                .bind(&db_client, &object_key, &id)
+                .bind(db_client, &object_key, &id)
                 .await
                 .context("Failed to update song cover object key")?;
             old
         }
         "audio" => {
             let old = admin_access::get_song_audio_object_key_by_id()
-                .bind(&db_client, &id)
+                .bind(db_client, &id)
                 .one()
                 .await
                 .context("Failed")?;
             admin_access::update_song_audio()
-                .bind(&db_client, &object_key, &id)
+                .bind(db_client, &object_key, &id)
                 .await
                 .context("Failed to update song audio object key")?;
             old
@@ -411,14 +412,15 @@ async fn remove_song(
     State(state): State<AppState>,
     Path(id): Path<i32>,
 ) -> Result<StatusCode, ResponseError> {
-    let db_client = state
+    let p_c = state
         .pg_pool
         .get()
         .await
-        .context("Failed to get connection from postgres pool")
+        .context("Failed to get a connection from pg pool")
         .map_err(ResponseError::UnexpectedError)?;
+    let db_client = p_c.deref();
     let song = admin_access::remove_song_by_id()
-        .bind(&db_client, &id)
+        .bind(db_client, &id)
         .opt()
         .await
         .context("Failed to remove song by id")?;
@@ -519,18 +521,19 @@ async fn add_data(
     Path(what): Path<String>,
     Json(data): Json<Vec<String>>,
 ) -> Result<StatusCode, ResponseError> {
-    let db_client = state
+    let p_c = state
         .pg_pool
         .get()
         .await
-        .context("Failed to get connection from postgres pool")
+        .context("Failed to get a connection from pg pool")
         .map_err(ResponseError::UnexpectedError)?;
+    let db_client = p_c.deref();
 
     match what.as_str() {
         "genres" => {
             for genre in data {
                 admin_access::insert_genre()
-                    .bind(&db_client, &genre)
+                    .bind(db_client, &genre)
                     .await
                     .context("Failed to insert genre")?;
             }
@@ -538,7 +541,7 @@ async fn add_data(
         "moods" => {
             for mood in data {
                 admin_access::insert_mood()
-                    .bind(&db_client, &mood)
+                    .bind(db_client, &mood)
                     .await
                     .context("Failed to insert genre")?;
             }
@@ -578,12 +581,13 @@ async fn remove_data(
     Path(what): Path<String>,
     Json(data): Json<Vec<String>>,
 ) -> Result<StatusCode, ResponseError> {
-    let db_client = state
+    let p_c = state
         .pg_pool
         .get()
         .await
-        .context("Failed to get connection from postgres pool")
+        .context("Failed to get a connection from pg pool")
         .map_err(ResponseError::UnexpectedError)?;
+    let db_client = p_c.deref();
 
     let check = |result: Result<u64, tokio_postgres::Error>| match result {
         Ok(c) => Ok(c),
@@ -604,7 +608,7 @@ async fn remove_data(
         "genres" => {
             for genre in data {
                 let count = check(
-                    admin_access::remove_genre().bind(&db_client, &genre).await,
+                    admin_access::remove_genre().bind(db_client, &genre).await,
                 )?;
                 tracing::info!("Removed {} genres", count);
             }
@@ -612,7 +616,7 @@ async fn remove_data(
         "moods" => {
             for mood in data {
                 let count = check(
-                    admin_access::remove_mood().bind(&db_client, &mood).await,
+                    admin_access::remove_mood().bind(db_client, &mood).await,
                 )?;
                 tracing::info!("Removed {} moods", count);
             }

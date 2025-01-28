@@ -10,6 +10,7 @@ pub mod auth;
 pub mod config;
 pub mod cornucopia;
 pub mod domain;
+pub mod helpers;
 pub mod middleware;
 pub mod object_storage;
 pub mod routes;

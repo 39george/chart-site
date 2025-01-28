@@ -46,7 +46,7 @@ impl ObjectStorage {
     pub async fn new(settings: ObjectStorageSettings) -> Self {
         // I don't know why without this it doesn't work
         let c = reqwest::Client::new();
-        let _response = c.get(&settings.endpoint_url).send().await;
+        let _response = c.get(&settings.api_endpoint).send().await;
 
         // Create Credentials object directly.
         let credentials = Credentials::new(
@@ -61,7 +61,7 @@ impl ObjectStorage {
             .region(Region::new(settings.region.clone()))
             .behavior_version(BehaviorVersion::latest())
             .credentials_provider(credentials)
-            .endpoint_url(settings.endpoint_url.clone())
+            .endpoint_url(settings.api_endpoint.clone())
             .force_path_style(true)
             .build();
         let client = Client::from_conf(config);
@@ -212,7 +212,7 @@ impl ObjectStorage {
         let form = PresignedPostData::builder(
             &self.settings.secret_access_key.expose_secret(),
             &self.settings.access_key_id.expose_secret(),
-            &self.settings.endpoint_url,
+            &self.settings.api_endpoint,
             &self.settings.region,
             &self.settings.bucket_name,
             object_key.as_ref(),
