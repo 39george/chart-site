@@ -2,13 +2,13 @@ app_port: 8000
 app_addr: "127.0.0.1"
 app_base_url: "http://127.0.0.1:8000"
 database:
-  host: "172.18.0.3"
+  host: "pg.docker.loc"
   port: 5432
 redis:
-  host: "172.18.0.4"
+  host: "redis.docker.loc"
   port: 6379
   db_number: 2
 object_storage:
-  endpoint_url: "http://172.18.0.2:3900"
+  api_endpoint: "http://172.18.0.2:3900"
   region: "garage"
   bucket_name: "chart-site-data"
