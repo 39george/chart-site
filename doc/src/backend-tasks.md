@@ -1,5 +1,6 @@
 # Tasks for backend
 
+
 | Task                                                                                         | Status                  |
 | -------------------------------------------------------------------------------------------- | ----------------------- |
 | A field `created_at` to **FetchSongs** schema                                                | Done                    |
@@ -17,3 +18,5 @@
 | Upload new backend to production                                                             | Done                    |
 | Implement cookie dark/white theme storing                                                    | Done                    |
 | Implement cookie authentication renewal                                                      | Done                    |
+| Implement cookie dark/white theme storing                                    |                         |
+
